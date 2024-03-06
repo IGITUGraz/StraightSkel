@@ -4,7 +4,18 @@
  * @date   2013-12-16
  */
 
-#include "FLMAFile.h"
+#include "db/3d/FLMAFile.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/Triangle.h"
+#include "data/3d/KernelFactory.h"
+#include "util/Configuration.h"
+#include "util/StringFuncs.h"
+#include <fstream>
+#include <vector>
 
 namespace db { namespace _3d {
 
@@ -16,25 +27,25 @@ FLMAFile::~FLMAFile() {
     // intentionally does nothing
 }
 
-PolyhedronSPtr FLMAFile::load(string filename) {
+PolyhedronSPtr FLMAFile::load(const std::string& filename) {
     PolyhedronSPtr result = PolyhedronSPtr();
-    ifstream ifs(filename.c_str());
+    std::ifstream ifs(filename.c_str());
     if (ifs.is_open()) {
         unsigned int l = 0;
         result = Polyhedron::create();
         unsigned int num_vertices = 0;
         unsigned int num_facets = 0;
         unsigned int poly_id = 0;
-        vector<VertexSPtr> vertices;
+        std::vector<VertexSPtr> vertices;
         while (ifs.good()) {
             l++;
-            string line;
+            std::string line;
             getline(ifs, line);
             if (l == 1) {
                 num_vertices = atoi(line.c_str());
             }
             if (l == 2) {
-                vector<string> str_coords =
+                std::vector<std::string> str_coords =
                         util::StringFuncs::split(line, " \t", false);
                 if (str_coords.size()%3 != 0) {
                     DEBUG_VAL("Error: " << filename << ":" << l);
@@ -48,14 +59,14 @@ PolyhedronSPtr FLMAFile::load(string filename) {
                     vertex->setID(i);
                     result->addVertex(vertex);
                 }
-                vertices = vector<VertexSPtr>(
+                vertices = std::vector<VertexSPtr>(
                         result->vertices().begin(), result->vertices().end());
             }
             if (l == 3) {
                 num_facets = atoi(line.c_str());
             }
             if (l > 3 && l%2 == 1 && poly_id < num_facets) {
-                vector<string> str_vs = util::StringFuncs::split(line, " \t", false);
+                std::vector<std::string> str_vs = util::StringFuncs::split(line, " \t", false);
                 unsigned int num_poly_vertices = str_vs.size();
                 VertexSPtr poly_vertices[num_poly_vertices];
                 for (unsigned int i = 0; i < num_poly_vertices; i++) {
@@ -85,8 +96,8 @@ PolyhedronSPtr FLMAFile::load(string filename) {
         result->setDescription("filename='"+filename+"'; ");
         double epsilon = 0.0001;
         util::ConfigurationSPtr config = util::Configuration::getInstance();
-        string section("db_3d_FLMAFile");
-        string key("epsilon_coplanarity");
+        std::string section("db_3d_FLMAFile");
+        std::string key("epsilon_coplanarity");
         if (config->contains(section, key)) {
             epsilon = config->getDouble(section, key);
         }
@@ -97,7 +108,7 @@ PolyhedronSPtr FLMAFile::load(string filename) {
     return result;
 }
 
-bool FLMAFile::save(string filename, PolyhedronSPtr polyhedron) {
+bool FLMAFile::save(const std::string& filename, PolyhedronSPtr polyhedron) {
     bool result = false;
     // TODO
     return result;

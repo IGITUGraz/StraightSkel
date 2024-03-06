@@ -7,18 +7,18 @@
  * StraightSkel is an implementation of the Straight Skeleton in 2- and
  * 3-dimensional space. It is used to animate the computation of offsets
  * of polygons and polyhedrons.
- * StraightSkel was written by Gernot Walzl in the years 2011, 2012, 2013.
+ * StraightSkel was written by Gernot Walzl
+ * mainly in the years 2011, 2012, 2013.
  */
 
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include "boost_thread.h"
+#include "debug.h"
+#include "typedefs_thread.h"
 #include "util/StringFuncs.h"
 
 #include "data/2d/ptrs.h"
 #include "data/2d/Polygon.h"
 #include "data/3d/ptrs.h"
+#include "data/3d/KernelFactory.h"
 #include "data/3d/Polyhedron.h"
 
 #include "db/2d/ptrs.h"
@@ -49,37 +49,45 @@
 #include "ui/gl/ptrs.h"
 #include "ui/gl/MainOpenGLWindow.h"
 
-
-using std::cout;
-using std::endl;
-using std::string;
-using data::_2d::PolygonSPtr;
-using data::_3d::PolyhedronSPtr;
-using algo::Controller;
-using algo::ControllerSPtr;
-using ui::gl::MainOpenGLWindow;
-using ui::gl::MainOpenGLWindowSPtr;
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <list>
+#include <string>
+#include <vector>
 
 
 void printUsage(const char* argv0) {
-    cout << "Usage: " << argv0 << " [2d|3d] [...] [GLUT_OPTIONS]" << endl;
-    cout << endl;
-    cout << "  2d options:" << endl;
-    cout << "    PolygonID" << endl;
-    cout << "    skel SkelID" << endl;
-    cout << endl;
-    cout << "  3d options:" << endl;
-    cout << "    PolyhedronID" << endl;
-    cout << "    load filename.obj" << endl;
-    cout << "    import filename.obj" << endl;
-    cout << "    skel SkelID" << endl;
-    cout << endl;
-    cout << "  general options:" << endl;
-    cout << "    --no-window" << endl;
-    cout << "    --save" << endl;
-    cout << "    --config StraightSkel.ini" << endl;
-    cout << endl;
-    cout << "Example: " << argv0 << " 3d load anything.obj" << endl;
+    std::cout << "Usage: " << argv0 << " [2d|3d] [...] [GLUT_OPTIONS]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  2d options:" << std::endl;
+    std::cout << "    PolygonID" << std::endl;
+    std::cout << "    skel SkelID" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  3d options:" << std::endl;
+    std::cout << "    PolyhedronID" << std::endl;
+    std::cout << "    load filename.obj" << std::endl;
+    std::cout << "    import filename.obj" << std::endl;
+    std::cout << "    skel SkelID" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  general options:" << std::endl;
+    std::cout << "    --no-window" << std::endl;
+    std::cout << "    --save" << std::endl;
+    std::cout << "    --save-offsets -1.0,-1.5" << std::endl;
+    std::cout << "    --config StraightSkel.ini" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Example: " << argv0 << " 3d load anything.obj" << std::endl;
+}
+
+void printCommand(int argc, const char* argv[]) {
+    std::cout << "Command: ";
+    for (int i = 0; i < argc; i++) {
+        if (i > 0) {
+            std::cout << " ";
+        }
+        std::cout << argv[i];
+    }
+    std::cout << std::endl;
 }
 
 bool isSet(const char* option, int argc, const char* argv[]) {
@@ -102,8 +110,20 @@ const char* getOption(const char* option, int argc, const char* argv[]) {
     return result;
 }
 
+std::list<double> parseCSV(const char* csv) {
+    std::list<double> values;
+    std::vector<std::string> str_vals = util::StringFuncs::split(csv, ",", false);
+    for (unsigned int cnt = 0; cnt < str_vals.size(); cnt++) {
+        values.push_back(std::stod(str_vals[cnt]));
+    }
+    values.sort(std::greater<double>());
+    return values;
+}
+
 
 int main(int argc, const char* argv[]) {
+    printCommand(argc, argv);
+
     if (argc < 3) {
         printUsage(argv[0]);
         return EXIT_FAILURE;
@@ -122,7 +142,7 @@ int main(int argc, const char* argv[]) {
     }
 
     util::ConfigurationSPtr config = util::Configuration::getInstance();
-    string str_conf_file;
+    std::string str_conf_file;
     const char* chr_conf_file = getOption("--config", argc, argv);
     if (chr_conf_file) {
         str_conf_file = chr_conf_file;
@@ -130,7 +150,7 @@ int main(int argc, const char* argv[]) {
         str_conf_file = config->findDefaultFilename();
     }
     if (!config->load(str_conf_file)) {
-        cout << "Error: Config file '" << str_conf_file << "' not found." << endl;
+        std::cout << "Error: Config file '" << str_conf_file << "' not found." << std::endl;
         if (chr_conf_file) {
             return EXIT_FAILURE;
         }
@@ -162,9 +182,9 @@ int main(int argc, const char* argv[]) {
 
     // load input
     int id = atoi(argv[2]);
-    PolygonSPtr polygon;
+    data::_2d::PolygonSPtr polygon;
     data::_2d::skel::StraightSkeletonSPtr skel2d;
-    PolyhedronSPtr polyhedron;
+    data::_3d::PolyhedronSPtr polyhedron;
     data::_3d::skel::StraightSkeletonSPtr skel3d;
     if (num_dims == 2) {
         db::_2d::PolygonDAOSPtr polygon_dao =
@@ -175,7 +195,7 @@ int main(int argc, const char* argv[]) {
                 polygon = db::_2d::FLMAFile::load(filename);
             }
             if (!polygon) {
-                cout << "Error: Unable to open '" << filename << "'." << endl;
+                std::cout << "Error: Unable to open '" << filename << "'." << std::endl;
                 return EXIT_FAILURE;
             }
         } else if (strcmp("skel", argv[2]) == 0) {
@@ -184,8 +204,8 @@ int main(int argc, const char* argv[]) {
                     db::_2d::DAOFactory::getStraightSkeletonDAO();
             skel2d = skel_dao->find(skelid);
             if (!skel2d) {
-                cout << "Error: StraightSkeleton with SkelID=" << skelid
-                    << " not found." << endl;
+                std::cout << "Error: StraightSkeleton with SkelID=" << skelid
+                    << " not found." << std::endl;
                 return EXIT_FAILURE;
             } else {
                 DEBUG_VAR(skel2d->toString());
@@ -198,20 +218,20 @@ int main(int argc, const char* argv[]) {
         } else {
             polygon = polygon_dao->find(id);
             if (!polygon) {
-                cout << "Error: Polygon with PolyID=" << id
-                    << " not found." << endl;
+                std::cout << "Error: Polygon with PolyID=" << id
+                    << " not found." << std::endl;
                 return EXIT_FAILURE;
             }
         }
         if (rand_move_points_when_degenerated && !rand_move_points) {
-            cout << "Checking for parallel lines." << endl;
+            std::cout << "Checking for parallel lines." << std::endl;
             if (algo::_2d::PolygonTransformation::hasParallelLines(polygon)) {
-                cout << "Warning: Polygon has parallel lines." << endl;
+                std::cout << "Warning: Polygon has parallel lines." << std::endl;
                 rand_move_points = true;
             }
         }
         if (rand_move_points) {
-            cout << "Points will be moved randomly." << endl;
+            std::cout << "Points will be moved randomly." << std::endl;
             algo::_2d::PolygonTransformation::randMovePoints(polygon, rand_move_points_range);
         }
         if (translate_and_scale_view) {
@@ -230,8 +250,8 @@ int main(int argc, const char* argv[]) {
             }
         }
         if (!polygon->isConsistent()) {
-            cout << "Warning: Polygon with PolyID=" << id
-                 << " is not consistent." << endl;
+            std::cout << "Warning: Polygon with PolyID=" << id
+                << " is not consistent." << std::endl;
         }
         DEBUG_VAR(polygon->toString());
     } else if (num_dims == 3) {
@@ -256,7 +276,7 @@ int main(int argc, const char* argv[]) {
                 polyhedron = db::_3d::FLMAFile::load(filename);
             }
             if (!polyhedron) {
-                cout << "Error: Unable to open '" << filename << "'." << endl;
+                std::cout << "Error: Unable to open '" << filename << "'." << std::endl;
                 return EXIT_FAILURE;
             }
         } else if (strcmp("skel", argv[2]) == 0) {
@@ -265,8 +285,8 @@ int main(int argc, const char* argv[]) {
                     db::_3d::DAOFactory::getStraightSkeletonDAO();
             skel3d = skel_dao->find(skelid);
             if (!skel3d) {
-                cout << "Error: StraightSkeleton with SkelID=" << skelid
-                    << " not found." << endl;
+                std::cout << "Error: StraightSkeleton with SkelID=" << skelid
+                    << " not found." << std::endl;
                 return EXIT_FAILURE;
             } else {
                 DEBUG_VAR(skel3d->toString());
@@ -279,38 +299,38 @@ int main(int argc, const char* argv[]) {
         } else if (strcmp("import", argv[2]) == 0) {
             polyhedron = db::_3d::OBJFile::load(argv[3]);
             if (!polyhedron) {
-                cout << "Error: Polyhedron '" << argv[3] << "' not found."
-                        << endl;
+                std::cout << "Error: Polyhedron '" << argv[3] << "' not found."
+                    << std::endl;
                 return EXIT_FAILURE;
             }
             if (polyhedron->isConsistent()) {
                 if (polyhedron_dao->insert(polyhedron) > 0) {
-                    cout << argv[3] << " imported: PolyhedronID="
-                            << polyhedron->getID() << endl;
+                    std::cout << argv[3] << " imported: PolyhedronID="
+                        << polyhedron->getID() << std::endl;
                     return EXIT_SUCCESS;
                 } else {
-                    cout << "Error: Not able to import polyhedron." << endl;
+                    std::cout << "Error: Not able to import polyhedron." << std::endl;
                     return EXIT_FAILURE;
                 }
             } else {
-                cout << "Error: Polyhedron is not consistent and "
-                        << "will not be imported." << endl;
+                std::cout << "Error: Polyhedron is not consistent and "
+                    << "will not be imported." << std::endl;
                 return EXIT_FAILURE;
             }
         } else {
             polyhedron = polyhedron_dao->find(id);
             if (!polyhedron) {
-                cout << "Error: Polyhedron with PolyhedronID=" << id
-                     << " not found." << endl;
+                std::cout << "Error: Polyhedron with PolyhedronID=" << id
+                    << " not found." << std::endl;
                 return EXIT_FAILURE;
             }
         }
         if (rand_move_points_when_degenerated && !rand_move_points) {
-            cout << "Checking if all combinations of 3 facet supporting planes intersect in a point." << endl;
-            cout << "In case this takes too long, "
-                 << "you may disable 'rand_move_points_when_degenerated'." << endl;
+            std::cout << "Checking if all combinations of 3 facet supporting planes intersect in a point." << std::endl;
+            std::cout << "In case this takes too long, "
+                << "you may disable 'rand_move_points_when_degenerated'." << std::endl;
             if (!algo::_3d::PolyhedronTransformation::doAll3PlanesIntersect(polyhedron)) {
-                cout << "Warning: Not all combinations of 3 planes intersect." << endl;
+                std::cout << "Warning: Not all combinations of 3 planes intersect." << std::endl;
                 rand_move_points = true;
             }
         }
@@ -323,9 +343,10 @@ int main(int argc, const char* argv[]) {
                     polyhedron, p_box_min, p_box_max);
         }
         if (rand_move_points) {
-            cout << "Points will be moved randomly." << endl;
+            std::cout << "Points will be moved randomly. "
+                 << "(rand_move_points_range=" << rand_move_points_range << ")" << std::endl;
             algo::_3d::PolyhedronTransformation::randMovePoints(polyhedron, rand_move_points_range);
-            string description = polyhedron->getDescription();
+            std::string description = polyhedron->getDescription();
             polyhedron = algo::_3d::SimpleStraightSkel::shiftFacets(polyhedron, 0.0);
             polyhedron->clearData();
             polyhedron->setDescription(description);
@@ -346,18 +367,18 @@ int main(int argc, const char* argv[]) {
             }
         }
         if (!polyhedron->isConsistent()) {
-            cout << "Warning: Polyhedron with PolyhedronID=" << id
-                 << " is not consistent." << endl;
+            std::cout << "Warning: Polyhedron with PolyhedronID=" << id
+                 << " is not consistent." << std::endl;
         }
         DEBUG_VAR(polyhedron->toString());
     }
 
     // create OpenGL window
     bool no_window = isSet("--no-window", argc, argv);
-    ControllerSPtr controller;
-    MainOpenGLWindowSPtr window;
+    algo::ControllerSPtr controller;
+    ui::gl::MainOpenGLWindowSPtr window;
     if (!no_window) {
-        controller = Controller::create();
+        controller = algo::Controller::create();
         controller->togglePause();
         int width = config->getInt("ui_gl_MainOpenGLWindow", "width");
         if (width == 0) {
@@ -367,7 +388,13 @@ int main(int argc, const char* argv[]) {
         if (height == 0) {
             height = 600;
         }
-        window = MainOpenGLWindow::create(argc, argv, width, height, controller);
+        window = ui::gl::MainOpenGLWindow::create(argc, argv, width, height, controller);
+    }
+
+    std::list<double> save_offsets;
+    const char* chr_save_offsets = getOption("--save-offsets", argc, argv);
+    if (chr_save_offsets) {
+        save_offsets = parseCSV(chr_save_offsets);
     }
 
     // run algorithm
@@ -377,8 +404,8 @@ int main(int argc, const char* argv[]) {
     algo::_2d::SimpleStraightSkelSPtr algoskel2d;
     algo::_3d::SimpleStraightSkelSPtr algoskel3d;
     if (num_dims == 2) {
-        algoskel2d =
-                algo::_2d::SimpleStraightSkel::create(polygon, controller);
+        algoskel2d = algo::_2d::SimpleStraightSkel::create(
+                polygon, controller);
         if (window) {
             window->setPolygon(polygon);
             if (skel2d) {
@@ -389,8 +416,8 @@ int main(int argc, const char* argv[]) {
             algoskel2d->run();
         }
     } else if (num_dims == 3) {
-        algoskel3d =
-                algo::_3d::SimpleStraightSkel::create(polyhedron, controller);
+        algoskel3d = algo::_3d::SimpleStraightSkel::create(
+                polyhedron, controller, save_offsets);
         if (window) {
             window->setPolyhedron(polyhedron);
             if (skel3d) {
@@ -417,14 +444,14 @@ int main(int argc, const char* argv[]) {
             if (skel2d) {
                 db::_2d::DAOFactory::getPolygonDAO()->insert(polygon);
                 db::_2d::DAOFactory::getStraightSkeletonDAO()->insert(skel2d);
-                cout << "SkelID=" << skel2d->getID() << endl;
+                std::cout << "SkelID=" << skel2d->getID() << std::endl;
             }
         } else if (num_dims == 3) {
             skel3d = algoskel3d->getResult();
             if (skel3d) {
                 db::_3d::DAOFactory::getPolyhedronDAO()->insert(polyhedron);
                 db::_3d::DAOFactory::getStraightSkeletonDAO()->insert(skel3d);
-                cout << "SkelID=" << skel3d->getID() << endl;
+                std::cout << "SkelID=" << skel3d->getID() << std::endl;
             }
         }
     }
@@ -457,4 +484,3 @@ int main(int argc, const char* argv[]) {
 
     return EXIT_SUCCESS;
 }
-

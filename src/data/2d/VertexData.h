@@ -5,11 +5,9 @@
  */
 
 #ifndef DATA_2D_VERTEXDATA_H
-#define	DATA_2D_VERTEXDATA_H
+#define DATA_2D_VERTEXDATA_H
 
-#include "debug.h"
 #include "data/2d/ptrs.h"
-#include "data/2d/Vertex.h"
 
 namespace data { namespace _2d {
 
@@ -34,5 +32,5 @@ protected:
 
 } }
 
-#endif	/* DATA_2D_VERTEXDATA_H */
+#endif /* DATA_2D_VERTEXDATA_H */
 

@@ -5,21 +5,13 @@
  */
 
 #ifndef DATA_2D_VERTEX_H
-#define	DATA_2D_VERTEX_H
+#define DATA_2D_VERTEX_H
 
-#include <cmath>
+#include "data/2d/ptrs.h"
 #include <list>
 #include <string>
-#include "debug.h"
-#include "util/StringFactory.h"
-#include "data/2d/ptrs.h"
-#include "data/2d/Edge.h"
 
 namespace data { namespace _2d {
-
-using std::list;
-using std::string;
-using util::StringFactory;
 
 class Vertex {
 public:
@@ -37,8 +29,8 @@ public:
     void setEdgeOut(EdgeSPtr edge);
     PolygonSPtr getPolygon() const;
     void setPolygon(PolygonSPtr polygon);
-    list<VertexSPtr>::iterator getListIt() const;
-    void setListIt(list<VertexSPtr>::iterator list_it);
+    std::list<VertexSPtr>::iterator getListIt() const;
+    void setListIt(std::list<VertexSPtr>::iterator list_it);
     VertexDataSPtr getData() const;
     void setData(VertexDataSPtr data);
     bool hasData() const;
@@ -55,7 +47,7 @@ public:
     double angle() const;
     bool isReflex() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Vertex(Point2SPtr point);
@@ -64,12 +56,12 @@ protected:
     EdgeWPtr edge_in_;
     EdgeWPtr edge_out_;
     PolygonWPtr polygon_;
-    list<VertexSPtr>::iterator list_it_;
+    std::list<VertexSPtr>::iterator list_it_;
     VertexDataSPtr data_;
     int id_;
 };
 
 } }
 
-#endif	/* DATA_2D_VERTEX_H */
+#endif /* DATA_2D_VERTEX_H */
 

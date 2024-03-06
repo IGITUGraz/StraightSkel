@@ -5,9 +5,9 @@
  */
 
 #ifndef ALGO_2D_PTRS_H
-#define	ALGO_2D_PTRS_H
+#define ALGO_2D_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace algo { namespace _2d {
 
@@ -24,5 +24,4 @@ typedef WEAK_PTR<SkelMeshGenerator> SkelMeshGeneratorWPtr;
 
 } }
 
-#endif	/* ALGO_2D_PTRS_H */
-
+#endif /* ALGO_2D_PTRS_H */

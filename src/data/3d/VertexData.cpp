@@ -4,7 +4,9 @@
  * @date   2011-11-22
  */
 
-#include "VertexData.h"
+#include "data/3d/VertexData.h"
+
+#include "data/3d/Vertex.h"
 
 namespace data { namespace _3d {
 

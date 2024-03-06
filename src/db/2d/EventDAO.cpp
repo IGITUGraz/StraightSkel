@@ -4,7 +4,16 @@
  * @date   2013-06-04
  */
 
-#include "EventDAO.h"
+#include "db/2d/EventDAO.h"
+
+#include "data/2d/skel/ConstOffsetEvent.h"
+#include "data/2d/skel/EdgeEvent.h"
+#include "data/2d/skel/SplitEvent.h"
+#include "data/2d/skel/TriangleEvent.h"
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/2d/NodeDAO.h"
+#include "db/2d/StraightSkeletonDAO.h"
 
 namespace db { namespace _2d {
 
@@ -16,8 +25,8 @@ EventDAO::~EventDAO() {
     // intentionally does nothing
 }
 
-string EventDAO::getTableSchema() const {
-    string schema("CREATE TABLE Events (\n"
+std::string EventDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Events (\n"
             "  SkelID INTEGER NOT NULL,\n"
             "  EventID INTEGER NOT NULL,\n"
             "  etype INTEGER,\n"
@@ -30,7 +39,7 @@ string EventDAO::getTableSchema() const {
 int EventDAO::nextEventID(int skelid) {
     int eventid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(EventID) FROM Events WHERE SkelID=?;");
+    std::string sql("SELECT MAX(EventID) FROM Events WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -56,11 +65,11 @@ int EventDAO::insert(AbstractEventSPtr event) {
     if (skelid > 0) {
         NodeSPtr node;
         if (event->getType() == AbstractEvent::EDGE_EVENT) {
-            node = dynamic_pointer_cast<data::_2d::skel::EdgeEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_2d::skel::EdgeEvent>(event)->getNode();
         } else if (event->getType() == AbstractEvent::SPLIT_EVENT) {
-            node = dynamic_pointer_cast<data::_2d::skel::SplitEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_2d::skel::SplitEvent>(event)->getNode();
         } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-            node = dynamic_pointer_cast<data::_2d::skel::TriangleEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_2d::skel::TriangleEvent>(event)->getNode();
         }
         int eventid = nextEventID(skelid);
         if (node) {
@@ -70,7 +79,7 @@ int EventDAO::insert(AbstractEventSPtr event) {
             } else {
                 dao_node->insert(node);
             }
-            string sql("INSERT INTO Events (SkelID, EventID, etype, NID) "
+            std::string sql("INSERT INTO Events (SkelID, EventID, etype, NID) "
                     "VALUES (?, ?, ?, ?);");
             SQLiteStmtSPtr stmt = db->prepare(sql);
             if (stmt) {
@@ -84,7 +93,7 @@ int EventDAO::insert(AbstractEventSPtr event) {
                 }
             }
         } else {
-            string sql("INSERT INTO Events (SkelID, EventID, etype) "
+            std::string sql("INSERT INTO Events (SkelID, EventID, etype) "
                     "VALUES (?, ?, ?);");
             SQLiteStmtSPtr stmt = db->prepare(sql);
             if (stmt) {
@@ -112,7 +121,7 @@ bool EventDAO::del(AbstractEventSPtr event) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Events WHERE SkelID=? AND EventID=?;");
+    std::string sql("DELETE FROM Events WHERE SkelID=? AND EventID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -130,7 +139,7 @@ bool EventDAO::del(AbstractEventSPtr event) {
 AbstractEventSPtr EventDAO::find(int skelid, int eventid) {
     AbstractEventSPtr result;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT etype, NID FROM Events WHERE SkelID=? AND EventID=?;");
+    std::string sql("SELECT etype, NID FROM Events WHERE SkelID=? AND EventID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);

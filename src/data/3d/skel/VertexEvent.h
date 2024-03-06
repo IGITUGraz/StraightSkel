@@ -5,15 +5,11 @@
  */
 
 #ifndef DATA_3D_SKEL_VERTEXEVENT_H
-#define	DATA_3D_SKEL_VERTEXEVENT_H
+#define DATA_3D_SKEL_VERTEXEVENT_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
 #include "data/3d/skel/ptrs.h"
 #include "data/3d/skel/AbstractEvent.h"
-#include "data/3d/skel/Node.h"
-#include "data/3d/skel/SkelVertexData.h"
 
 namespace data { namespace _3d { namespace skel {
 
@@ -44,5 +40,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_VERTEXEVENT_H */
+#endif /* DATA_3D_SKEL_VERTEXEVENT_H */
 

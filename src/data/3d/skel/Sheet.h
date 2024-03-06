@@ -5,25 +5,17 @@
  */
 
 #ifndef DATA_3D_SKEL_SHEET_H
-#define	DATA_3D_SKEL_SHEET_H
+#define DATA_3D_SKEL_SHEET_H
 
-#include <list>
-#include <string>
-#include "debug.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/Facet.h"
 #include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/Node.h"
-#include "data/3d/skel/Arc.h"
+#include <list>
+#include <memory>
+#include <string>
 
 namespace data { namespace _3d { namespace skel {
 
-using std::list;
-using std::string;
-using std::stringstream;
-
-class Sheet : public boost::enable_shared_from_this<Sheet> {
+class Sheet : public std::enable_shared_from_this<Sheet> {
 public:
     virtual ~Sheet();
     static SheetSPtr create();
@@ -35,8 +27,8 @@ public:
 
     StraightSkeletonSPtr getSkel() const;
     void setSkel(StraightSkeletonSPtr skel);
-    list<SheetSPtr>::iterator getListIt() const;
-    void setListIt(list<SheetSPtr>::iterator list_it);
+    std::list<SheetSPtr>::iterator getListIt() const;
+    void setListIt(std::list<SheetSPtr>::iterator list_it);
 
     int getID() const;
     void setID(int id);
@@ -50,24 +42,23 @@ public:
     void addArc(ArcSPtr arc);
     bool removeArc(ArcSPtr arc);
 
-    list<ArcSPtr>& arcs();
-    list<NodeSPtr>& nodes();
+    std::list<ArcSPtr>& arcs();
+    std::list<NodeSPtr>& nodes();
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Sheet();
     FacetSPtr facet_b_;
     FacetSPtr facet_f_;
-    list<ArcSPtr> arcs_;
-    list<NodeSPtr> nodes_;
+    std::list<ArcSPtr> arcs_;
+    std::list<NodeSPtr> nodes_;
     StraightSkeletonWPtr skel_;
-    list<SheetSPtr>::iterator list_it_;
+    std::list<SheetSPtr>::iterator list_it_;
     Plane3SPtr plane_;
     int id_;
 };
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SHEET_H */
-
+#endif /* DATA_3D_SKEL_SHEET_H */

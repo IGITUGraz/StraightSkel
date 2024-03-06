@@ -4,7 +4,14 @@
  * @date   2012-11-28
  */
 
-#include "CircularArc.h"
+#include "data/3d/skel/CircularArc.h"
+
+#include "debug.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/SphericalSkeleton.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _3d { namespace skel {
 
@@ -48,11 +55,11 @@ void CircularArc::setNodeSrc(CircularNodeSPtr node_src) {
 }
 
 
-list<CircularArcWPtr>::iterator CircularArc::getNodeSrcListIt() const {
+std::list<CircularArcWPtr>::iterator CircularArc::getNodeSrcListIt() const {
     return this->node_src_list_it_;
 }
 
-void CircularArc::setNodeSrcListIt(list<CircularArcWPtr>::iterator node_src_list_it) {
+void CircularArc::setNodeSrcListIt(std::list<CircularArcWPtr>::iterator node_src_list_it) {
     this->node_src_list_it_ = node_src_list_it;
 }
 
@@ -65,11 +72,11 @@ void CircularArc::setNodeDst(CircularNodeSPtr node_dst) {
     this->node_dst_ = node_dst;
 }
 
-list<CircularArcWPtr>::iterator CircularArc::getNodeDstListIt() const {
+std::list<CircularArcWPtr>::iterator CircularArc::getNodeDstListIt() const {
     return this->node_dst_list_it_;
 }
 
-void CircularArc::setNodeDstListIt(list<CircularArcWPtr>::iterator node_dst_list_it) {
+void CircularArc::setNodeDstListIt(std::list<CircularArcWPtr>::iterator node_dst_list_it) {
     this->node_dst_list_it_ = node_dst_list_it;
 }
 
@@ -121,11 +128,11 @@ void CircularArc::setSkel(SphericalSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<CircularArcSPtr>::iterator CircularArc::getListIt() const {
+std::list<CircularArcSPtr>::iterator CircularArc::getListIt() const {
     return this->list_it_;
 }
 
-void CircularArc::setListIt(list<CircularArcSPtr>::iterator list_it) {
+void CircularArc::setListIt(std::list<CircularArcSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -137,16 +144,16 @@ bool CircularArc::hasNodeDst() const {
     return result;
 }
 
-string CircularArc::toString() const {
-    string result("CircularArc(");
-    result += StringFactory::fromPointer(this) + ", ";
+std::string CircularArc::toString() const {
+    std::string result("CircularArc(");
+    result += util::StringFactory::fromPointer(this) + ", ";
     result += "src=" + node_src_->toString() + ", ";
     if (node_dst_) {
         result += "dst=" + node_dst_->toString();
     } else {
-        result += "dir=<" + StringFactory::fromDouble((*direction_)[0]) + ", " +
-                StringFactory::fromDouble((*direction_)[1]) + ", " +
-                StringFactory::fromDouble((*direction_)[2]) + ">";
+        result += "dir=<" + util::StringFactory::fromDouble((*direction_)[0]) + ", " +
+                util::StringFactory::fromDouble((*direction_)[1]) + ", " +
+                util::StringFactory::fromDouble((*direction_)[2]) + ">";
     }
     result += ")";
     return result;

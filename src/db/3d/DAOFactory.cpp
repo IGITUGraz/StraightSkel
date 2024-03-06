@@ -4,7 +4,24 @@
  * @date   2012-01-27
  */
 
-#include "DAOFactory.h"
+#include "db/3d/DAOFactory.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/PointDAO.h"
+#include "db/3d/PlaneDAO.h"
+#include "db/3d/VertexDAO.h"
+#include "db/3d/EdgeDAO.h"
+#include "db/3d/TriangleDAO.h"
+#include "db/3d/FacetDAO.h"
+#include "db/3d/PolyhedronDAO.h"
+#include "db/3d/NodeDAO.h"
+#include "db/3d/ArcDAO.h"
+#include "db/3d/SheetDAO.h"
+#include "db/3d/EventDAO.h"
+#include "db/3d/StraightSkeletonDAO.h"
+#include <cstdlib>
+#include <fstream>
 
 namespace db { namespace _3d {
 
@@ -49,16 +66,16 @@ DAOFactory::~DAOFactory() {
     db_.reset();
 }
 
-string DAOFactory::findDefaultFilename() {
-    string name("StraightSkel");
-    string filename("skeldata3d.db3");
-    string result = filename;
-    string home(getenv("HOME"));
+std::string DAOFactory::findDefaultFilename() {
+    std::string name("StraightSkel");
+    std::string filename("skeldata3d.db3");
+    std::string result = filename;
+    std::string home(getenv("HOME"));
 //    boost::filesystem::path p(home+"/."+name);
 //    if (boost::filesystem::is_directory(p)) {
 //        result = home+"/."+name+"/"+filename;
 //    }
-    string filenames[2];
+    std::string filenames[2];
     filenames[0] = filename;
     filenames[1] = home+"/."+name+"/"+filename;
     for (unsigned int i = 0; i < 1; i++) {
@@ -74,7 +91,7 @@ string DAOFactory::findDefaultFilename() {
 
 bool DAOFactory::createTables() {
     bool result = true;
-    string sql[13];
+    std::string sql[13];
     sql[0] = getPointDAO()->getTableSchema();
     sql[1] = getPlaneDAO()->getTableSchema();
     sql[2] = getVertexDAO()->getTableSchema();
@@ -102,7 +119,7 @@ bool DAOFactory::createTables() {
 SQLiteDatabaseSPtr DAOFactory::getDB() {
     if (!db_) {
         db_ = SQLiteDatabaseSPtr(new SQLiteDatabase());
-        string filename = findDefaultFilename();
+        std::string filename = findDefaultFilename();
         std::ifstream input(filename.c_str());
         if (input.is_open()) {
             input.close();

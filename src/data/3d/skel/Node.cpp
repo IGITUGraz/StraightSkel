@@ -4,7 +4,13 @@
  * @date   2012-03-27
  */
 
-#include "Node.h"
+#include "data/3d/skel/Node.h"
+
+#include "data/3d/KernelFactory.h"
+#include "data/3d/skel/Arc.h"
+#include "debug.h"
+#include "util/StringFactory.h"
+#include <algorithm>
 
 namespace data { namespace _3d { namespace skel {
 
@@ -52,11 +58,11 @@ void Node::setSkel(StraightSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<NodeSPtr>::iterator Node::getListIt() const {
+std::list<NodeSPtr>::iterator Node::getListIt() const {
     return this->list_it_;
 }
 
-void Node::setListIt(list<NodeSPtr>::iterator list_it) {
+void Node::setListIt(std::list<NodeSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -69,7 +75,7 @@ void Node::setID(int id) {
 }
 
 void Node::addArc(ArcSPtr arc) {
-    list<ArcWPtr>::iterator it = arcs_.insert(arcs_.end(), ArcWPtr(arc));
+    std::list<ArcWPtr>::iterator it = arcs_.insert(arcs_.end(), ArcWPtr(arc));
     if (arc->getNodeSrc() == shared_from_this()) {
         arc->setNodeSrcListIt(it);
     } else if (arc->hasNodeDst()) {
@@ -83,12 +89,12 @@ bool Node::removeArc(ArcSPtr arc) {
     bool result = false;
     if (arc->getNodeSrc() == shared_from_this()) {
         arcs_.erase(arc->getNodeSrcListIt());
-        arc->setNodeSrcListIt(list<ArcWPtr>::iterator());
+        arc->setNodeSrcListIt(std::list<ArcWPtr>::iterator());
         result = true;
     } else if (arc->hasNodeDst()) {
         if (arc->getNodeDst() == shared_from_this()) {
             arcs_.erase(arc->getNodeDstListIt());
-            arc->setNodeDstListIt(list<ArcWPtr>::iterator());
+            arc->setNodeDstListIt(std::list<ArcWPtr>::iterator());
             result = true;
         }
     }
@@ -101,9 +107,9 @@ void Node::addSheet(SheetSPtr sheet) {
 
 bool Node::removeSheet(SheetSPtr sheet) {
     bool result = false;
-    list<SheetWPtr>::iterator it = sheets_.begin();
+    std::list<SheetWPtr>::iterator it = sheets_.begin();
     while (it != sheets_.end()) {
-        list<SheetWPtr>::iterator it_current = it;
+        std::list<SheetWPtr>::iterator it_current = it;
         SheetWPtr sheet_wptr = *it++;
         if (!sheet_wptr.expired()) {
             if (sheet_wptr.lock() == sheet) {
@@ -131,7 +137,7 @@ bool Node::containsSheet(SheetSPtr sheet) const {
 }
 
 void Node::clear() {
-    list<SheetWPtr>::iterator it_s = sheets_.begin();
+    std::list<SheetWPtr>::iterator it_s = sheets_.begin();
     while (it_s != sheets_.end()) {
         SheetWPtr sheet_wptr = *it_s++;
         if (!sheet_wptr.expired()) {
@@ -140,7 +146,7 @@ void Node::clear() {
         }
     }
     sheets_.clear();
-    list<ArcWPtr>::iterator it_a = arcs_.begin();
+    std::list<ArcWPtr>::iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         ArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -151,17 +157,17 @@ void Node::clear() {
     arcs_.clear();
 }
 
-list<ArcWPtr>& Node::arcs() {
+std::list<ArcWPtr>& Node::arcs() {
     return this->arcs_;
 }
 
-list<SheetWPtr>& Node::sheets() {
+std::list<SheetWPtr>& Node::sheets() {
     return this->sheets_;
 }
 
 unsigned int Node::degree() const {
     unsigned int result = 0;
-    list<ArcWPtr>::const_iterator it_a = arcs_.begin();
+    std::list<ArcWPtr>::const_iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         ArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -195,16 +201,16 @@ double Node::getZ() const {
 #endif
 }
 
-string Node::toString() const {
-    string result("Node(");
+std::string Node::toString() const {
+    std::string result("Node(");
     if (id_ != -1) {
-        result += "id=" + StringFactory::fromInteger(id_) + ", ";
+        result += "id=" + util::StringFactory::fromInteger(id_) + ", ";
     } else {
-        result += StringFactory::fromPointer(this) + ", ";
+        result += util::StringFactory::fromPointer(this) + ", ";
     }
-    result += "<" +StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ", ";
-    result += StringFactory::fromDouble(getZ()) + ">)";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ", ";
+    result += util::StringFactory::fromDouble(getZ()) + ">)";
     return result;
 }
 

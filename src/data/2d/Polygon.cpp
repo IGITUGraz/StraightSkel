@@ -4,7 +4,13 @@
  * @date   2011-11-22
  */
 
-#include "Polygon.h"
+#include "data/2d/Polygon.h"
+
+#include "data/2d/Edge.h"
+#include "data/2d/Vertex.h"
+#include "debug.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _2d {
 
@@ -32,7 +38,7 @@ PolygonSPtr Polygon::create(unsigned int num_edges, EdgeSPtr edges[]) {
 }
 
 void Polygon::addVertex(VertexSPtr vertex) {
-    list<VertexSPtr>::iterator it = vertices_.insert(vertices_.end(), vertex);
+    std::list<VertexSPtr>::iterator it = vertices_.insert(vertices_.end(), vertex);
     vertex->setPolygon(shared_from_this());
     vertex->setListIt(it);
 }
@@ -42,7 +48,7 @@ bool Polygon::removeVertex(VertexSPtr vertex) {
     if (vertex->getPolygon() == shared_from_this()) {
         vertices_.erase(vertex->getListIt());
         vertex->setPolygon(PolygonSPtr());
-        vertex->setListIt(list<VertexSPtr>::iterator());
+        vertex->setListIt(std::list<VertexSPtr>::iterator());
         EdgeSPtr edge = vertex->getEdgeIn();
         if (edge) {
             this->removeEdge(edge);
@@ -59,7 +65,7 @@ bool Polygon::removeVertex(VertexSPtr vertex) {
 }
 
 void Polygon::addEdge(EdgeSPtr edge) {
-    list<EdgeSPtr>::iterator it = edges_.insert(edges_.end(), edge);
+    std::list<EdgeSPtr>::iterator it = edges_.insert(edges_.end(), edge);
     edge->setPolygon(shared_from_this());
     edge->setListIt(it);
     VertexSPtr vertex = edge->getVertexSrc();
@@ -77,7 +83,7 @@ bool Polygon::removeEdge(EdgeSPtr edge) {
     if (edge->getPolygon() == shared_from_this()) {
         edges_.erase(edge->getListIt());
         edge->setPolygon(PolygonSPtr());
-        edge->setListIt(list<EdgeSPtr>::iterator());
+        edge->setListIt(std::list<EdgeSPtr>::iterator());
         VertexSPtr vertex = edge->getVertexSrc();
         if (vertex->getEdgeOut() == edge) {
             vertex->setEdgeOut(EdgeSPtr());
@@ -92,7 +98,7 @@ bool Polygon::removeEdge(EdgeSPtr edge) {
 }
 
 void Polygon::sortEdges() {
-    list<EdgeSPtr> temp;
+    std::list<EdgeSPtr> temp;
     while (edges_.size() > 0) {
         EdgeSPtr first = EdgeSPtr();
         EdgeSPtr edge = edges_.front();
@@ -106,7 +112,7 @@ void Polygon::sortEdges() {
         }
     }
     edges_.clear();
-    list<EdgeSPtr>::iterator it_e = temp.begin();
+    std::list<EdgeSPtr>::iterator it_e = temp.begin();
     while (it_e != temp.end()) {
         EdgeSPtr edge = *it_e++;
         edge->setListIt(edges_.insert(edges_.end(), edge));
@@ -114,12 +120,12 @@ void Polygon::sortEdges() {
 }
 
 void Polygon::clear() {
-    list<EdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         this->removeEdge(edge);
     }
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         this->removeVertex(vertex);
@@ -130,11 +136,11 @@ SharedMutex& Polygon::mutex() {
     return this->mutex_;
 }
 
-list<VertexSPtr>& Polygon::vertices() {
+std::list<VertexSPtr>& Polygon::vertices() {
     return this->vertices_;
 }
 
-list<EdgeSPtr>& Polygon::edges() {
+std::list<EdgeSPtr>& Polygon::edges() {
     return this->edges_;
 }
 
@@ -147,12 +153,12 @@ void Polygon::setID(int id) {
 }
 
 void Polygon::resetAllIDs() {
-    list<EdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         edge->setID(-1);
     }
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         vertex->setID(-1);
@@ -162,7 +168,7 @@ void Polygon::resetAllIDs() {
 
 bool Polygon::isConsistent() const {
     bool result = true;
-    list<VertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->getPolygon() != shared_from_this()) {
@@ -184,7 +190,7 @@ bool Polygon::isConsistent() const {
             }
         }
     }
-    list<EdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         if (edge->getPolygon() != shared_from_this()) {
@@ -217,7 +223,7 @@ bool Polygon::isConsistent() const {
 
 int Polygon::countReflex() const {
     int result = 0;
-    list<VertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->isReflex()) {
@@ -231,7 +237,7 @@ int Polygon::countHoles() const {
     int result = -1;
     EdgeSPtr edge;
     EdgeSPtr edge_prev;
-    list<EdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         edge = *it_e++;
         if (edge->getVertexSrc()->getEdgeIn() != edge_prev) {
@@ -242,35 +248,35 @@ int Polygon::countHoles() const {
     return result;
 }
 
-string Polygon::getDescription() const {
+std::string Polygon::getDescription() const {
     return this->description_;
 }
 
-void Polygon::setDescription(string desc) {
+void Polygon::setDescription(const std::string& desc) {
     this->description_ = desc;
 }
 
-void Polygon::appendDescription(string desc) {
+void Polygon::appendDescription(const std::string& desc) {
     this->description_.append(desc);
 }
 
-string Polygon::toString() const {
-    stringstream sstr;
+std::string Polygon::toString() const {
+    std::stringstream sstr;
     sstr << "Polygon(";
     if (id_ != -1) {
-        sstr << "id=" << StringFactory::fromInteger(id_) << ", ";
+        sstr << "id=" << util::StringFactory::fromInteger(id_) << ", ";
     } else {
-        sstr << StringFactory::fromPointer(this) << ", ";
+        sstr << util::StringFactory::fromPointer(this) << ", ";
     }
-    sstr << "Vertices:" + StringFactory::fromInteger(vertices_.size()) + ", ";
-    sstr << "Edges:" + StringFactory::fromInteger(edges_.size()) + ",\n";
-    list<VertexSPtr>::const_iterator it_v = vertices_.begin();
+    sstr << "Vertices:" + util::StringFactory::fromInteger(vertices_.size()) + ", ";
+    sstr << "Edges:" + util::StringFactory::fromInteger(edges_.size()) + ",\n";
+    std::list<VertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         sstr << "\t" << vertex->toString() << "\n";
     }
     sstr << "\n";
-    list<EdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::const_iterator it_e = edges_.begin();
         while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         sstr << "\t" << edge->toString() << "\n";

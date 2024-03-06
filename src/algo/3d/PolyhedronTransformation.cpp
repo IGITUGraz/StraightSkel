@@ -4,7 +4,18 @@
  * @date   2012-09-01
  */
 
-#include "PolyhedronTransformation.h"
+#include "algo/3d/PolyhedronTransformation.h"
+
+#include "algo/3d/KernelWrapper.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "util/StringFactory.h"
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+#include <list>
+#include <limits>
 
 namespace algo { namespace _3d {
 
@@ -17,7 +28,7 @@ PolyhedronTransformation::~PolyhedronTransformation() {
 }
 
 void PolyhedronTransformation::translate(PolyhedronSPtr polyhedron, Vector3SPtr v_t) {
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point3SPtr p = vertex->getPoint();
@@ -27,13 +38,13 @@ void PolyhedronTransformation::translate(PolyhedronSPtr polyhedron, Vector3SPtr 
     polyhedron->initPlanes();
 
     polyhedron->appendDescription("translate=<" +
-            StringFactory::fromDouble((*v_t)[0]) + ", " +
-            StringFactory::fromDouble((*v_t)[1]) + ", " +
-            StringFactory::fromDouble((*v_t)[2]) + ">; ");
+            util::StringFactory::fromDouble((*v_t)[0]) + ", " +
+            util::StringFactory::fromDouble((*v_t)[1]) + ", " +
+            util::StringFactory::fromDouble((*v_t)[2]) + ">; ");
 }
 
 void PolyhedronTransformation::scale(PolyhedronSPtr polyhedron, Vector3SPtr v_s) {
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point3SPtr p = vertex->getPoint();
@@ -44,17 +55,17 @@ void PolyhedronTransformation::scale(PolyhedronSPtr polyhedron, Vector3SPtr v_s)
     polyhedron->initPlanes();
 
     polyhedron->appendDescription("scale=<" +
-            StringFactory::fromDouble((*v_s)[0]) + ", " +
-            StringFactory::fromDouble((*v_s)[1]) + ", " +
-            StringFactory::fromDouble((*v_s)[2]) + ">; ");
+            util::StringFactory::fromDouble((*v_s)[0]) + ", " +
+            util::StringFactory::fromDouble((*v_s)[1]) + ", " +
+            util::StringFactory::fromDouble((*v_s)[2]) + ">; ");
 }
 
 bool PolyhedronTransformation::hasParallelPlanes(PolyhedronSPtr polyhedron) {
     bool result = false;
-    list<FacetSPtr>::iterator it_f1 = polyhedron->facets().begin();
+    std::list<FacetSPtr>::iterator it_f1 = polyhedron->facets().begin();
     while (it_f1 != polyhedron->facets().end()) {
         FacetSPtr facet1 = *it_f1++;
-        list<FacetSPtr>::iterator it_f2 = it_f1;
+        std::list<FacetSPtr>::iterator it_f2 = it_f1;
         while (it_f2 != polyhedron->facets().end()) {
             FacetSPtr facet2 = *it_f2++;
             if (!KernelWrapper::intersection(
@@ -72,13 +83,13 @@ bool PolyhedronTransformation::hasParallelPlanes(PolyhedronSPtr polyhedron) {
 
 bool PolyhedronTransformation::doAll3PlanesIntersect(PolyhedronSPtr polyhedron) {
     bool result = true;
-    list<FacetSPtr>::iterator it_f1 = polyhedron->facets().begin();
+    std::list<FacetSPtr>::iterator it_f1 = polyhedron->facets().begin();
     while (it_f1 != polyhedron->facets().end()) {
         FacetSPtr facet1 = *it_f1++;
-        list<FacetSPtr>::iterator it_f2 = it_f1;
+        std::list<FacetSPtr>::iterator it_f2 = it_f1;
         while (it_f2 != polyhedron->facets().end()) {
             FacetSPtr facet2 = *it_f2++;
-            list<FacetSPtr>::iterator it_f3 = it_f2;
+            std::list<FacetSPtr>::iterator it_f3 = it_f2;
             while (it_f3 != polyhedron->facets().end()) {
                 FacetSPtr facet3 = *it_f3++;
                 if (!KernelWrapper::intersection(
@@ -110,7 +121,7 @@ Vector3SPtr PolyhedronTransformation::randVec(double min, double max) {
 void PolyhedronTransformation::randMovePoints(PolyhedronSPtr polyhedron, double range) {
     // srand(time(NULL));
     srand(0);   // set seed to a const value to reproduce errors
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point3SPtr p = vertex->getPoint();
@@ -121,7 +132,7 @@ void PolyhedronTransformation::randMovePoints(PolyhedronSPtr polyhedron, double 
     polyhedron->initPlanes();
 
     polyhedron->appendDescription("rand_move_points_range=" +
-            StringFactory::fromDouble(range) + "; ");
+            util::StringFactory::fromDouble(range) + "; ");
 }
 
 Point3SPtr PolyhedronTransformation::boundingBoxMin(PolyhedronSPtr polyhedron) {
@@ -129,7 +140,7 @@ Point3SPtr PolyhedronTransformation::boundingBoxMin(PolyhedronSPtr polyhedron) {
     for (unsigned int i = 0; i < 3; i++) {
         p_min[i] = std::numeric_limits<double>::max();
     }
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point3SPtr p = vertex->getPoint();
@@ -148,7 +159,7 @@ Point3SPtr PolyhedronTransformation::boundingBoxMax(PolyhedronSPtr polyhedron) {
     for (unsigned int i = 0; i < 3; i++) {
         p_max[i] = -std::numeric_limits<double>::max();
     }
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point3SPtr p = vertex->getPoint();
@@ -206,7 +217,7 @@ void PolyhedronTransformation::translateNscale(PolyhedronSPtr polyhedron,
 bool PolyhedronTransformation::isInsideBox(PolyhedronSPtr polyhedron,
         Point3SPtr p_box_min, Point3SPtr p_box_max) {
     bool result = true;
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point3SPtr p = vertex->getPoint();

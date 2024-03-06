@@ -5,29 +5,21 @@
  */
 
 #ifndef UI_GL_OPENGLWINDOW_H
-#define	UI_GL_OPENGLWINDOW_H
+#define UI_GL_OPENGLWINDOW_H
 
-#include <cmath>
-#include <GL/glut.h>
-#include <stdexcept>
-#include <map>
-#include <string>
-#include "boost_thread.h"
-#include "ui/vecmath.h"
+#include "typedefs_thread.h"
 #include "ui/gl/ptrs.h"
 #include "ui/gl/typedefs.h"
-#include "ui/gl/Camera.h"
-
-using std::runtime_error;
-using std::map;
-using std::string;
+#include <GL/glut.h>
+#include <map>
+#include <string>
 
 namespace ui { namespace gl {
 
 /*!
  * This class is intended do be subclassed.
  */
-class OpenGLWindow : public boost::enable_shared_from_this<OpenGLWindow> {
+class OpenGLWindow : public std::enable_shared_from_this<OpenGLWindow> {
 
 public:
     virtual ~OpenGLWindow();
@@ -40,7 +32,7 @@ public:
     bool dumpWindow(const char* filename);
 
 protected:
-    static map<int, OpenGLWindowWPtr> windows_;
+    static std::map<int, OpenGLWindowWPtr> windows_;
     static bool glut_started_;
     static RecursiveMutex mutex_;
 
@@ -71,7 +63,7 @@ protected:
             const vec3f src, const vec3f dst, float radius);
     void drawTriangle(const vec3f a, const vec3f b, const vec3f c);
     void drawArrow(const vec3f position, const vec3f direction);
-    void drawText(const string text);
+    void drawText(const std::string& text);
     void drawCrosshair(float size);
 
     // to be implemented by inherited class
@@ -95,5 +87,4 @@ protected:
 
 } }
 
-#endif	/* UI_GL_OPENGLWINDOW_H */
-
+#endif /* UI_GL_OPENGLWINDOW_H */

@@ -4,7 +4,7 @@
  * @date   2012-12-21
  */
 
-#include "SphericalOffset.h"
+#include "data/3d/skel/SphericalOffset.h"
 
 namespace data { namespace _3d { namespace skel {
 

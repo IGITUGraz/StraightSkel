@@ -5,27 +5,16 @@
  */
 
 #ifndef DATA_3D_FACET_H
-#define	DATA_3D_FACET_H
+#define DATA_3D_FACET_H
 
+#include "data/2d/ptrs.h"
+#include "data/3d/ptrs.h"
 #include <list>
 #include <string>
-#include <sstream>
-#include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Triangle.h"
-#include "data/2d/ptrs.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
-#include "data/2d/Polygon.h"
 
 namespace data { namespace _3d {
 
-using std::list;
-using std::string;
-using std::stringstream;
-
-class Facet : public boost::enable_shared_from_this<Facet> {
+class Facet : public std::enable_shared_from_this<Facet> {
 public:
     virtual ~Facet();
 
@@ -59,7 +48,7 @@ public:
      */
     EdgeSPtr findEdge(FacetSPtr facet) const;
 
-    list<EdgeSPtr> findEdges(FacetSPtr facet) const;
+    std::list<EdgeSPtr> findEdges(FacetSPtr facet) const;
 
     bool containsVertex(VertexSPtr vertex) const;
     bool containsEdge(EdgeSPtr edge) const;
@@ -72,16 +61,16 @@ public:
 
     PolyhedronSPtr getPolyhedron() const;
     void setPolyhedron(PolyhedronSPtr polyhedron);
-    list<FacetSPtr>::iterator getPolyhedronListIt() const;
-    void setPolyhedronListIt(list<FacetSPtr>::iterator list_it);
+    std::list<FacetSPtr>::iterator getPolyhedronListIt() const;
+    void setPolyhedronListIt(std::list<FacetSPtr>::iterator list_it);
 
     FacetDataSPtr getData() const;
     void setData(FacetDataSPtr data);
     bool hasData() const;
 
-    list<VertexSPtr>& vertices();
-    list<EdgeSPtr>& edges();
-    list<TriangleSPtr>& triangles();
+    std::list<VertexSPtr>& vertices();
+    std::list<EdgeSPtr>& edges();
+    std::list<TriangleSPtr>& triangles();
 
     /**
      * counter clockwise from outside
@@ -110,15 +99,15 @@ public:
 
     data::_2d::PolygonSPtr toPolygon();
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Facet();
-    list<VertexSPtr> vertices_;
-    list<EdgeSPtr> edges_;
-    list<TriangleSPtr> triangles_;
+    std::list<VertexSPtr> vertices_;
+    std::list<EdgeSPtr> edges_;
+    std::list<TriangleSPtr> triangles_;
     PolyhedronWPtr polyhedron_;
-    list<FacetSPtr>::iterator polyhedron_list_it_;
+    std::list<FacetSPtr>::iterator polyhedron_list_it_;
     FacetDataSPtr data_;
     int id_;
     Plane3SPtr plane_;
@@ -126,5 +115,4 @@ protected:
 
 } }
 
-#endif	/* DATA_3D_FACET_H */
-
+#endif /* DATA_3D_FACET_H */

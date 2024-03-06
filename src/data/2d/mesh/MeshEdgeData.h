@@ -7,16 +7,14 @@
 #ifndef DATA_2D_MESH_MESHEDGEDATA_H
 #define DATA_2D_MESH_MESHEDGEDATA_H
 
-#include <list>
-#include "debug.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/EdgeData.h"
 #include "data/2d/skel/ptrs.h"
 #include "data/2d/mesh/ptrs.h"
+#include <list>
 
 namespace data { namespace _2d { namespace mesh {
 
-using std::list;
 using namespace data::_2d;
 using namespace data::_2d::skel;
 
@@ -36,22 +34,21 @@ public:
     void addEdge(EdgeSPtr edge);
     bool removeEdge(EdgeSPtr edge);
 
-    list<ArcWPtr>& arcs();
-    list<MeshRayWPtr>& rays();
-    list<MeshCellWPtr>& cells();
+    std::list<ArcWPtr>& arcs();
+    std::list<MeshRayWPtr>& rays();
+    std::list<MeshCellWPtr>& cells();
 
-    list<EdgeWPtr>& edges();
+    std::list<EdgeWPtr>& edges();
 
 protected:
     MeshEdgeData();
-    list<ArcWPtr> arcs_;
-    list<MeshRayWPtr> rays_;
-    list<MeshCellWPtr> cells_;
+    std::list<ArcWPtr> arcs_;
+    std::list<MeshRayWPtr> rays_;
+    std::list<MeshCellWPtr> cells_;
 
-    list<EdgeWPtr> edges_;
+    std::list<EdgeWPtr> edges_;
 };
 
 } } }
 
-#endif	/* DATA_3D_MESH_MESHEDGEDATA_H */
-
+#endif /* DATA_3D_MESH_MESHEDGEDATA_H */

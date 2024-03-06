@@ -4,7 +4,31 @@
  * @date   2013-06-03
  */
 
-#include "StraightSkeletonDAO.h"
+#include "db/3d/StraightSkeletonDAO.h"
+
+#include "data/3d/skel/ConstOffsetEvent.h"
+#include "data/3d/skel/EdgeEvent.h"
+#include "data/3d/skel/EdgeMergeEvent.h"
+#include "data/3d/skel/TriangleEvent.h"
+#include "data/3d/skel/DblEdgeMergeEvent.h"
+#include "data/3d/skel/DblTriangleEvent.h"
+#include "data/3d/skel/TetrahedronEvent.h"
+#include "data/3d/skel/VertexEvent.h"
+#include "data/3d/skel/FlipVertexEvent.h"
+#include "data/3d/skel/SurfaceEvent.h"
+#include "data/3d/skel/PolyhedronSplitEvent.h"
+#include "data/3d/skel/SplitMergeEvent.h"
+#include "data/3d/skel/EdgeSplitEvent.h"
+#include "data/3d/skel/PierceEvent.h"
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/EventDAO.h"
+#include "db/3d/NodeDAO.h"
+#include "db/3d/ArcDAO.h"
+#include "db/3d/PolyhedronDAO.h"
+#include "db/3d/SheetDAO.h"
+#include <list>
+#include <map>
 
 namespace db { namespace _3d {
 
@@ -16,8 +40,8 @@ StraightSkeletonDAO::~StraightSkeletonDAO() {
     // intentionally does nothing
 }
 
-string StraightSkeletonDAO::getTableSchema() const {
-    string schema("CREATE TABLE StraightSkeletons (\n"
+std::string StraightSkeletonDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE StraightSkeletons (\n"
             "  SkelID INTEGER PRIMARY KEY,\n"
             "  PolyhedronID INTEGER,\n"
             "  config TEXT,\n"
@@ -30,7 +54,7 @@ string StraightSkeletonDAO::getTableSchema() const {
 int StraightSkeletonDAO::nextSkelID() {
     int skelid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(SkelID) FROM StraightSkeletons;");
+    std::string sql("SELECT MAX(SkelID) FROM StraightSkeletons;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         skelid = 1;
@@ -49,7 +73,7 @@ int StraightSkeletonDAO::createSkelID(StraightSkeletonSPtr skel) {
         polyhedronid = skel->getPolyhedron()->getID();
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql;
+    std::string sql;
     if (polyhedronid > 0) {
         sql = "INSERT INTO StraightSkeletons (SkelID, PolyhedronID, config, description, created) "
             "VALUES (?, ?, ?, ?, strftime('%s','now'));";
@@ -86,7 +110,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
     int skelid = createSkelID(skel);
     if (skelid > 0) {
         NodeDAOSPtr dao_node = DAOFactory::getNodeDAO();
-        list<NodeSPtr>::iterator it_n = skel->nodes().begin();
+        std::list<NodeSPtr>::iterator it_n = skel->nodes().begin();
         while (it_n != skel->nodes().end()) {
             NodeSPtr node = *it_n++;
             if (node->getID() > 0) {
@@ -96,7 +120,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
             }
         }
         ArcDAOSPtr dao_arc = DAOFactory::getArcDAO();
-        list<ArcSPtr>::iterator it_a = skel->arcs().begin();
+        std::list<ArcSPtr>::iterator it_a = skel->arcs().begin();
         while (it_a != skel->arcs().end()) {
             ArcSPtr arc = *it_a++;
             if (arc->getID() > 0) {
@@ -106,7 +130,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
             }
         }
         SheetDAOSPtr dao_sheet = DAOFactory::getSheetDAO();
-        list<SheetSPtr>::iterator it_s = skel->sheets().begin();
+        std::list<SheetSPtr>::iterator it_s = skel->sheets().begin();
         while (it_s != skel->sheets().end()) {
             SheetSPtr sheet = *it_s++;
             if (sheet->getID() > 0) {
@@ -116,7 +140,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
             }
         }
         EventDAOSPtr dao_event = DAOFactory::getEventDAO();
-        list<AbstractEventSPtr>::iterator it_e = skel->events().begin();
+        std::list<AbstractEventSPtr>::iterator it_e = skel->events().begin();
         while (it_e != skel->events().end()) {
             AbstractEventSPtr event = *it_e++;
             if (event->getID() > 0) {
@@ -141,7 +165,7 @@ bool StraightSkeletonDAO::del(StraightSkeletonSPtr skel) {
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     bool trans_started = db->beginTransaction();
-    string sql("DELETE FROM StraightSkeletons WHERE SkelID=?;");
+    std::string sql("DELETE FROM StraightSkeletons WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -185,16 +209,16 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     NodeDAOSPtr dao_node = DAOFactory::getNodeDAO();
     EventDAOSPtr dao_event = DAOFactory::getEventDAO();
-    string sql("SELECT SkelID, config FROM StraightSkeletons WHERE SkelID=?;");
+    std::string sql("SELECT SkelID, config FROM StraightSkeletons WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
         if (stmt->execute() > 0) {
             result = StraightSkeleton::create();
             result->setID(skelid);
-            string config = stmt->getString(1);
+            std::string config = stmt->getString(1);
             result->setConfig(config);
-            map<int, NodeSPtr> nodes;
+            std::map<int, NodeSPtr> nodes;
             sql = "SELECT NID FROM Nodes WHERE SkelID=? ORDER BY NID ASC;";
             SQLiteStmtSPtr stmt_n = db->prepare(sql);
             if (stmt_n) {
@@ -208,7 +232,7 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
                 }
                 stmt_n->close();
             }
-            map<int, ArcSPtr> arcs;
+            std::map<int, ArcSPtr> arcs;
             sql = "SELECT AID, NID_SRC, NID_DST FROM Arcs WHERE SkelID=? ORDER BY AID ASC;";
             SQLiteStmtSPtr stmt_a = db->prepare(sql);
             if (stmt_a) {
@@ -236,7 +260,7 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
                     int sid = stmt_s->getInteger(0);
                     SheetSPtr sheet = Sheet::create();
                     sheet->setID(sid);
-                    string sql_sa = "SELECT AID FROM Sheets_Arcs "
+                    std::string sql_sa = "SELECT AID FROM Sheets_Arcs "
                             "WHERE SkelID=? AND SID=? ORDER BY AID ASC;";
                     SQLiteStmtSPtr stmt_sa = db->prepare(sql_sa);
                     if (stmt_sa) {
@@ -265,31 +289,31 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
                     int nid = stmt_e->getInteger(1);
                     AbstractEventSPtr event = dao_event->find(skelid, eventid);
                     if (event->getType() == AbstractEvent::EDGE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::EdgeEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::EdgeEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::EDGE_MERGE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::EdgeMergeEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::EdgeMergeEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::TriangleEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::TriangleEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::DBL_EDGE_MERGE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::DblEdgeMergeEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::DblEdgeMergeEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::DBL_TRIANGLE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::DblTriangleEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::DblTriangleEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::TETRAHEDRON_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::TetrahedronEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::TetrahedronEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::VERTEX_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::VertexEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::VertexEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::FLIP_VERTEX_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::FlipVertexEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::FlipVertexEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::SURFACE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::SurfaceEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::SurfaceEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::POLYHEDRON_SPLIT_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::PolyhedronSplitEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::PolyhedronSplitEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::SPLIT_MERGE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::SplitMergeEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::SplitMergeEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::EDGE_SPLIT_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::EdgeSplitEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::EdgeSplitEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::PIERCE_EVENT) {
-                        dynamic_pointer_cast<data::_3d::skel::PierceEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_3d::skel::PierceEvent>(event)->setNode(nodes[nid]);
                     }
                     result->addEvent(event);
                 }
@@ -303,7 +327,7 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
 int StraightSkeletonDAO::findPolyhedronID(int skelid) {
     int result = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT PolyhedronID FROM StraightSkeletons WHERE SkelID=?;");
+    std::string sql("SELECT PolyhedronID FROM StraightSkeletons WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);

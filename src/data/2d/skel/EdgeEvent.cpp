@@ -4,7 +4,12 @@
  * @date   2012-02-03
  */
 
-#include "EdgeEvent.h"
+#include "data/2d/skel/EdgeEvent.h"
+
+#include "debug.h"
+#include "data/2d/Edge.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/SkelEdgeData.h"
 
 namespace data { namespace _2d { namespace skel {
 

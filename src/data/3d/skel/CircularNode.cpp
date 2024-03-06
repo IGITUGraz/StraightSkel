@@ -4,7 +4,12 @@
  * @date   2012-11-28
  */
 
-#include "CircularNode.h"
+#include "data/3d/skel/CircularNode.h"
+
+#include "debug.h"
+#include "data/3d/skel/CircularArc.h"
+#include "util/StringFactory.h"
+#include <algorithm>
 
 namespace data { namespace _3d { namespace skel {
 
@@ -52,16 +57,16 @@ void CircularNode::setSkel(SphericalSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<CircularNodeSPtr>::iterator CircularNode::getListIt() const {
+std::list<CircularNodeSPtr>::iterator CircularNode::getListIt() const {
     return this->list_it_;
 }
 
-void CircularNode::setListIt(list<CircularNodeSPtr>::iterator list_it) {
+void CircularNode::setListIt(std::list<CircularNodeSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
 void CircularNode::addArc(CircularArcSPtr arc) {
-    list<CircularArcWPtr>::iterator it = arcs_.insert(arcs_.end(), CircularArcWPtr(arc));
+    std::list<CircularArcWPtr>::iterator it = arcs_.insert(arcs_.end(), CircularArcWPtr(arc));
     if (arc->getNodeSrc() == shared_from_this()) {
         arc->setNodeSrcListIt(it);
     } else if (arc->hasNodeDst()) {
@@ -75,12 +80,12 @@ bool CircularNode::removeArc(CircularArcSPtr arc) {
     bool result = false;
     if (arc->getNodeSrc() == shared_from_this()) {
         arcs_.erase(arc->getNodeSrcListIt());
-        arc->setNodeSrcListIt(list<CircularArcWPtr>::iterator());
+        arc->setNodeSrcListIt(std::list<CircularArcWPtr>::iterator());
         result = true;
     } else if (arc->hasNodeDst()) {
         if (arc->getNodeDst() == shared_from_this()) {
             arcs_.erase(arc->getNodeDstListIt());
-            arc->setNodeDstListIt(list<CircularArcWPtr>::iterator());
+            arc->setNodeDstListIt(std::list<CircularArcWPtr>::iterator());
             result = true;
         }
     }
@@ -95,7 +100,7 @@ bool CircularNode::containsArc(CircularArcSPtr arc) const {
 }
 
 void CircularNode::clear() {
-    list<CircularArcWPtr>::iterator it_a = arcs_.begin();
+    std::list<CircularArcWPtr>::iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         CircularArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -106,13 +111,13 @@ void CircularNode::clear() {
     arcs_.clear();
 }
 
-list<CircularArcWPtr>& CircularNode::arcs() {
+std::list<CircularArcWPtr>& CircularNode::arcs() {
     return this->arcs_;
 }
 
 unsigned int CircularNode::degree() {
     unsigned int result = 0;
-    list<CircularArcWPtr>::iterator it_a = arcs_.begin();
+    std::list<CircularArcWPtr>::iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         CircularArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -146,12 +151,12 @@ double CircularNode::getZ() const {
 #endif
 }
 
-string CircularNode::toString() const {
-    string result("CircularNode(");
-    result += StringFactory::fromPointer(this) + ", ";
-    result += "<" + StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ", ";
-    result += StringFactory::fromDouble(getZ()) + ">)";
+std::string CircularNode::toString() const {
+    std::string result("CircularNode(");
+    result += util::StringFactory::fromPointer(this) + ", ";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ", ";
+    result += util::StringFactory::fromDouble(getZ()) + ">)";
     return result;
 }
 

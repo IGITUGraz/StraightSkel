@@ -5,39 +5,32 @@
  */
 
 #ifndef UTIL_STRINGFACTORY_H
-#define	UTIL_STRINGFACTORY_H
+#define UTIL_STRINGFACTORY_H
 
 #include <string>
-#include <sstream>
-#include <iomanip>
-#include <boost/date_time/local_time/local_time.hpp>
 
 namespace util {
-
-using std::string;
-using std::stringstream;
 
 class StringFactory {
 public:
     virtual ~StringFactory();
-    static string fromBoolean(bool value);
-    static string fromInteger(int value);
-    static string fromFloat(float value);
-    static string fromFloatArr(int length, float value[]);
-    static string fromDouble(double value);
-    static string fromDoubleArr(int length, double value[]);
-    static string fromPointer(const void* value);
-    static string replaceAll(string str, string search, string replace);
+    static std::string fromBoolean(bool value);
+    static std::string fromInteger(int value);
+    static std::string fromFloat(float value);
+    static std::string fromFloatArr(int length, float value[]);
+    static std::string fromDouble(double value);
+    static std::string fromDoubleArr(int length, double value[]);
+    static std::string fromPointer(const void* value);
+    static std::string replaceAll(const std::string& str, const std::string& search, const std::string& replace);
 
-    static const string DATE_FORMAT;
+    static const std::string DATE_FORMAT;
 
     /**
      * @param format  %Y-%m-%d_%H%M%S
      */
-    static string now(string format);
+    static std::string now(const std::string& format);
 };
 
 }
 
-#endif	/* UTIL_STRINGFACTORY_H */
-
+#endif /* UTIL_STRINGFACTORY_H */

@@ -4,7 +4,13 @@
  * @date   2012-11-28
  */
 
-#include "CircularEdge.h"
+#include "data/3d/CircularEdge.h"
+
+#include "debug.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/SphericalPolygon.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _3d {
 
@@ -55,11 +61,11 @@ void CircularEdge::setPolygon(SphericalPolygonSPtr polygon) {
     this->polygon_ = polygon;
 }
 
-list<CircularEdgeSPtr>::iterator CircularEdge::getListIt() const {
+std::list<CircularEdgeSPtr>::iterator CircularEdge::getListIt() const {
     return this->list_it_;
 }
 
-void CircularEdge::setListIt(list<CircularEdgeSPtr>::iterator list_it) {
+void CircularEdge::setListIt(std::list<CircularEdgeSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -120,9 +126,9 @@ CircularEdgeSPtr CircularEdge::prev() const {
     return vertex_src_->getEdgeIn();
 }
 
-string CircularEdge::toString() const {
-    string result("CircularEdge(");
-    result += StringFactory::fromPointer(this) + ", ";
+std::string CircularEdge::toString() const {
+    std::string result("CircularEdge(");
+    result += util::StringFactory::fromPointer(this) + ", ";
     result += "src=" + vertex_src_->toString() + ", ";
     result += "dst=" + vertex_dst_->toString() + ")";
     return result;

@@ -4,7 +4,7 @@
  * @date   2011-11-11
  */
 
-#include "Line2.h"
+#include "kernel/Line2.h"
 
 namespace kernel {
 

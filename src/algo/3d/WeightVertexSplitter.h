@@ -5,32 +5,18 @@
  */
 
 #ifndef ALGO_3D_WEIGHTVERTEXSPLITTER_H
-#define	ALGO_3D_WEIGHTVERTEXSPLITTER_H
+#define ALGO_3D_WEIGHTVERTEXSPLITTER_H
 
-#include <list>
-#include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/SkelVertexData.h"
-#include "data/3d/skel/SkelEdgeData.h"
-#include "data/2d/ptrs.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
-#include "data/2d/skel/ptrs.h"
-#include "data/2d/skel/SkelEdgeData.h"
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/KernelWrapper.h"
 #include "algo/3d/AbstractVertexSplitter.h"
-#include "algo/2d/ptrs.h"
-#include "algo/2d/SimpleStraightSkel.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include "data/2d/ptrs.h"
+#include "data/2d/skel/ptrs.h"
 
 namespace algo { namespace _3d {
 
-using std::list;
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 
 class WeightVertexSplitter : public AbstractVertexSplitter {
@@ -54,5 +40,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_WEIGHTVERTEXSPLITTER_H */
-
+#endif /* ALGO_3D_WEIGHTVERTEXSPLITTER_H */

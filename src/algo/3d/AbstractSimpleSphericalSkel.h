@@ -5,27 +5,16 @@
  */
 
 #ifndef ALGO_3D_ABSTRACTSIMPLESPHERICALSKEL_H
-#define	ALGO_3D_ABSTRACTSIMPLESPHERICALSKEL_H
+#define ALGO_3D_ABSTRACTSIMPLESPHERICALSKEL_H
 
-#include <list>
-#include "boost_thread.h"
-#include "debug.h"
-
-#include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/Facet.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/SphericalSkeleton.h"
-
+#include "typedefs_thread.h"
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/KernelWrapper.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
 
 namespace algo { namespace _3d {
 
-using std::list;
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 using namespace data::_3d::skel;
 
@@ -70,5 +59,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_ABSTRACTSIMPLESPHERICALSKEL_H */
-
+#endif /* ALGO_3D_ABSTRACTSIMPLESPHERICALSKEL_H */

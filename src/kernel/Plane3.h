@@ -5,10 +5,10 @@
  */
 
 #ifndef PLANE3_H
-#define	PLANE3_H
+#define PLANE3_H
 
-#include "Point3.h"
-#include "Vector3.h"
+#include "kernel/Point3.h"
+#include "kernel/Vector3.h"
 
 namespace kernel {
 
@@ -41,5 +41,5 @@ protected:
 
 }
 
-#endif	/* PLANE3_H */
+#endif /* PLANE3_H */
 

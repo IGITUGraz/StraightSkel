@@ -5,11 +5,9 @@
  */
 
 #ifndef DATA_2D_SKEL_TRIANGLEEVENT_H
-#define	DATA_2D_SKEL_TRIANGLEEVENT_H
+#define DATA_2D_SKEL_TRIANGLEEVENT_H
 
 #include "data/2d/skel/EdgeEvent.h"
-#include "data/2d/skel/SkelVertexData.h"
-#include "data/2d/skel/SkelEdgeData.h"
 
 namespace data { namespace _2d { namespace skel {
 
@@ -26,5 +24,4 @@ protected:
 
 } } }
 
-#endif	/* DATA_2D_SKEL_TRIANGLEEVENT_H */
-
+#endif /* DATA_2D_SKEL_TRIANGLEEVENT_H */

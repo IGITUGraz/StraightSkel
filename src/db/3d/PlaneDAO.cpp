@@ -4,7 +4,10 @@
  * @date   2013-06-07
  */
 
-#include "PlaneDAO.h"
+#include "db/3d/PlaneDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
 
 namespace db { namespace _3d {
 
@@ -16,8 +19,8 @@ PlaneDAO::~PlaneDAO() {
     // intentionally does nothing
 }
 
-string PlaneDAO::getTableSchema() const {
-    string schema("CREATE TABLE Planes (\n"
+std::string PlaneDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Planes (\n"
             "  PlaneID INTEGER PRIMARY KEY,\n"
             "  a REAL,\n"
             "  b REAL,\n"
@@ -30,7 +33,7 @@ string PlaneDAO::getTableSchema() const {
 int PlaneDAO::nextPlaneID() {
     int plane_id = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(PlaneID) FROM Planes;");
+    std::string sql("SELECT MAX(PlaneID) FROM Planes;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         plane_id = 1;
@@ -49,7 +52,7 @@ int PlaneDAO::insert(Plane3SPtr plane) {
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     int plane_id = nextPlaneID();
     if (plane_id > 0) {
-        string sql("INSERT INTO Planes (PlaneID, a, b, c, d) "
+        std::string sql("INSERT INTO Planes (PlaneID, a, b, c, d) "
                 "VALUES (?, ?, ?, ?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
@@ -87,7 +90,7 @@ bool PlaneDAO::del(Plane3SPtr plane) {
     // TODO
     if (plane_id > 0) {
         SQLiteDatabaseSPtr db = DAOFactory::getDB();
-        string sql("DELETE FROM Planes WHERE PlaneID=?;");
+        std::string sql("DELETE FROM Planes WHERE PlaneID=?;");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
             stmt->bindInteger(1, plane_id);
@@ -102,7 +105,7 @@ bool PlaneDAO::del(Plane3SPtr plane) {
 Plane3SPtr PlaneDAO::find(int plane_id) {
     Plane3SPtr result = Plane3SPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT a, b, c, d FROM Planes WHERE PlaneID=?;");
+    std::string sql("SELECT a, b, c, d FROM Planes WHERE PlaneID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, plane_id);

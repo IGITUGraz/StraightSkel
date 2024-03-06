@@ -4,7 +4,12 @@
  * @date   2013-05-23
  */
 
-#include "ArcDAO.h"
+#include "db/2d/ArcDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/2d/NodeDAO.h"
+#include "db/2d/StraightSkeletonDAO.h"
 
 namespace db { namespace _2d {
 
@@ -16,8 +21,8 @@ ArcDAO::~ArcDAO() {
     // intentionally does nothing
 }
 
-string ArcDAO::getTableSchema() const {
-    string schema("CREATE TABLE Arcs (\n"
+std::string ArcDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Arcs (\n"
             "  SkelID INTEGER NOT NULL,\n"
             "  AID INTEGER NOT NULL,\n"
             "  NID_SRC INTEGER,\n"
@@ -30,7 +35,7 @@ string ArcDAO::getTableSchema() const {
 int ArcDAO::nextAID(int skelid) {
     int aid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(AID) FROM Arcs WHERE SkelID=?;");
+    std::string sql("SELECT MAX(AID) FROM Arcs WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -69,7 +74,7 @@ int ArcDAO::insert(ArcSPtr arc) {
         } else {
             dao_node->insert(arc->getNodeDst());
         }
-        string sql("INSERT INTO Arcs (SkelID, AID, NID_SRC, NID_DST) "
+        std::string sql("INSERT INTO Arcs (SkelID, AID, NID_SRC, NID_DST) "
                 "VALUES (?, ?, ?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
@@ -97,7 +102,7 @@ bool ArcDAO::del(ArcSPtr arc) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Arcs WHERE SkelID=? AND AID=?;");
+    std::string sql("DELETE FROM Arcs WHERE SkelID=? AND AID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -115,7 +120,7 @@ bool ArcDAO::del(ArcSPtr arc) {
 ArcSPtr ArcDAO::find(int skelid, int aid) {
     ArcSPtr result = ArcSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT NID_SRC, NID_DST FROM Arcs WHERE SkelID=? AND AID=?;");
+    std::string sql("SELECT NID_SRC, NID_DST FROM Arcs WHERE SkelID=? AND AID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);

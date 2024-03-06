@@ -4,7 +4,17 @@
  * @date   2011-11-21
  */
 
-#include "StraightSkeleton.h"
+#include "data/2d/skel/StraightSkeleton.h"
+
+#include "debug.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/Arc.h"
+#include "data/2d/skel/AbstractEvent.h"
+#include "data/2d/skel/EdgeEvent.h"
+#include "data/2d/skel/SplitEvent.h"
+#include "data/2d/skel/TriangleEvent.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _2d { namespace skel {
 
@@ -23,18 +33,18 @@ StraightSkeletonSPtr StraightSkeleton::create() {
 }
 
 void StraightSkeleton::addEvent(AbstractEventSPtr event) {
-    list<AbstractEventSPtr>::iterator it = events_.insert(events_.end(), event);
+    std::list<AbstractEventSPtr>::iterator it = events_.insert(events_.end(), event);
     event->setSkel(shared_from_this());
     event->setListIt(it);
     NodeSPtr node;
     if (event->getType() == AbstractEvent::EDGE_EVENT) {
-        EdgeEventSPtr edge_event = dynamic_pointer_cast<EdgeEvent>(event);
+        EdgeEventSPtr edge_event = std::dynamic_pointer_cast<EdgeEvent>(event);
         node = edge_event->getNode();
     } else if (event->getType() == AbstractEvent::SPLIT_EVENT) {
-        SplitEventSPtr split_event = dynamic_pointer_cast<SplitEvent>(event);
+        SplitEventSPtr split_event = std::dynamic_pointer_cast<SplitEvent>(event);
         node = split_event->getNode();
     } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-        TriangleEventSPtr triangle_event = dynamic_pointer_cast<TriangleEvent>(event);
+        TriangleEventSPtr triangle_event = std::dynamic_pointer_cast<TriangleEvent>(event);
         node = triangle_event->getNode();
     }
     if (node) {
@@ -49,16 +59,16 @@ bool StraightSkeleton::removeEvent(AbstractEventSPtr event) {
     if (event->getSkel() == shared_from_this()) {
         events_.erase(event->getListIt());
         event->setSkel(StraightSkeletonSPtr());
-        event->setListIt(list<AbstractEventSPtr>::iterator());
+        event->setListIt(std::list<AbstractEventSPtr>::iterator());
         NodeSPtr node;
         if (event->getType() == AbstractEvent::EDGE_EVENT) {
-            EdgeEventSPtr edge_event = dynamic_pointer_cast<EdgeEvent>(event);
+            EdgeEventSPtr edge_event = std::dynamic_pointer_cast<EdgeEvent>(event);
             node = edge_event->getNode();
         } else if (event->getType() == AbstractEvent::SPLIT_EVENT) {
-            SplitEventSPtr split_event = dynamic_pointer_cast<SplitEvent>(event);
+            SplitEventSPtr split_event = std::dynamic_pointer_cast<SplitEvent>(event);
             node = split_event->getNode();
         } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-            TriangleEventSPtr triangle_event = dynamic_pointer_cast<TriangleEvent>(event);
+            TriangleEventSPtr triangle_event = std::dynamic_pointer_cast<TriangleEvent>(event);
             node = triangle_event->getNode();
         }
         if (node) {
@@ -69,7 +79,7 @@ bool StraightSkeleton::removeEvent(AbstractEventSPtr event) {
 }
 
 void StraightSkeleton::addNode(NodeSPtr node) {
-    list<NodeSPtr>::iterator it = nodes_.insert(nodes_.end(), node);
+    std::list<NodeSPtr>::iterator it = nodes_.insert(nodes_.end(), node);
     node->setSkel(shared_from_this());
     node->setListIt(it);
 }
@@ -79,14 +89,14 @@ bool StraightSkeleton::removeNode(NodeSPtr node) {
     if (node->getSkel() == shared_from_this()) {
         nodes_.erase(node->getListIt());
         node->setSkel(StraightSkeletonSPtr());
-        node->setListIt(list<NodeSPtr>::iterator());
+        node->setListIt(std::list<NodeSPtr>::iterator());
         result = true;
     }
     return result;
 }
 
 void StraightSkeleton::addArc(ArcSPtr arc) {
-    list<ArcSPtr>::iterator it = arcs_.insert(arcs_.end(), arc);
+    std::list<ArcSPtr>::iterator it = arcs_.insert(arcs_.end(), arc);
     arc->setSkel(shared_from_this());
     arc->setListIt(it);
 }
@@ -96,7 +106,7 @@ bool StraightSkeleton::removeArc(ArcSPtr arc) {
     if (arc->getSkel() == shared_from_this()) {
         arcs_.erase(arc->getListIt());
         arc->setSkel(StraightSkeletonSPtr());
-        arc->setListIt(list<ArcSPtr>::iterator());
+        arc->setListIt(std::list<ArcSPtr>::iterator());
         result = true;
     }
     return result;
@@ -106,15 +116,15 @@ SharedMutex& StraightSkeleton::mutex() {
     return this->mutex_;
 }
 
-list<AbstractEventSPtr>& StraightSkeleton::events() {
+std::list<AbstractEventSPtr>& StraightSkeleton::events() {
     return this->events_;
 }
 
-list<NodeSPtr>& StraightSkeleton::nodes() {
+std::list<NodeSPtr>& StraightSkeleton::nodes() {
     return this->nodes_;
 }
 
-list<ArcSPtr>& StraightSkeleton::arcs() {
+std::list<ArcSPtr>& StraightSkeleton::arcs() {
     return this->arcs_;
 }
 
@@ -135,17 +145,17 @@ void StraightSkeleton::setID(int id) {
 }
 
 void StraightSkeleton::resetAllIDs() {
-    list<AbstractEventSPtr>::iterator it_e = events_.begin();
+    std::list<AbstractEventSPtr>::iterator it_e = events_.begin();
     while (it_e != events_.end()) {
         AbstractEventSPtr event = *it_e++;
         event->setID(-1);
     }
-    list<ArcSPtr>::iterator it_a = arcs_.begin();
+    std::list<ArcSPtr>::iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         ArcSPtr arc = *it_a++;
         arc->setID(-1);
     }
-    list<NodeSPtr>::iterator it_n = nodes_.begin();
+    std::list<NodeSPtr>::iterator it_n = nodes_.begin();
     while (it_n != nodes_.end()) {
         NodeSPtr node = *it_n++;
         node->setID(-1);
@@ -156,7 +166,7 @@ void StraightSkeleton::resetAllIDs() {
 bool StraightSkeleton::isConsistent() const {
     bool result = true;
 
-    list<NodeSPtr>::const_iterator it_n = nodes_.begin();
+    std::list<NodeSPtr>::const_iterator it_n = nodes_.begin();
     while (it_n != nodes_.end()) {
         NodeSPtr node = *it_n++;
         if (node->getSkel() != shared_from_this()) {
@@ -164,7 +174,7 @@ bool StraightSkeleton::isConsistent() const {
             result = false;
             break;
         }
-        list<ArcWPtr>::const_iterator it_a = node->arcs().begin();
+        std::list<ArcWPtr>::const_iterator it_a = node->arcs().begin();
         while (it_a != node->arcs().end()) {
             ArcWPtr arc_wptr = *it_a++;
             if (arc_wptr.expired()) {
@@ -181,7 +191,7 @@ bool StraightSkeleton::isConsistent() const {
         }
     }
 
-    list<ArcSPtr>::const_iterator it_a = arcs_.begin();
+    std::list<ArcSPtr>::const_iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         ArcSPtr arc = *it_a++;
         ArcWPtr arc_wptr(arc);
@@ -190,7 +200,7 @@ bool StraightSkeleton::isConsistent() const {
             result = false;
             break;
         }
-        list<ArcWPtr> warcs = arc->getNodeSrc()->arcs();
+        std::list<ArcWPtr> warcs = arc->getNodeSrc()->arcs();
         if (warcs.end() == std::find(warcs.begin(), warcs.end(), arc_wptr)) {
             DEBUG_VAR(arc->toString());
             DEBUG_VAR(arc->getNodeSrc()->toString());
@@ -213,7 +223,7 @@ bool StraightSkeleton::isConsistent() const {
 
 int StraightSkeleton::countEvents(int type) const {
     int result = 0;
-    list<AbstractEventSPtr>::const_iterator it_e = events_.begin();
+    std::list<AbstractEventSPtr>::const_iterator it_e = events_.begin();
     while (it_e != events_.end()) {
         AbstractEventSPtr event = *it_e++;
         if (event->getType() == type) {
@@ -223,25 +233,25 @@ int StraightSkeleton::countEvents(int type) const {
     return result;
 }
 
-string StraightSkeleton::getDescription() const {
+std::string StraightSkeleton::getDescription() const {
     return this->description_;
 }
 
-void StraightSkeleton::setDescription(string desc) {
+void StraightSkeleton::setDescription(const std::string& desc) {
     this->description_ = desc;
 }
 
-void StraightSkeleton::appendDescription(string desc) {
+void StraightSkeleton::appendDescription(const std::string& desc) {
     this->description_.append(desc);
 }
 
-string StraightSkeleton::toString() const {
-    stringstream sstr;
+std::string StraightSkeleton::toString() const {
+    std::stringstream sstr;
     sstr << "StraightSkeleton(";
     if (id_ != -1) {
-        sstr << "id=" << StringFactory::fromInteger(id_);
+        sstr << "id=" << util::StringFactory::fromInteger(id_);
     } else {
-        sstr << StringFactory::fromPointer(this);
+        sstr << util::StringFactory::fromPointer(this);
     }
     sstr << "," << std::endl;
     sstr << "Nodes:  " << nodes_.size() << std::endl;

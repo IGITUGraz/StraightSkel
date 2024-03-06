@@ -4,7 +4,14 @@
  * @date   2012-04-26
  */
 
-#include "LineInFacet.h"
+#include "algo/3d/LineInFacet.h"
+
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Vertex.h"
+#include "algo/3d/KernelWrapper.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -23,7 +30,7 @@ bool IsLineInFacet(FacetSPtr facet, Line3SPtr line) {
     Plane3SPtr plane_orient= KernelFactory::createPlane3(p_line, p_line_dir,
             KernelFactory::createPoint3(line->point() + *v_normal_ray));
 
-    list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
     while (it_e != facet->edges().end()) {
         EdgeSPtr edge = *it_e++;
         Point3SPtr p_src = edge->getVertexSrc()->getPoint();

@@ -1,4 +1,13 @@
-#include "FacetDAO.h"
+#include "db/3d/FacetDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/VertexDAO.h"
+#include "db/3d/EdgeDAO.h"
+#include "db/3d/TriangleDAO.h"
+#include "db/3d/PlaneDAO.h"
+#include "db/3d/PolyhedronDAO.h"
+#include <map>
 
 namespace db { namespace _3d {
 
@@ -10,8 +19,8 @@ FacetDAO::~FacetDAO() {
     // intentionally does nothing
 }
 
-string FacetDAO::getTableSchema() const {
-    string schema("CREATE TABLE Facets (\n"
+std::string FacetDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Facets (\n"
             "  PolyhedronID INTEGER NOT NULL,\n"
             "  FID INTEGER NOT NULL,\n"
             "  PlaneID INTEGER,\n"
@@ -23,7 +32,7 @@ string FacetDAO::getTableSchema() const {
 int FacetDAO::nextFID(int polyhedronid) {
     int fid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(FID) FROM Facets WHERE PolyhedronID=?;");
+    std::string sql("SELECT MAX(FID) FROM Facets WHERE PolyhedronID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -48,7 +57,7 @@ int FacetDAO::createFID(FacetSPtr facet) {
     }
     if (polyhedronid > 0) {
         int fid = nextFID(polyhedronid);
-        string sql("INSERT INTO Facets (PolyhedronID, FID) "
+        std::string sql("INSERT INTO Facets (PolyhedronID, FID) "
                 "VALUES (?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
@@ -72,7 +81,7 @@ int FacetDAO::insert(FacetSPtr facet) {
     int fid = createFID(facet);
     if (fid > 0) {
         VertexDAOSPtr dao_vertex = DAOFactory::getVertexDAO();
-        list<VertexSPtr>::iterator it_v = facet->vertices().begin();
+        std::list<VertexSPtr>::iterator it_v = facet->vertices().begin();
         while (it_v != facet->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             if (vertex->getID() > 0) {
@@ -82,7 +91,7 @@ int FacetDAO::insert(FacetSPtr facet) {
             }
         }
         EdgeDAOSPtr dao_edge = DAOFactory::getEdgeDAO();
-        list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
         while (it_e != facet->edges().end()) {
             EdgeSPtr edge = *it_e++;
             if (edge->getID() > 0) {
@@ -92,7 +101,7 @@ int FacetDAO::insert(FacetSPtr facet) {
             }
         }
         TriangleDAOSPtr dao_triangle = DAOFactory::getTriangleDAO();
-        list<TriangleSPtr>::iterator it_t = facet->triangles().begin();
+        std::list<TriangleSPtr>::iterator it_t = facet->triangles().begin();
         while (it_t != facet->triangles().end()) {
             TriangleSPtr triangle = *it_t++;
             if (triangle->getID() > 0) {
@@ -106,7 +115,7 @@ int FacetDAO::insert(FacetSPtr facet) {
             PlaneDAOSPtr dao_plane = DAOFactory::getPlaneDAO();
             int plane_id = dao_plane->insert(plane);
             if (plane_id > 0) {
-                string sql("UPDATE Facets SET PlaneID=? "
+                std::string sql("UPDATE Facets SET PlaneID=? "
                         "WHERE PolyhedronID=? AND FID=?;");
                 SQLiteStmtSPtr stmt = db->prepare(sql);
                 if (stmt) {
@@ -133,7 +142,7 @@ bool FacetDAO::del(FacetSPtr facet) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Facets WHERE PolyhedronID=? AND FID=?;");
+    std::string sql("DELETE FROM Facets WHERE PolyhedronID=? AND FID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -177,7 +186,7 @@ FacetSPtr FacetDAO::find(int polyhedronid, int fid) {
     FacetSPtr result = FacetSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     VertexDAOSPtr dao_vertex = DAOFactory::getVertexDAO();
-    string sql("SELECT FID, PlaneID FROM Facets "
+    std::string sql("SELECT FID, PlaneID FROM Facets "
             "WHERE PolyhedronID=? AND FID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
@@ -192,7 +201,7 @@ FacetSPtr FacetDAO::find(int polyhedronid, int fid) {
                 Plane3SPtr plane = dao_plane->find(plane_id);
                 result->setPlane(plane);
             }
-            map<int, VertexSPtr> vertices;
+            std::map<int, VertexSPtr> vertices;
             sql = "SELECT EID, VID_SRC, VID_DST, FID_L, FID_R FROM Edges "
                     "WHERE PolyhedronID=? AND (FID_L=? OR FID_R=?);";
             SQLiteStmtSPtr stmt_e = db->prepare(sql);

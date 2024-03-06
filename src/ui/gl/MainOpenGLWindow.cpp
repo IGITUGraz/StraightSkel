@@ -4,7 +4,80 @@
  * @date   2011-12-20
  */
 
-#include "MainOpenGLWindow.h"
+#include "ui/gl/MainOpenGLWindow.h"
+
+#include "algo/3d/KernelWrapper.h"
+
+#include "data/2d/Polygon.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/VertexData.h"
+#include "data/2d/EdgeData.h"
+#include "data/2d/skel/AbstractEvent.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/Arc.h"
+#include "data/2d/skel/StraightSkeleton.h"
+#include "data/2d/mesh/Mesh.h"
+#include "data/2d/mesh/MeshCell.h"
+#include "data/2d/mesh/MeshVertex.h"
+
+#include "data/3d/Polyhedron.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Triangle.h"
+#include "data/3d/VertexData.h"
+#include "data/3d/EdgeData.h"
+#include "data/3d/SphericalPolygon.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/CircularVertexData.h"
+#include "data/3d/CircularEdgeData.h"
+#include "data/3d/skel/StraightSkeleton.h"
+#include "data/3d/skel/AbstractEvent.h"
+#include "data/3d/skel/Arc.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/Sheet.h"
+#include "data/3d/skel/SphericalSkeleton.h"
+#include "data/3d/skel/SphericalSkelVertexData.h"
+#include "data/3d/skel/SkelEdgeData.h"
+#include "data/3d/skel/SphericalAbstractEvent.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/ConstOffsetEvent.h"
+#include "data/3d/skel/EdgeEvent.h"
+#include "data/3d/skel/EdgeMergeEvent.h"
+#include "data/3d/skel/TriangleEvent.h"
+#include "data/3d/skel/DblEdgeMergeEvent.h"
+#include "data/3d/skel/DblTriangleEvent.h"
+#include "data/3d/skel/TetrahedronEvent.h"
+#include "data/3d/skel/VertexEvent.h"
+#include "data/3d/skel/FlipVertexEvent.h"
+#include "data/3d/skel/SurfaceEvent.h"
+#include "data/3d/skel/PolyhedronSplitEvent.h"
+#include "data/3d/skel/SplitMergeEvent.h"
+#include "data/3d/skel/EdgeSplitEvent.h"
+#include "data/3d/skel/PierceEvent.h"
+
+#include "db/2d/DAOFactory.h"
+#include "db/2d/PolygonDAO.h"
+#include "db/2d/StraightSkeletonDAO.h"
+#include "db/3d/DAOFactory.h"
+#include "db/3d/PolyhedronDAO.h"
+#include "db/3d/StraightSkeletonDAO.h"
+#include "db/3d/OBJFile.h"
+
+#include "ui/gl/Camera.h"
+#include "ui/gl/KeyboardAdapter.h"
+#include "ui/gl/MouseAdapter.h"
+#include "ui/ps/PlanePSPrinter.h"
+#include "ui/ps/SpacePSPrinter.h"
+#include "ui/ps/CutPatternPrinter.h"
+
+#include "util/StringFactory.h"
+
+#include <fstream>
+#include <sstream>
 
 namespace ui { namespace gl {
 
@@ -23,7 +96,7 @@ MainOpenGLWindow::MainOpenGLWindow(int argc, const char* argv[],
     this->mode_ = 0;
     this->toggle_roof_ = true;
     this->toggle_poly_ = 3;
-    this->toggle_skel_ = false;
+    this->toggle_skel_ = true;
     this->toggle_experimental_ = false;
     this->thickness_ = 1.0f;
     this->crosshair_size_ = 0.0f;
@@ -36,7 +109,7 @@ MainOpenGLWindow::MainOpenGLWindow(int argc, const char* argv[],
     this->scale_ = 1.0f;
     ConfigurationSPtr config = Configuration::getInstance();
     if (config->isLoaded()) {
-        string section("ui_gl_MainOpenGLWindow");
+        std::string section("ui_gl_MainOpenGLWindow");
         crosshair_size_ = (float)config->getDouble(section, "crosshair_size");
         coord_axes_size_ = (float)config->getDouble(section, "coord_axes_size");
         highlight_ = config->getBool(section, "highlight");
@@ -105,16 +178,18 @@ void MainOpenGLWindow::toggleExperimental() {
 
 void MainOpenGLWindow::incThickness() {
     Lock l(mutex_);
-    if (thickness_ < 1.95f) {
-        thickness_ += 0.1f;
-    }
+//    if (thickness_ < 1.95f) {
+//        thickness_ += 0.1f;
+//    }
+    thickness_ *= 2.0f;
 }
 
 void MainOpenGLWindow::decThickness() {
     Lock l(mutex_);
-    if (thickness_ > 0.15f) {
-        thickness_ -= 0.1f;
-    }
+//    if (thickness_ > 0.15f) {
+//        thickness_ -= 0.1f;
+//    }
+    thickness_ /= 2.0f;
 }
 
 
@@ -174,8 +249,8 @@ void MainOpenGLWindow::saveLastPoly() {
         db::_3d::DAOFactory::getPolyhedronDAO()->insert(polyhedron);
         std::cout << "PolyhedronID=" << polyhedron->getID() << std::endl;
 
-        string now = StringFactory::now(StringFactory::DATE_FORMAT);
-        string filename_obj = now + ".obj";
+        std::string now = util::StringFactory::now(util::StringFactory::DATE_FORMAT);
+        std::string filename_obj = now + ".obj";
         if (db::_3d::OBJFile::save(filename_obj, polyhedron)) {
             std::cout << "filename_obj=" << filename_obj << std::endl;
         }
@@ -183,8 +258,8 @@ void MainOpenGLWindow::saveLastPoly() {
 }
 
 void MainOpenGLWindow::dumpWin() {
-    string now = StringFactory::now("%Y-%m-%d_%H%M%S%f");
-    string filename_bmp = now + ".bmp";
+    std::string now = util::StringFactory::now("%Y-%m-%d_%H%M%S%f");
+    std::string filename_bmp = now + ".bmp";
     DEBUG_VAR(filename_bmp);
     dumpWindow(filename_bmp.c_str());
 }
@@ -194,8 +269,8 @@ void MainOpenGLWindow::printScreen() {
         ui::ps::PlanePSPrinterSPtr printer2 = ui::ps::PlanePSPrinter::create();
         printer2->setScale(printer2->getScale() * scale_);
         printer2->initBoundingBox(polygon_);
-        string now = StringFactory::now(StringFactory::DATE_FORMAT);
-        string filename_eps = now + ".eps";
+        std::string now = util::StringFactory::now(util::StringFactory::DATE_FORMAT);
+        std::string filename_eps = now + ".eps";
         DEBUG_VAR(filename_eps);
         std::ofstream of;
         of.open(filename_eps.c_str());
@@ -213,7 +288,7 @@ void MainOpenGLWindow::printScreen() {
                 }
                 if (toggle_poly_ >= 3) {
                     ReadLock l(skel_2d_->mutex());
-                    list<data::_2d::skel::AbstractEventSPtr>::reverse_iterator it_e =
+                    std::list<data::_2d::skel::AbstractEventSPtr>::reverse_iterator it_e =
                             skel_2d_->events().rbegin();
                     while (it_e != skel_2d_->events().rend()) {
                         data::_2d::skel::AbstractEventSPtr event = *it_e++;
@@ -253,8 +328,8 @@ void MainOpenGLWindow::printScreen() {
         printer3->setViewport(viewport);
         printer3->setCamEye(cam_eye);
         printer3->setCamCenter(cam_center);
-        string now = StringFactory::now(StringFactory::DATE_FORMAT);
-        string filename_eps = now + ".eps";
+        std::string now = util::StringFactory::now(util::StringFactory::DATE_FORMAT);
+        std::string filename_eps = now + ".eps";
         DEBUG_VAR(filename_eps);
         std::ofstream of;
         of.open(filename_eps.c_str());
@@ -284,7 +359,7 @@ void MainOpenGLWindow::printScreen() {
                     }
                     if (toggle_poly_ >= 3) {
                         ReadLock l(skel_3d_->mutex());
-                        list<data::_3d::skel::AbstractEventSPtr>::reverse_iterator it_e =
+                        std::list<data::_3d::skel::AbstractEventSPtr>::reverse_iterator it_e =
                                 skel_3d_->events().rbegin();
                         while (it_e != skel_3d_->events().rend()) {
                             data::_3d::skel::AbstractEventSPtr event = *it_e++;
@@ -348,8 +423,8 @@ void MainOpenGLWindow::run() {
 
 
 ThreadSPtr MainOpenGLWindow::startThread() {
-    return ThreadSPtr(new boost::thread(
-            boost::bind(&MainOpenGLWindow::run, this)));
+    return ThreadSPtr(new std::thread(
+            std::bind(&MainOpenGLWindow::run, this)));
 }
 
 
@@ -429,7 +504,7 @@ void MainOpenGLWindow::drawPolygon(PolygonSPtr polygon, float height, bool bold,
     ReadLock l(polygon->mutex());
     vec4f color_begin;
     getColor(color_begin);
-    list<data::_2d::VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<data::_2d::VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         data::_2d::VertexSPtr vertex = *it_v++;
         if (highlight_ && vertex->hasData()) {
@@ -450,7 +525,7 @@ void MainOpenGLWindow::drawPolygon(PolygonSPtr polygon, float height, bool bold,
     if (vertices_only) {
         return;
     }
-    list<data::_2d::EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<data::_2d::EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         data::_2d::EdgeSPtr edge = *it_e++;
         data::_2d::VertexSPtr vertex_src = edge->getVertexSrc();
@@ -487,7 +562,7 @@ void MainOpenGLWindow::drawSkel2d(data::_2d::skel::StraightSkeletonSPtr skel_2d)
     vec4f color_begin;
     getColor(color_begin);
     if (toggle_skel_) {
-        list<data::_2d::skel::NodeSPtr>::iterator it_n = skel_2d->nodes().begin();
+        std::list<data::_2d::skel::NodeSPtr>::iterator it_n = skel_2d->nodes().begin();
         while (it_n != skel_2d->nodes().end()) {
             data::_2d::skel::NodeSPtr node = *it_n++;
             vec3f p;
@@ -497,7 +572,7 @@ void MainOpenGLWindow::drawSkel2d(data::_2d::skel::StraightSkeletonSPtr skel_2d)
             }
             drawSphere(p, 0.1f * thickness_/scale_);
         }
-        list<data::_2d::skel::ArcSPtr>::iterator it_a = skel_2d->arcs().begin();
+        std::list<data::_2d::skel::ArcSPtr>::iterator it_a = skel_2d->arcs().begin();
         while (it_a != skel_2d->arcs().end()) {
             data::_2d::skel::ArcSPtr arc = *it_a++;
             data::_2d::skel::NodeSPtr node = arc->getNodeSrc();
@@ -529,7 +604,7 @@ void MainOpenGLWindow::drawSkel2d(data::_2d::skel::StraightSkeletonSPtr skel_2d)
     if (toggle_poly_ >= 3) {
         setColor(c_white);
         bool vertices_only = false;
-        list<data::_2d::skel::AbstractEventSPtr>::reverse_iterator it_e = skel_2d->events().rbegin();
+        std::list<data::_2d::skel::AbstractEventSPtr>::reverse_iterator it_e = skel_2d->events().rbegin();
         while (it_e != skel_2d->events().rend()) {
             data::_2d::skel::AbstractEventSPtr event = *it_e++;
             float height = 0.0f;
@@ -554,14 +629,14 @@ void MainOpenGLWindow::drawMesh2d(data::_2d::mesh::MeshSPtr mesh_2d) {
     ReadLock l(mesh_2d->mutex());
     vec4f color_begin;
     getColor(color_begin);
-    list<data::_2d::mesh::MeshCellSPtr>::iterator it_c = mesh_2d->cells().begin();
+    std::list<data::_2d::mesh::MeshCellSPtr>::iterator it_c = mesh_2d->cells().begin();
     while (it_c != mesh_2d->cells().end()) {
         data::_2d::mesh::MeshCellSPtr cell = *it_c++;
         if (cell->vertices().size() != 4) {
             setColor(c_red);
         }
         data::_2d::mesh::MeshVertexSPtr vertex_prev = cell->vertices().back();
-        list<data::_2d::mesh::MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+        std::list<data::_2d::mesh::MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
         while (it_v != cell->vertices().end()) {
             data::_2d::mesh::MeshVertexSPtr vertex = *it_v++;
             vec3f p_src;
@@ -583,7 +658,7 @@ void MainOpenGLWindow::drawPolyhedron(PolyhedronSPtr polyhedron, bool bold, bool
     ReadLock l(polyhedron->mutex());
     vec4f color_begin;
     getColor(color_begin);
-    list<data::_3d::VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<data::_3d::VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         data::_3d::VertexSPtr vertex = *it_v++;
         if (highlight_ && vertex->hasData()) {
@@ -603,7 +678,7 @@ void MainOpenGLWindow::drawPolyhedron(PolyhedronSPtr polyhedron, bool bold, bool
     if (vertices_only) {
         return;
     }
-    list<data::_3d::EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+    std::list<data::_3d::EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
     while (it_e != polyhedron->edges().end()) {
         data::_3d::EdgeSPtr edge = *it_e++;
         data::_3d::VertexSPtr vertex_src = edge->getVertexSrc();
@@ -627,7 +702,7 @@ void MainOpenGLWindow::drawPolyhedron(PolyhedronSPtr polyhedron, bool bold, bool
         }
         if (draw_dirs_ && edge->hasData()) {
             data::_3d::skel::SkelEdgeDataSPtr data =
-                    dynamic_pointer_cast<data::_3d::skel::SkelEdgeData>(edge->getData());
+                    std::dynamic_pointer_cast<data::_3d::skel::SkelEdgeData>(edge->getData());
             data::_3d::skel::SheetSPtr sheet = data->getSheet();
             if (sheet) {
                 data::_3d::Vector3SPtr normal =
@@ -655,10 +730,10 @@ void MainOpenGLWindow::drawPolyhedron(PolyhedronSPtr polyhedron, bool bold, bool
         return;
     }
     setColor(c_trans_grey);
-    list<data::_3d::FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+    std::list<data::_3d::FacetSPtr>::iterator it_f = polyhedron->facets().begin();
     while (it_f != polyhedron->facets().end()) {
         data::_3d::FacetSPtr facet = *it_f++;
-        list<data::_3d::TriangleSPtr>::iterator it_t = facet->triangles().begin();
+        std::list<data::_3d::TriangleSPtr>::iterator it_t = facet->triangles().begin();
         while (it_t != facet->triangles().end()) {
             data::_3d::TriangleSPtr triangle = *it_t++;
             vec3f a;
@@ -696,14 +771,14 @@ void MainOpenGLWindow::drawSkel3d(data::_3d::skel::StraightSkeletonSPtr skel_3d)
     vec4f color_begin;
     getColor(color_begin);
     if (toggle_skel_) {
-        list<data::_3d::skel::NodeSPtr>::iterator it_n = skel_3d->nodes().begin();
+        std::list<data::_3d::skel::NodeSPtr>::iterator it_n = skel_3d->nodes().begin();
         while (it_n != skel_3d->nodes().end()) {
             data::_3d::skel::NodeSPtr node = *it_n++;
             vec3f p;
             convert(node->getPoint(), p);
             drawSphere(p, 0.1f * thickness_/scale_);
         }
-        list<data::_3d::skel::ArcSPtr>::iterator it_a = skel_3d->arcs().begin();
+        std::list<data::_3d::skel::ArcSPtr>::iterator it_a = skel_3d->arcs().begin();
         while (it_a != skel_3d->arcs().end()) {
             data::_3d::skel::ArcSPtr arc = *it_a++;
             data::_3d::skel::NodeSPtr node = arc->getNodeSrc();
@@ -729,7 +804,7 @@ void MainOpenGLWindow::drawSkel3d(data::_3d::skel::StraightSkeletonSPtr skel_3d)
     if (toggle_poly_ >= 3) {
         setColor(c_white);
         bool vertices_only = false;
-        list<data::_3d::skel::AbstractEventSPtr>::reverse_iterator it_e = skel_3d->events().rbegin();
+        std::list<data::_3d::skel::AbstractEventSPtr>::reverse_iterator it_e = skel_3d->events().rbegin();
         while (it_e != skel_3d->events().rend()) {
             data::_3d::skel::AbstractEventSPtr event = *it_e++;
             drawPolyhedron(event->getPolyhedronResult(), false, vertices_only);
@@ -751,48 +826,48 @@ void MainOpenGLWindow::drawColoredNodes(data::_3d::skel::StraightSkeletonSPtr sk
     ReadLock l(skel_3d->mutex());
     vec4f color_begin;
     getColor(color_begin);
-    list<data::_3d::skel::AbstractEventSPtr>::iterator it_e = skel_3d->events().begin();
+    std::list<data::_3d::skel::AbstractEventSPtr>::iterator it_e = skel_3d->events().begin();
     while (it_e != skel_3d->events().end()) {
         data::_3d::skel::AbstractEventSPtr event = *it_e++;
         data::_3d::skel::NodeSPtr node;
         if (event->getType() == data::_3d::skel::AbstractEvent::EDGE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::EdgeEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::EdgeEvent>(event)->getNode();
             setColor(c_blue);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::EDGE_MERGE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::EdgeMergeEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::EdgeMergeEvent>(event)->getNode();
             setColor(c_blue);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::TRIANGLE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::TriangleEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::TriangleEvent>(event)->getNode();
             setColor(c_blue);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::DBL_EDGE_MERGE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::DblEdgeMergeEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::DblEdgeMergeEvent>(event)->getNode();
             setColor(c_blue);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::DBL_TRIANGLE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::DblTriangleEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::DblTriangleEvent>(event)->getNode();
             setColor(c_blue);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::TETRAHEDRON_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::TetrahedronEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::TetrahedronEvent>(event)->getNode();
             setColor(c_blue);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::VERTEX_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::VertexEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::VertexEvent>(event)->getNode();
             setColor(c_red);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::FLIP_VERTEX_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::FlipVertexEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::FlipVertexEvent>(event)->getNode();
             setColor(c_red);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::SURFACE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::SurfaceEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::SurfaceEvent>(event)->getNode();
             setColor(c_red);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::POLYHEDRON_SPLIT_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::PolyhedronSplitEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::PolyhedronSplitEvent>(event)->getNode();
             setColor(c_red);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::SPLIT_MERGE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::SplitMergeEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::SplitMergeEvent>(event)->getNode();
             setColor(c_red);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::EDGE_SPLIT_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::EdgeSplitEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::EdgeSplitEvent>(event)->getNode();
             setColor(c_red);
         } else if (event->getType() == data::_3d::skel::AbstractEvent::PIERCE_EVENT) {
-            node = dynamic_pointer_cast<data::_3d::skel::PierceEvent>(event)->getNode();
+            node = std::dynamic_pointer_cast<data::_3d::skel::PierceEvent>(event)->getNode();
             setColor(c_red);
         } else {
             continue;  // CONST_OFFSET_EVENT
@@ -818,7 +893,7 @@ void MainOpenGLWindow::drawSphericalPolygon(SphericalPolygonSPtr sphericalpolygo
             data::_3d::KernelFactory::createPoint3(sphere);
     vec3f center;
     convert(p_center, center);
-    list<data::_3d::CircularVertexSPtr>::iterator it_v = sphericalpolygon->vertices().begin();
+    std::list<data::_3d::CircularVertexSPtr>::iterator it_v = sphericalpolygon->vertices().begin();
     while (it_v != sphericalpolygon->vertices().end()) {
         data::_3d::CircularVertexSPtr vertex = *it_v++;
         if (!vertex->isPointValid()) {
@@ -841,7 +916,7 @@ void MainOpenGLWindow::drawSphericalPolygon(SphericalPolygonSPtr sphericalpolygo
     if (vertices_only) {
         return;
     }
-    list<data::_3d::CircularEdgeSPtr>::iterator it_e = sphericalpolygon->edges().begin();
+    std::list<data::_3d::CircularEdgeSPtr>::iterator it_e = sphericalpolygon->edges().begin();
     while (it_e != sphericalpolygon->edges().end()) {
         data::_3d::CircularEdgeSPtr edge = *it_e++;
         data::_3d::CircularVertexSPtr vertex_src = edge->getVertexSrc();
@@ -892,7 +967,7 @@ void MainOpenGLWindow::drawSphericalPolygon(SphericalPolygonSPtr sphericalpolygo
             data::_3d::Plane3SPtr plane = plane_edge;
             if (vertex_src->hasData()) {
                 data::_3d::skel::SphericalSkelVertexDataSPtr data_src =
-                        dynamic_pointer_cast<data::_3d::skel::SphericalSkelVertexData>(
+                        std::dynamic_pointer_cast<data::_3d::skel::SphericalSkelVertexData>(
                         vertex_src->getData());
                 data::_3d::skel::CircularArcSPtr arc_src = data_src->getArc();
                 if (arc_src) {
@@ -925,7 +1000,7 @@ void MainOpenGLWindow::drawSphericalPolygon(SphericalPolygonSPtr sphericalpolygo
             data::_3d::Plane3SPtr plane = plane_edge;
             if (vertex_dst->hasData()) {
                 data::_3d::skel::SphericalSkelVertexDataSPtr data_dst =
-                        dynamic_pointer_cast<data::_3d::skel::SphericalSkelVertexData>(
+                        std::dynamic_pointer_cast<data::_3d::skel::SphericalSkelVertexData>(
                         vertex_dst->getData());
                 data::_3d::skel::CircularArcSPtr arc_dst = data_dst->getArc();
                 if (arc_dst) {
@@ -969,14 +1044,14 @@ void MainOpenGLWindow::drawSphericalSkel(data::_3d::skel::SphericalSkeletonSPtr 
                 data::_3d::KernelFactory::createPoint3(sphericalskel->getSphere());
         vec3f center;
         convert(p_center, center);
-        list<data::_3d::skel::CircularNodeSPtr>::iterator it_n = sphericalskel->nodes().begin();
+        std::list<data::_3d::skel::CircularNodeSPtr>::iterator it_n = sphericalskel->nodes().begin();
         while (it_n != sphericalskel->nodes().end()) {
             data::_3d::skel::CircularNodeSPtr node = *it_n++;
             vec3f p;
             convert(node->getPoint(), p);
             drawSphere(p, 0.1f * thickness_/scale_);
         }
-        list<data::_3d::skel::CircularArcSPtr>::iterator it_a = sphericalskel->arcs().begin();
+        std::list<data::_3d::skel::CircularArcSPtr>::iterator it_a = sphericalskel->arcs().begin();
         while (it_a != sphericalskel->arcs().end()) {
             data::_3d::skel::CircularArcSPtr arc = *it_a++;
             data::_3d::skel::CircularNodeSPtr node = arc->getNodeSrc();
@@ -1006,7 +1081,7 @@ void MainOpenGLWindow::drawSphericalSkel(data::_3d::skel::SphericalSkeletonSPtr 
     if (toggle_poly_ >= 3) {
         setColor(c_white);
         bool vertices_only = false;
-        list<data::_3d::skel::SphericalAbstractEventSPtr>::reverse_iterator it_e = sphericalskel->events().rbegin();
+        std::list<data::_3d::skel::SphericalAbstractEventSPtr>::reverse_iterator it_e = sphericalskel->events().rbegin();
         while (it_e != sphericalskel->events().rend()) {
             data::_3d::skel::SphericalAbstractEventSPtr event = *it_e++;
             drawSphericalPolygon(event->getPolygonResult(), false, vertices_only);

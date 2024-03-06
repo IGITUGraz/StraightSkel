@@ -4,7 +4,16 @@
  * @date   2013-02-01
  */
 
-#include "ConvexVertexSplitter.h"
+#include "algo/3d/ConvexVertexSplitter.h"
+
+#include "debug.h"
+#include "algo/3d/SelfIntersection.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Polyhedron.h"
+#include "util/ptrs.h"
+#include "util/Configuration.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -13,7 +22,7 @@ ConvexVertexSplitter::ConvexVertexSplitter() {
     optimization_ = -1;
     util::ConfigurationSPtr config = util::Configuration::getInstance();
     if (config->isLoaded()) {
-        string s_optimization = config->getString(
+        std::string s_optimization = config->getString(
                 "algo_3d_ConvexVertexSplitter", "optimization");
         if (s_optimization.compare("max") == 0) {
             optimization_ = -1;
@@ -35,7 +44,7 @@ ConvexVertexSplitterSPtr ConvexVertexSplitter::create() {
 
 int ConvexVertexSplitter::countConvexEdges(PolyhedronSPtr polyhedron) {
     int result = 0;
-    list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
     while (it_e != polyhedron->edges().end()) {
         EdgeSPtr edge = *it_e++;
         if (!edge->isReflex()) {
@@ -52,13 +61,13 @@ PolyhedronSPtr ConvexVertexSplitter::splitVertex(VertexSPtr vertex) {
     }
     WriteLock l(polyhedron->mutex());
     vertex->sort();
-    list<combi> combinations = generateAllCombinations(vertex->degree());
+    std::list<combi> combinations = generateAllCombinations(vertex->degree());
     combi combi_opt;
     PolyhedronSPtr poly_opt;
     PolyhedronSPtr poly_opt_offset;
     int num_convex_edges = 0;
     int num_convex_edges_opt = 0;
-    list<combi>::iterator it_combi = combinations.begin();
+    std::list<combi>::iterator it_combi = combinations.begin();
     while (it_combi != combinations.end()) {
         combi combination = *it_combi++;
         PolyhedronSPtr poly_c = copyVertex(vertex);
@@ -101,8 +110,8 @@ PolyhedronSPtr ConvexVertexSplitter::splitVertex(VertexSPtr vertex) {
     return polyhedron;
 }
 
-string ConvexVertexSplitter::toString() const {
-    string result("ConvexVertexSplitter(");
+std::string ConvexVertexSplitter::toString() const {
+    std::string result("ConvexVertexSplitter(");
     if (optimization_ == -1) {
         result += "max";
     } else if (optimization_ == 1) {

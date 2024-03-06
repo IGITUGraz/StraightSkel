@@ -5,9 +5,8 @@
  */
 
 #ifndef DATA_3D_SKEL_SKELVERTEXDATA_H
-#define	DATA_3D_SKEL_SKELVERTEXDATA_H
+#define DATA_3D_SKEL_SKELVERTEXDATA_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
 #include "data/3d/VertexData.h"
 #include "data/3d/skel/ptrs.h"
@@ -36,5 +35,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SKELVERTEXDATA_H */
+#endif /* DATA_3D_SKEL_SKELVERTEXDATA_H */
 

@@ -5,7 +5,7 @@
  */
 
 #ifndef UI_GL_TYPEDEFS_H
-#define	UI_GL_TYPEDEFS_H
+#define UI_GL_TYPEDEFS_H
 
 #include "ui/typedefs.h"
 
@@ -32,5 +32,5 @@ const vec4f c_dark_yellow = {0.5f, 0.5f, 0.0f, 1.0f};
 
 } }
 
-#endif	/* UI_GL_TYPEDEFS_H */
+#endif /* UI_GL_TYPEDEFS_H */
 

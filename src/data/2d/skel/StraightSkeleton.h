@@ -5,30 +5,17 @@
  */
 
 #ifndef DATA_2D_SKEL_STRAIGHTSKELETON_H
-#define	DATA_2D_SKEL_STRAIGHTSKELETON_H
+#define DATA_2D_SKEL_STRAIGHTSKELETON_H
 
-#include <list>
-#include <string>
-#include "boost_thread.h"
-#include "util/StringFactory.h"
+#include "typedefs_thread.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/skel/ptrs.h"
-#include "data/2d/skel/Node.h"
-#include "data/2d/skel/Arc.h"
-#include "data/2d/skel/AbstractEvent.h"
-#include "data/2d/skel/EdgeEvent.h"
-#include "data/2d/skel/SplitEvent.h"
-#include "data/2d/skel/TriangleEvent.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _2d { namespace skel {
 
-using std::list;
-using std::string;
-using std::stringstream;
-using boost::dynamic_pointer_cast;
-using util::StringFactory;
-
-class StraightSkeleton : public boost::enable_shared_from_this<StraightSkeleton> {
+class StraightSkeleton : public std::enable_shared_from_this<StraightSkeleton> {
 public:
     virtual ~StraightSkeleton();
 
@@ -45,9 +32,9 @@ public:
     bool removeArc(ArcSPtr arc);
 
     SharedMutex& mutex();
-    list<AbstractEventSPtr>& events();
-    list<NodeSPtr>& nodes();
-    list<ArcSPtr>& arcs();
+    std::list<AbstractEventSPtr>& events();
+    std::list<NodeSPtr>& nodes();
+    std::list<ArcSPtr>& arcs();
 
     PolygonSPtr getPolygon() const;
     void setPolygon(PolygonSPtr polygon);
@@ -61,24 +48,23 @@ public:
 
     int countEvents(int type) const;
 
-    string getDescription() const;
-    void setDescription(string desc);
-    void appendDescription(string desc);
+    std::string getDescription() const;
+    void setDescription(const std::string& desc);
+    void appendDescription(const std::string& desc);
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     StraightSkeleton();
     PolygonSPtr polygon_;
     mutable SharedMutex mutex_;
-    list<AbstractEventSPtr> events_;
-    list<NodeSPtr> nodes_;
-    list<ArcSPtr> arcs_;
+    std::list<AbstractEventSPtr> events_;
+    std::list<NodeSPtr> nodes_;
+    std::list<ArcSPtr> arcs_;
     int id_;
-    string description_;
+    std::string description_;
 };
 
 } } }
 
-#endif	/* DATA_2D_SKEL_STRAIGHTSKELETON_H */
-
+#endif /* DATA_2D_SKEL_STRAIGHTSKELETON_H */

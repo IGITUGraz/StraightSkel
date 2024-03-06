@@ -4,7 +4,16 @@
  * @date   2013-12-16
  */
 
-#include "FLMAFile.h"
+#include "db/2d/FLMAFile.h"
+
+#include "data/2d/KernelFactory.h"
+#include "data/2d/Polygon.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "util/StringFuncs.h"
+#include "util/Configuration.h"
+#include <fstream>
+#include <vector>
 
 namespace db { namespace _2d {
 
@@ -16,25 +25,25 @@ FLMAFile::~FLMAFile() {
     // intentionally does nothing
 }
 
-PolygonSPtr FLMAFile::load(string filename) {
+PolygonSPtr FLMAFile::load(const std::string& filename) {
     PolygonSPtr result = PolygonSPtr();
-    ifstream ifs(filename.c_str());
+    std::ifstream ifs(filename.c_str());
     if (ifs.is_open()) {
         unsigned int l = 0;
         result = Polygon::create();
         unsigned int num_vertices = 0;
         unsigned int num_edges = 0;
         unsigned int edge_id = 0;
-        vector<VertexSPtr> vertices;
+        std::vector<VertexSPtr> vertices;
         while (ifs.good()) {
             l++;
-            string line;
+            std::string line;
             getline(ifs, line);
             if (l == 1) {
                 num_vertices = atoi(line.c_str());
             }
             if (l == 2) {
-                vector<string> str_coords =
+                std::vector<std::string> str_coords =
                         util::StringFuncs::split(line, " \t", false);
                 if (str_coords.size()%3 != 0) {
                     DEBUG_VAL("Error: " << filename << ":" << l);
@@ -48,14 +57,14 @@ PolygonSPtr FLMAFile::load(string filename) {
                     vertex->setID(i);
                     result->addVertex(vertex);
                 }
-                vertices = vector<VertexSPtr>(
+                vertices = std::vector<VertexSPtr>(
                         result->vertices().begin(), result->vertices().end());
             }
             if (l == 3) {
                 num_edges = atoi(line.c_str());
             }
             if (l > 3 && l%2 == 1 && edge_id < num_edges) {
-                vector<string> str_vs = util::StringFuncs::split(line, " \t", false);
+                std::vector<std::string> str_vs = util::StringFuncs::split(line, " \t", false);
                 if (str_vs.size() >= 2) {
                     unsigned int vertex_src_id = atoi(str_vs[0].c_str());
                     unsigned int vertex_dst_id = atoi(str_vs[1].c_str());
@@ -82,8 +91,8 @@ PolygonSPtr FLMAFile::load(string filename) {
         result->setDescription("filename='"+filename+"'; ");
         double epsilon = 0.0001;
         util::ConfigurationSPtr config = util::Configuration::getInstance();
-        string section("db_2d_FLMAFile");
-        string key("epsilon_collinearity");
+        std::string section("db_2d_FLMAFile");
+        std::string key("epsilon_collinearity");
         if (config->contains(section, key)) {
             epsilon = config->getDouble(section, key);
         }
@@ -93,7 +102,7 @@ PolygonSPtr FLMAFile::load(string filename) {
     return result;
 }
 
-bool FLMAFile::save(string filename, PolygonSPtr polygon) {
+bool FLMAFile::save(const std::string& filename, PolygonSPtr polygon) {
     bool result = false;
     // TODO
     return result;

@@ -5,14 +5,13 @@
  */
 
 #ifndef INTERSECTION_H
-#define	INTERSECTION_H
+#define INTERSECTION_H
 
-#include <cmath>
-#include "Point2.h"
-#include "Line2.h"
-#include "Point3.h"
-#include "Line3.h"
-#include "Plane3.h"
+#include "kernel/Point2.h"
+#include "kernel/Line2.h"
+#include "kernel/Point3.h"
+#include "kernel/Line3.h"
+#include "kernel/Plane3.h"
 
 namespace kernel {
 
@@ -24,5 +23,5 @@ Point3* intersection(const Plane3* plane, const Line3* line);
 
 }
 
-#endif	/* INTERSECTION_H */
+#endif /* INTERSECTION_H */
 

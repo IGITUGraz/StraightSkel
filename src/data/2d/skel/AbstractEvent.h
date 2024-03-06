@@ -5,23 +5,14 @@
  */
 
 #ifndef DATA_2D_SKEL_ABSTRACTEVENT_H
-#define	DATA_2D_SKEL_ABSTRACTEVENT_H
+#define DATA_2D_SKEL_ABSTRACTEVENT_H
 
-#include <list>
-#include <string>
-#include <sstream>
-#include "debug.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/skel/ptrs.h"
-#include "data/2d/skel/Node.h"
-#include "util/StringFactory.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _2d { namespace skel {
-
-using std::list;
-using std::string;
-using std::stringstream;
-using util::StringFactory;
 
 class AbstractEvent {
 public:
@@ -30,8 +21,8 @@ public:
     void setPolygonResult(PolygonSPtr polyon);
     StraightSkeletonSPtr getSkel() const;
     void setSkel(StraightSkeletonSPtr skel);
-    list<AbstractEventSPtr>::iterator getListIt() const;
-    void setListIt(list<AbstractEventSPtr>::iterator list_it);
+    std::list<AbstractEventSPtr>::iterator getListIt() const;
+    void setListIt(std::list<AbstractEventSPtr>::iterator list_it);
 
     int getID() const;
     void setID(int id);
@@ -46,18 +37,18 @@ public:
 
     virtual int getType() const;
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     AbstractEvent();
     PolygonSPtr polygon_result_;
     StraightSkeletonWPtr skel_;
-    list<AbstractEventSPtr>::iterator list_it_;
+    std::list<AbstractEventSPtr>::iterator list_it_;
     int type_;
     int id_;
 };
 
 } } }
 
-#endif	/* DATA_2D_SKEL_ABSTRACTEVENT_H */
+#endif /* DATA_2D_SKEL_ABSTRACTEVENT_H */
 

@@ -4,7 +4,11 @@
  * @date   2012-11-28
  */
 
-#include "CircularVertex.h"
+#include "data/3d/CircularVertex.h"
+
+#include "debug.h"
+#include "data/3d/CircularEdge.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _3d {
 
@@ -85,11 +89,11 @@ void CircularVertex::setPolygon(SphericalPolygonSPtr polygon) {
     this->polygon_ = polygon;
 }
 
-list<CircularVertexSPtr>::iterator CircularVertex::getListIt() const {
+std::list<CircularVertexSPtr>::iterator CircularVertex::getListIt() const {
     return this->list_it_;
 }
 
-void CircularVertex::setListIt(list<CircularVertexSPtr>::iterator list_it) {
+void CircularVertex::setListIt(std::list<CircularVertexSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -152,12 +156,12 @@ double CircularVertex::getZ() const {
 #endif
 }
 
-string CircularVertex::toString() const {
-    string result("CircularVertex(");
-    result += StringFactory::fromPointer(this) + ", ";
-    result += "<" + StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ", ";
-    result += StringFactory::fromDouble(getZ()) + ">)";
+std::string CircularVertex::toString() const {
+    std::string result("CircularVertex(");
+    result += util::StringFactory::fromPointer(this) + ", ";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ", ";
+    result += util::StringFactory::fromDouble(getZ()) + ">)";
     return result;
 }
 

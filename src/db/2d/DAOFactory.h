@@ -5,32 +5,19 @@
  */
 
 #ifndef DB_2D_DAOFACTORY_H
-#define	DB_2D_DAOFACTORY_H
+#define DB_2D_DAOFACTORY_H
 
-#include <cstdlib>
-#include <string>
-#include <fstream>
 #include "db/ptrs.h"
-#include "db/SQLiteDatabase.h"
 #include "db/2d/ptrs.h"
-#include "db/2d/PointDAO.h"
-#include "db/2d/VertexDAO.h"
-#include "db/2d/EdgeDAO.h"
-#include "db/2d/PolygonDAO.h"
-#include "db/2d/NodeDAO.h"
-#include "db/2d/ArcDAO.h"
-#include "db/2d/EventDAO.h"
-#include "db/2d/StraightSkeletonDAO.h"
+#include <string>
 
 namespace db { namespace _2d {
-
-using std::string;
 
 class DAOFactory {
 public:
     virtual ~DAOFactory();
 
-    static string findDefaultFilename();
+    static std::string findDefaultFilename();
     static bool createTables();
     static SQLiteDatabaseSPtr getDB();
 
@@ -64,5 +51,4 @@ protected:
 
 } }
 
-#endif	/* DB_2D_DAOFACTORY_H */
-
+#endif /* DB_2D_DAOFACTORY_H */

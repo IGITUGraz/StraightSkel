@@ -5,9 +5,9 @@
  */
 
 #ifndef DATA_2D_SKEL_PTRS_H
-#define	DATA_2D_SKEL_PTRS_H
+#define DATA_2D_SKEL_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 /*
  * forward declare classes
@@ -55,4 +55,4 @@ typedef WEAK_PTR<SkelEdgeData> SkelEdgeDataWPtr;
 
 } } }
 
-#endif	/* DATA_2D_SKEL_PTRS_H */
+#endif /* DATA_2D_SKEL_PTRS_H */

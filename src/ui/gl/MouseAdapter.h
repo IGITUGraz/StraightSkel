@@ -5,13 +5,12 @@
  */
 
 #ifndef UI_GL_MOUSEADAPTER_H
-#define	UI_GL_MOUSEADAPTER_H
+#define UI_GL_MOUSEADAPTER_H
 
 #include "ui/gl/ptrs.h"
-#include "ui/gl/Camera.h"
 #include "ui/gl/typedefs.h"
 #include "util/ptrs.h"
-#include "util/Configuration.h"
+#include <string>
 
 namespace ui { namespace gl {
 
@@ -23,7 +22,7 @@ public:
     /**
      * It will return -1 when the given string is invalid.
      */
-    int toButton(const string& button);
+    int toButton(const std::string& button);
     void loadConfig(util::ConfigurationSPtr config);
 
     void pressed(int button, int x, int y);
@@ -58,5 +57,5 @@ protected:
 
 } }
 
-#endif	/* UI_GL_MOUSEADAPTER_H */
+#endif /* UI_GL_MOUSEADAPTER_H */
 

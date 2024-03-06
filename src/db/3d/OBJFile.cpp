@@ -4,7 +4,22 @@
  * @date   2012-05-15
  */
 
-#include "OBJFile.h"
+#include "db/3d/OBJFile.h"
+
+#include "debug.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Triangle.h"
+#include "data/3d/KernelFactory.h"
+#include "util/StringFuncs.h"
+#include "util/Configuration.h"
+#include <cmath>
+#include <exception>
+#include <fstream>
+#include <sstream>
+#include <vector>
 
 namespace db { namespace _3d {
 
@@ -16,20 +31,20 @@ OBJFile::~OBJFile() {
     // intentionally does nothing
 }
 
-PolyhedronSPtr OBJFile::load(string filename) {
+PolyhedronSPtr OBJFile::load(const std::string& filename) {
     PolyhedronSPtr result = PolyhedronSPtr();
-    ifstream ifs(filename.c_str());
+    std::ifstream ifs(filename.c_str());
     if (ifs.is_open()) {
         result = Polyhedron::create();
         unsigned int vertex_id_new = 0;
         unsigned int facet_id_new = 0;
-        vector<VertexSPtr> vertices;
-        vector<Vector3SPtr> normals;
+        std::vector<VertexSPtr> vertices;
+        std::vector<Vector3SPtr> normals;
         while (ifs.good()) {
-            string line;
+            std::string line;
             getline(ifs, line);
             if (line.find("v ") == 0) {  // vertex
-                vector<string> strs = util::StringFuncs::split(line, " \t", false);
+                std::vector<std::string> strs = util::StringFuncs::split(line, " \t", false);
                 if (strs.size() >= 4) {
                     vertex_id_new++;
                     Point3SPtr point = KernelFactory::createPoint3(
@@ -39,7 +54,7 @@ PolyhedronSPtr OBJFile::load(string filename) {
                     result->addVertex(vertex);
                 }
             } else if (line.find("vn ") == 0) {  // vertex normal
-                vector<string> strs = util::StringFuncs::split(line, " \t", false);
+                std::vector<std::string> strs = util::StringFuncs::split(line, " \t", false);
                 if (strs.size() >= 4) {
                     Vector3SPtr normal = KernelFactory::createVector3(
                             atof(strs[1].c_str()), atof(strs[2].c_str()), atof(strs[3].c_str()));
@@ -47,10 +62,10 @@ PolyhedronSPtr OBJFile::load(string filename) {
                 }
             } else if (line.find("f ") == 0) {  // face
                 if (vertices.size() != result->vertices().size()) {  // initialize vector
-                    vertices = vector<VertexSPtr>(
+                    vertices = std::vector<VertexSPtr>(
                             result->vertices().begin(), result->vertices().end());
                 }
-                vector<string> strs = util::StringFuncs::split(line, " \t", false);
+                std::vector<std::string> strs = util::StringFuncs::split(line, " \t", false);
                 if (strs.size() >= 4) {
                     facet_id_new++;
                     unsigned int num_vertices = strs.size() - 1;
@@ -60,7 +75,7 @@ PolyhedronSPtr OBJFile::load(string filename) {
                         poly_vertices[i] = VertexSPtr();
                     }
                     for (unsigned int i = 0; i < num_vertices; i++) {
-                        vector<string> strsvertex =
+                        std::vector<std::string> strsvertex =
                                 util::StringFuncs::split(strs[i+1], "/", true);
                         if (strsvertex.size() > 0) {
                             unsigned int vertex_id = atoi(strsvertex[0].c_str());
@@ -130,7 +145,7 @@ PolyhedronSPtr OBJFile::load(string filename) {
         }
         ifs.close();
         result->setDescription("filename='"+filename+"'; ");
-        list<EdgeSPtr>::iterator it_e = result->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e = result->edges().begin();
         while (it_e != result->edges().end()) {
             EdgeSPtr edge = *it_e++;
             if (!(edge->getFacetL() && edge->getFacetR())) {
@@ -140,8 +155,8 @@ PolyhedronSPtr OBJFile::load(string filename) {
         }
         double epsilon = 0.0001;
         util::ConfigurationSPtr config = util::Configuration::getInstance();
-        string section("db_3d_OBJFile");
-        string key("epsilon_coplanarity");
+        std::string section("db_3d_OBJFile");
+        std::string key("epsilon_coplanarity");
         if (config->contains(section, key)) {
             epsilon = config->getDouble(section, key);
         }
@@ -152,13 +167,13 @@ PolyhedronSPtr OBJFile::load(string filename) {
     return result;
 }
 
-bool OBJFile::save(string filename, PolyhedronSPtr polyhedron) {
+bool OBJFile::save(const std::string& filename, PolyhedronSPtr polyhedron) {
     bool result = false;
-    ofstream ofs(filename.c_str());
+    std::ofstream ofs(filename.c_str());
     if (ofs.is_open()) {
         WriteLock l(polyhedron->mutex());
         unsigned int vertex_id = 0;
-        list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+        std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
         while (it_v != polyhedron->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             vertex_id++;
@@ -168,7 +183,7 @@ bool OBJFile::save(string filename, PolyhedronSPtr polyhedron) {
                         << vertex->getZ() << "\n";
         }
         unsigned int facet_id = 0;
-        list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+        std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
         while (it_f != polyhedron->facets().end()) {
             FacetSPtr facet = *it_f++;
             facet->makeFirstConvex();

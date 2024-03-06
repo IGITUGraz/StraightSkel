@@ -5,21 +5,13 @@
  */
 
 #ifndef ALGO_3D_POLYHEDRONTRANSFORMATION_H
-#define	ALGO_3D_POLYHEDRONTRANSFORMATION_H
+#define ALGO_3D_POLYHEDRONTRANSFORMATION_H
 
-#include <cstdlib>
-#include <cmath>
-#include <ctime>
-#include <list>
-#include <limits>
 #include "data/3d/ptrs.h"
-#include "data/3d/Polyhedron.h"
-#include "algo/3d/KernelWrapper.h"
 
 namespace algo { namespace _3d {
 
 using namespace data::_3d;
-using std::list;
 
 class PolyhedronTransformation {
 public:
@@ -51,5 +43,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_POLYHEDRONTRANSFORMATION_H */
-
+#endif /* ALGO_3D_POLYHEDRONTRANSFORMATION_H */

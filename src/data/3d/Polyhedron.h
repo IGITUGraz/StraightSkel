@@ -5,25 +5,16 @@
  */
 
 #ifndef DATA_3D_POLYHEDRON_H
-#define	DATA_3D_POLYHEDRON_H
+#define DATA_3D_POLYHEDRON_H
 
-#include <list>
-#include <map>
-#include <string>
-#include "boost_thread.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Facet.h"
-#include "debug.h"
+#include "typedefs_thread.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _3d {
 
-using std::list;
-using std::map;
-using std::string;
-
-class Polyhedron : public boost::enable_shared_from_this<Polyhedron> {
+class Polyhedron : public std::enable_shared_from_this<Polyhedron> {
 public:
     virtual ~Polyhedron();
 
@@ -57,9 +48,9 @@ public:
 
     SharedMutex& mutex();
 
-    list<VertexSPtr>& vertices();
-    list<EdgeSPtr>& edges();
-    list<FacetSPtr>& facets();
+    std::list<VertexSPtr>& vertices();
+    std::list<EdgeSPtr>& edges();
+    std::list<FacetSPtr>& facets();
 
     bool isConsistent() const;
     void clear();
@@ -69,23 +60,22 @@ public:
 
     void resetAllIDs();
 
-    string getDescription() const;
-    void setDescription(string desc);
-    void appendDescription(string desc);
+    std::string getDescription() const;
+    void setDescription(const std::string& desc);
+    void appendDescription(const std::string& desc);
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Polyhedron();
     mutable SharedMutex mutex_;
-    list<VertexSPtr> vertices_;
-    list<EdgeSPtr> edges_;
-    list<FacetSPtr> facets_;
+    std::list<VertexSPtr> vertices_;
+    std::list<EdgeSPtr> edges_;
+    std::list<FacetSPtr> facets_;
     int id_;
-    string description_;
+    std::string description_;
 };
 
 } }
 
-#endif	/* DATA_3D_POLYHEDRON_H */
-
+#endif /* DATA_3D_POLYHEDRON_H */

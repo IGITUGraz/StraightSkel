@@ -5,15 +5,9 @@
  */
 
 #ifndef ALGO_3D_SELFINTERSECTION_H
-#define	ALGO_3D_SELFINTERSECTION_H
+#define ALGO_3D_SELFINTERSECTION_H
 
-#include <list>
-#include <limits>
 #include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Facet.h"
-#include "algo/3d/KernelWrapper.h"
 
 namespace algo { namespace _3d {
 
@@ -39,5 +33,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_SELFINTERSECTION_H */
-
+#endif /* ALGO_3D_SELFINTERSECTION_H */

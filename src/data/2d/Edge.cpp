@@ -4,7 +4,12 @@
  * @date   2011-11-22
  */
 
-#include "Edge.h"
+#include "data/2d/Edge.h"
+
+#include "debug.h"
+#include "util/StringFactory.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/KernelFactory.h"
 
 namespace data { namespace _2d {
 
@@ -55,11 +60,11 @@ void Edge::setPolygon(PolygonSPtr polygon) {
     this->polygon_ = polygon;
 }
 
-list<EdgeSPtr>::iterator Edge::getListIt() const {
+std::list<EdgeSPtr>::iterator Edge::getListIt() const {
     return this->list_it_;
 }
 
-void Edge::setListIt(list<EdgeSPtr>::iterator list_it) {
+void Edge::setListIt(std::list<EdgeSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -106,12 +111,12 @@ Line2SPtr Edge::line() const {
             vertex_src_->getPoint(), vertex_dst_->getPoint());
 }
 
-string Edge::toString() const {
-    string result("Edge(");
+std::string Edge::toString() const {
+    std::string result("Edge(");
     if (id_ != -1) {
-        result += "id=" + StringFactory::fromInteger(id_) + ", ";
+        result += "id=" + util::StringFactory::fromInteger(id_) + ", ";
     } else {
-        result += StringFactory::fromPointer(this) + ", ";
+        result += util::StringFactory::fromPointer(this) + ", ";
     }
     result += "src=" + vertex_src_->toString() + ", ";
     result += "dst=" + vertex_dst_->toString() + ")";

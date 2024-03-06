@@ -5,15 +5,9 @@
  */
 
 #ifndef DB_2D_ABSTRACTFILE_H
-#define	DB_2D_ABSTRACTFILE_H
+#define DB_2D_ABSTRACTFILE_H
 
-#include <cmath>
-#include "debug.h"
 #include "data/2d/ptrs.h"
-#include "data/2d/KernelFactory.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
-#include "data/2d/Polygon.h"
 
 namespace db { namespace _2d {
 
@@ -30,5 +24,5 @@ protected:
 
 } }
 
-#endif	/* DB_2D_ABSTRACTFILE_H */
+#endif /* DB_2D_ABSTRACTFILE_H */
 

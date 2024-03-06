@@ -4,7 +4,9 @@
  * @date   2012-02-25
  */
 
-#include "distance.h"
+#include "kernel/distance.h"
+
+#include <cmath>
 
 namespace kernel {
 

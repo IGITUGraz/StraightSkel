@@ -5,16 +5,9 @@
  */
 
 #ifndef DB_3D_ABSTRACTFILE_H
-#define	DB_3D_ABSTRACTFILE_H
+#define DB_3D_ABSTRACTFILE_H
 
-#include <cmath>
-#include "debug.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Facet.h"
-#include "data/3d/Polyhedron.h"
 
 namespace db { namespace _3d {
 
@@ -33,5 +26,4 @@ protected:
 
 } }
 
-#endif	/* DB_3D_ABSTRACTFILE_H */
-
+#endif /* DB_3D_ABSTRACTFILE_H */

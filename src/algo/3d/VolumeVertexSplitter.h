@@ -5,21 +5,17 @@
  */
 
 #ifndef ALGO_3D_VOLUMEVERTEXSPLITTER_H
-#define	ALGO_3D_VOLUMEVERTEXSPLITTER_H
+#define ALGO_3D_VOLUMEVERTEXSPLITTER_H
 
-#include "data/3d/ptrs.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/2d/ptrs.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Polygon.h"
 #include "algo/ptrs.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/AbstractVertexSplitter.h"
 #include "algo/3d/CombiVertexSplitter.h"
+#include "data/2d/ptrs.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include <string>
 
 namespace algo { namespace _3d {
-
-using std::string;
 
 class VolumeVertexSplitter : public CombiVertexSplitter {
 public:
@@ -39,7 +35,7 @@ public:
 
     virtual PolyhedronSPtr splitVertex(VertexSPtr vertex);
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     VolumeVertexSplitter();
@@ -48,5 +44,5 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_VOLUMEVERTEXSPLITTER_H */
+#endif /* ALGO_3D_VOLUMEVERTEXSPLITTER_H */
 

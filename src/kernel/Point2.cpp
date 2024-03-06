@@ -4,7 +4,9 @@
  * @date   2011-11-10
  */
 
-#include "Point2.h"
+#include "kernel/Point2.h"
+
+#include <stdexcept>
 
 namespace kernel {
 
@@ -41,7 +43,7 @@ double Point2::operator[](unsigned int i) const {
     } else if (i == 1) {
         return this->y_;
     } else {
-        throw out_of_range("Index out of bounds.");
+        throw std::out_of_range("Index out of bounds.");
     }
 }
 

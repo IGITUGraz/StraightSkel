@@ -4,7 +4,13 @@
  * @date   2011-11-26
  */
 
-#include "Triangle.h"
+#include "data/3d/Triangle.h"
+
+#include "data/3d/Vertex.h"
+#include "data/3d/Facet.h"
+#include "data/3d/KernelFactory.h"
+#include "debug.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _3d {
 
@@ -32,11 +38,11 @@ void Triangle::setFacet(FacetSPtr facet) {
     this->facet_ = facet;
 }
 
-list<TriangleSPtr>::iterator Triangle::getFacetListIt() const {
+std::list<TriangleSPtr>::iterator Triangle::getFacetListIt() const {
     return this->facet_list_it_;
 }
 
-void Triangle::setFacetListIt(list<TriangleSPtr>::iterator list_it) {
+void Triangle::setFacetListIt(std::list<TriangleSPtr>::iterator list_it) {
     this->facet_list_it_ = list_it;
 }
 
@@ -68,16 +74,16 @@ void Triangle::setID(int id) {
     this->id_ = id;
 }
 
-string Triangle::toString() const {
-    string result("Triangle(");
+std::string Triangle::toString() const {
+    std::string result("Triangle(");
     for (unsigned int i = 0; i < 3; i++) {
         if (i > 0) {
             result += ", ";
         }
         if (vertices_[i]->getID() != -1) {
-            result += StringFactory::fromInteger(vertices_[i]->getID());
+            result += util::StringFactory::fromInteger(vertices_[i]->getID());
         } else {
-            result += StringFactory::fromPointer(vertices_[i].get());
+            result += util::StringFactory::fromPointer(vertices_[i].get());
         }
     }
     result += ")";

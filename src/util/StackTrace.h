@@ -5,28 +5,24 @@
  */
 
 #ifndef UTIL_STACKTRACE_H
-#define	UTIL_STACKTRACE_H
+#define UTIL_STACKTRACE_H
 
-#include <cstdlib>
-#include <iostream>
 #ifdef __linux__
 #include <execinfo.h>
 #include <cxxabi.h>
 #endif
+#include <iostream>
+#include <string>
 
 namespace util {
-
-using std::string;
-using std::ostream;
 
 class StackTrace {
 public:
     virtual ~StackTrace();
-    static string demangle(string symbol_mangled);
-    static void print(ostream& os);
+    static std::string demangle(const std::string& symbol_mangled);
+    static void print(std::ostream& os);
 };
 
 }
 
-#endif	/* UTIL_STACKTRACE_H */
-
+#endif /* UTIL_STACKTRACE_H */

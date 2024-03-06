@@ -4,7 +4,18 @@
  * @date   2012-11-28
  */
 
-#include "SphericalSkeleton.h"
+#include "data/3d/skel/SphericalSkeleton.h"
+
+#include "debug.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/SphericalAbstractEvent.h"
+#include "data/3d/skel/SphericalEdgeEvent.h"
+#include "data/3d/skel/SphericalSplitEvent.h"
+#include "data/3d/skel/SphericalTriangleEvent.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _3d { namespace skel {
 
@@ -39,21 +50,21 @@ void SphericalSkeleton::setRotAxesPlane(Plane3SPtr rot_axes_plane) {
 
 
 void SphericalSkeleton::addEvent(SphericalAbstractEventSPtr event) {
-    list<SphericalAbstractEventSPtr>::iterator it = events_.insert(events_.end(), event);
+    std::list<SphericalAbstractEventSPtr>::iterator it = events_.insert(events_.end(), event);
     event->setSkel(shared_from_this());
     event->setListIt(it);
     CircularNodeSPtr node = CircularNodeSPtr();
     if (event->getType() == SphericalAbstractEvent::EDGE_EVENT) {
         SphericalEdgeEventSPtr edge_event =
-                dynamic_pointer_cast<SphericalEdgeEvent>(event);
+                std::dynamic_pointer_cast<SphericalEdgeEvent>(event);
         node = edge_event->getNode();
     } else if (event->getType() == SphericalAbstractEvent::SPLIT_EVENT) {
         SphericalSplitEventSPtr split_event =
-                dynamic_pointer_cast<SphericalSplitEvent>(event);
+                std::dynamic_pointer_cast<SphericalSplitEvent>(event);
         node = split_event->getNode();
     } else if (event->getType() == SphericalAbstractEvent::TRIANGLE_EVENT) {
         SphericalTriangleEventSPtr triangle_event =
-                dynamic_pointer_cast<SphericalTriangleEvent>(event);
+                std::dynamic_pointer_cast<SphericalTriangleEvent>(event);
         node = triangle_event->getNode();
     }
     if (node) {
@@ -68,19 +79,19 @@ bool SphericalSkeleton::removeEvent(SphericalAbstractEventSPtr event) {
     if (event->getSkel() == shared_from_this()) {
         events_.erase(event->getListIt());
         event->setSkel(SphericalSkeletonSPtr());
-        event->setListIt(list<SphericalAbstractEventSPtr>::iterator());
+        event->setListIt(std::list<SphericalAbstractEventSPtr>::iterator());
         CircularNodeSPtr node = CircularNodeSPtr();
         if (event->getType() == SphericalAbstractEvent::EDGE_EVENT) {
             SphericalEdgeEventSPtr edge_event =
-                    dynamic_pointer_cast<SphericalEdgeEvent>(event);
+                    std::dynamic_pointer_cast<SphericalEdgeEvent>(event);
             node = edge_event->getNode();
         } else if (event->getType() == SphericalAbstractEvent::SPLIT_EVENT) {
             SphericalSplitEventSPtr split_event =
-                    dynamic_pointer_cast<SphericalSplitEvent>(event);
+                    std::dynamic_pointer_cast<SphericalSplitEvent>(event);
             node = split_event->getNode();
         } else if (event->getType() == SphericalAbstractEvent::TRIANGLE_EVENT) {
             SphericalTriangleEventSPtr triangle_event =
-                    dynamic_pointer_cast<SphericalTriangleEvent>(event);
+                    std::dynamic_pointer_cast<SphericalTriangleEvent>(event);
             node = triangle_event->getNode();
         }
         if (node) {
@@ -91,7 +102,7 @@ bool SphericalSkeleton::removeEvent(SphericalAbstractEventSPtr event) {
 }
 
 void SphericalSkeleton::addNode(CircularNodeSPtr node) {
-    list<CircularNodeSPtr>::iterator it = nodes_.insert(nodes_.end(), node);
+    std::list<CircularNodeSPtr>::iterator it = nodes_.insert(nodes_.end(), node);
     node->setSkel(shared_from_this());
     node->setListIt(it);
 }
@@ -101,14 +112,14 @@ bool SphericalSkeleton::removeNode(CircularNodeSPtr node) {
     if (node->getSkel() == shared_from_this()) {
         nodes_.erase(node->getListIt());
         node->setSkel(SphericalSkeletonSPtr());
-        node->setListIt(list<CircularNodeSPtr>::iterator());
+        node->setListIt(std::list<CircularNodeSPtr>::iterator());
         result = true;
     }
     return result;
 }
 
 void SphericalSkeleton::addArc(CircularArcSPtr arc) {
-    list<CircularArcSPtr>::iterator it = arcs_.insert(arcs_.end(), arc);
+    std::list<CircularArcSPtr>::iterator it = arcs_.insert(arcs_.end(), arc);
     arc->setSkel(shared_from_this());
     arc->setListIt(it);
 }
@@ -118,7 +129,7 @@ bool SphericalSkeleton::removeArc(CircularArcSPtr arc) {
     if (arc->getSkel() == shared_from_this()) {
         arcs_.erase(arc->getListIt());
         arc->setSkel(SphericalSkeletonSPtr());
-        arc->setListIt(list<CircularArcSPtr>::iterator());
+        arc->setListIt(std::list<CircularArcSPtr>::iterator());
         result = true;
     }
     return result;
@@ -128,21 +139,21 @@ SharedMutex& SphericalSkeleton::mutex() {
     return this->mutex_;
 }
 
-list<SphericalAbstractEventSPtr>& SphericalSkeleton::events() {
+std::list<SphericalAbstractEventSPtr>& SphericalSkeleton::events() {
     return this->events_;
 }
 
-list<CircularNodeSPtr>& SphericalSkeleton::nodes() {
+std::list<CircularNodeSPtr>& SphericalSkeleton::nodes() {
     return this->nodes_;
 }
 
-list<CircularArcSPtr>& SphericalSkeleton::arcs() {
+std::list<CircularArcSPtr>& SphericalSkeleton::arcs() {
     return this->arcs_;
 }
 
 bool SphericalSkeleton::isConsistent() const {
     bool result = true;
-    list<CircularNodeSPtr>::const_iterator it_n = nodes_.begin();
+    std::list<CircularNodeSPtr>::const_iterator it_n = nodes_.begin();
     while (it_n != nodes_.end()) {
         CircularNodeSPtr node = *it_n++;
         if (node->getSkel() != shared_from_this()) {
@@ -151,7 +162,7 @@ bool SphericalSkeleton::isConsistent() const {
             break;
         }
         unsigned int num_arcs = 0;
-        list<CircularArcWPtr>::const_iterator it_a = node->arcs().begin();
+        std::list<CircularArcWPtr>::const_iterator it_a = node->arcs().begin();
         while (it_a != node->arcs().end()) {
             CircularArcWPtr arc_wptr = *it_a++;
             if (arc_wptr.expired()) {
@@ -173,7 +184,7 @@ bool SphericalSkeleton::isConsistent() const {
             DEBUG_VAR(num_arcs);
         }
     }
-    list<CircularArcSPtr>::const_iterator it_a = arcs_.begin();
+    std::list<CircularArcSPtr>::const_iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         CircularArcSPtr arc = *it_a++;
         CircularArcWPtr arc_wptr(arc);
@@ -182,7 +193,7 @@ bool SphericalSkeleton::isConsistent() const {
             result = false;
             break;
         }
-        list<CircularArcWPtr> warcs = arc->getNodeSrc()->arcs();
+        std::list<CircularArcWPtr> warcs = arc->getNodeSrc()->arcs();
         if (warcs.end() == std::find(warcs.begin(), warcs.end(), arc_wptr)) {
             DEBUG_VAR(arc->toString());
             DEBUG_VAR(arc->getNodeSrc()->toString());
@@ -204,7 +215,7 @@ bool SphericalSkeleton::isConsistent() const {
 
 int SphericalSkeleton::countEvents(int type) const {
     int result = 0;
-    list<SphericalAbstractEventSPtr>::const_iterator it_e = events_.begin();
+    std::list<SphericalAbstractEventSPtr>::const_iterator it_e = events_.begin();
     while (it_e != events_.end()) {
         SphericalAbstractEventSPtr event = *it_e++;
         if (event->getType() == type) {
@@ -226,10 +237,10 @@ double SphericalSkeleton::getRadius() const {
     return result;
 }
 
-string SphericalSkeleton::toString() const {
-    stringstream sstr;
+std::string SphericalSkeleton::toString() const {
+    std::stringstream sstr;
     sstr << "SphericalSkeleton(";
-    sstr << StringFactory::fromPointer(this);
+    sstr << util::StringFactory::fromPointer(this);
     sstr << "," << std::endl;
     sstr << "Nodes:  " << nodes_.size() << std::endl;
     sstr << "Arcs:   " << arcs_.size() << std::endl;

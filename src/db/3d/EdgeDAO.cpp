@@ -1,4 +1,11 @@
-#include "EdgeDAO.h"
+#include "db/3d/EdgeDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/PointDAO.h"
+#include "db/3d/VertexDAO.h"
+#include "db/3d/PolyhedronDAO.h"
+#include "db/3d/FacetDAO.h"
 
 namespace db { namespace _3d {
 
@@ -10,8 +17,8 @@ EdgeDAO::~EdgeDAO() {
     // intentionally does nothing
 }
 
-string EdgeDAO::getTableSchema() const {
-    string schema("CREATE TABLE Edges (\n"
+std::string EdgeDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Edges (\n"
             "  PolyhedronID INTEGER NOT NULL,\n"
             "  EID INTEGER NOT NULL,\n"
             "  VID_SRC INTEGER,\n"
@@ -26,7 +33,7 @@ string EdgeDAO::getTableSchema() const {
 int EdgeDAO::nextEID(int polyhedronid) {
     int eid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(EID) FROM Edges WHERE PolyhedronID=?;");
+    std::string sql("SELECT MAX(EID) FROM Edges WHERE PolyhedronID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -62,7 +69,7 @@ int EdgeDAO::insert(EdgeSPtr edge) {
         } else {
             dao_vertex->insert(edge->getVertexDst());
         }
-        string sql("INSERT INTO Edges (PolyhedronID, EID, VID_SRC, VID_DST) "
+        std::string sql("INSERT INTO Edges (PolyhedronID, EID, VID_SRC, VID_DST) "
                 "VALUES (?, ?, ?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
@@ -90,7 +97,7 @@ bool EdgeDAO::del(EdgeSPtr edge) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Edges WHERE PolyhedronID=? AND EID=?;");
+    std::string sql("DELETE FROM Edges WHERE PolyhedronID=? AND EID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -106,7 +113,7 @@ bool EdgeDAO::del(EdgeSPtr edge) {
 EdgeSPtr EdgeDAO::find(int polyhedronid, int eid) {
     EdgeSPtr result = EdgeSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT VID_SRC, VID_DST FROM Edges WHERE PolyhedronID=? AND EID=?;");
+    std::string sql("SELECT VID_SRC, VID_DST FROM Edges WHERE PolyhedronID=? AND EID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -135,7 +142,7 @@ bool EdgeDAO::update(EdgeSPtr edge) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("UPDATE Edges "
+    std::string sql("UPDATE Edges "
             "SET VID_SRC=?, VID_DST=?, FID_L=?, FID_R=? "
             "WHERE PolyhedronID=? AND EID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);

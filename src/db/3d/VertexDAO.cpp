@@ -1,4 +1,9 @@
-#include "VertexDAO.h"
+#include "db/3d/VertexDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/PointDAO.h"
+#include "db/3d/PolyhedronDAO.h"
 
 namespace db { namespace _3d {
 
@@ -10,8 +15,8 @@ VertexDAO::~VertexDAO() {
     // intentionally does nothing
 }
 
-string VertexDAO::getTableSchema() const {
-    string schema("CREATE TABLE Vertices (\n"
+std::string VertexDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Vertices (\n"
             "  PolyhedronID INTEGER NOT NULL,\n"
             "  VID INTEGER NOT NULL,\n"
             "  PointID INTEGER,\n"
@@ -23,7 +28,7 @@ string VertexDAO::getTableSchema() const {
 int VertexDAO::nextVID(int polyhedronid) {
     int vid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(VID) FROM Vertices WHERE PolyhedronID=?;");
+    std::string sql("SELECT MAX(VID) FROM Vertices WHERE PolyhedronID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -51,7 +56,7 @@ int VertexDAO::insert(VertexSPtr vertex) {
         int pointid = dao_point->insert(vertex->getPoint());
         if (pointid > 0) {
             int vid = nextVID(polyhedronid);
-            string sql("INSERT INTO Vertices (PolyhedronID, VID, PointID) "
+            std::string sql("INSERT INTO Vertices (PolyhedronID, VID, PointID) "
                     "VALUES (?, ?, ?);");
             SQLiteStmtSPtr stmt = db->prepare(sql);
             if (stmt) {
@@ -79,7 +84,7 @@ bool VertexDAO::del(VertexSPtr vertex) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Vertices WHERE PolyhedronID=? AND VID=?;");
+    std::string sql("DELETE FROM Vertices WHERE PolyhedronID=? AND VID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -116,7 +121,7 @@ bool VertexDAO::del(VertexSPtr vertex) {
 VertexSPtr VertexDAO::find(int polyhedronid, int vid) {
     VertexSPtr result = VertexSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT PointID FROM Vertices WHERE PolyhedronID=? AND VID=?;");
+    std::string sql("SELECT PointID FROM Vertices WHERE PolyhedronID=? AND VID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);

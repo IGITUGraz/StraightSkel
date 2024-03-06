@@ -5,19 +5,18 @@
  */
 
 #ifndef DB_2D_VERTEXDAO_H
-#define	DB_2D_VERTEXDAO_H
+#define DB_2D_VERTEXDAO_H
 
-#include <string>
 #include "data/2d/ptrs.h"
 #include "data/2d/Vertex.h"
 #include "data/2d/Polygon.h"
 #include "db/ptrs.h"
 #include "db/2d/ptrs.h"
 #include "db/2d/DAOFactory.h"
+#include <string>
 
 namespace db { namespace _2d {
 
-using std::string;
 using data::_2d::Vertex;
 using data::_2d::VertexSPtr;
 
@@ -25,7 +24,7 @@ class VertexDAO {
 friend class DAOFactory;
 public:
     virtual ~VertexDAO();
-    string getTableSchema() const;
+    std::string getTableSchema() const;
     int insert(VertexSPtr vertex);
     bool del(VertexSPtr vertex);
     VertexSPtr find(int polyid, int vid);
@@ -37,5 +36,5 @@ protected:
 
 } }
 
-#endif	/* DB_2D_VERTEXDAO_H */
+#endif /* DB_2D_VERTEXDAO_H */
 

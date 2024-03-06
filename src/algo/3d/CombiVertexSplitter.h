@@ -5,40 +5,24 @@
  */
 
 #ifndef ALGO_3D_COMBIVERTEXSPLITTER_H
-#define	ALGO_3D_COMBIVERTEXSPLITTER_H
+#define ALGO_3D_COMBIVERTEXSPLITTER_H
 
-#include <list>
-#include <vector>
-#include <map>
-#include <string>
-#include <sstream>
-#include <boost/shared_array.hpp>
-#include "debug.h"
-#include "boost_thread.h"
-#include "util/Configuration.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Facet.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/SkelVertexData.h"
 #include "algo/3d/ptrs.h"
 #include "algo/3d/AbstractVertexSplitter.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include <boost/shared_array.hpp>
+#include <list>
+#include <vector>
+#include <string>
 
 namespace algo { namespace _3d {
 
-using std::list;
-using std::vector;
-using std::map;
-using std::string;
-using std::stringstream;
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 using namespace data::_3d::skel;
 
 typedef boost::shared_array<int> vec2i;
-typedef vector<vec2i> combi;
+typedef std::vector<vec2i> combi;
 
 class CombiVertexSplitter : public AbstractVertexSplitter {
 public:
@@ -48,16 +32,16 @@ public:
 
     static vec2i createSplit(int begin, int end);
     static int compareSplits(vec2i split1, vec2i split2);
-    static vector<int> initLabels(unsigned int degree);
-    static vector<int> splitLabels(vector<int>& labels, vec2i split);
-    static list<vec2i> createSingleSplitCombinations(vector<int> labels);
-    static list<combi> appendSplitCombinations(
-            combi history, list<vec2i> splits);
-    static list<combi> mergeCombinations(combi history,
-            list<combi> combis1, list<combi> combis2);
-    static list<combi> generateCombinationsRec(
-            combi history, vector<int> labels);
-    static list<combi> generateAllCombinations(unsigned int degree);
+    static std::vector<int> initLabels(unsigned int degree);
+    static std::vector<int> splitLabels(std::vector<int>& labels, vec2i split);
+    static std::list<vec2i> createSingleSplitCombinations(std::vector<int> labels);
+    static std::list<combi> appendSplitCombinations(
+            combi history, std::list<vec2i> splits);
+    static std::list<combi> mergeCombinations(combi history,
+            std::list<combi> combis1, std::list<combi> combis2);
+    static std::list<combi> generateCombinationsRec(
+            combi history, std::vector<int> labels);
+    static std::list<combi> generateAllCombinations(unsigned int degree);
 
     static PolyhedronSPtr copyVertex(VertexSPtr vertex);
     static PolyhedronSPtr splitVertex(VertexSPtr vertex, combi combination);
@@ -65,9 +49,9 @@ public:
 
     virtual PolyhedronSPtr splitVertex(VertexSPtr vertex);
 
-    static string combiToString(combi combination);
+    static std::string combiToString(combi combination);
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     CombiVertexSplitter();
@@ -77,5 +61,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_COMBIVERTEXSPLITTER_H */
-
+#endif /* ALGO_3D_COMBIVERTEXSPLITTER_H */

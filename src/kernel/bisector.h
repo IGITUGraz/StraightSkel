@@ -5,14 +5,13 @@
  */
 
 #ifndef BISECTOR_H
-#define	BISECTOR_H
+#define BISECTOR_H
 
-#include <cmath>
-#include "Point2.h"
-#include "Line2.h"
-#include "Point3.h"
-#include "Plane3.h"
-#include "intersection.h"
+#include "kernel/Point2.h"
+#include "kernel/Line2.h"
+#include "kernel/Point3.h"
+#include "kernel/Plane3.h"
+#include "kernel/intersection.h"
 
 namespace kernel {
 
@@ -22,5 +21,5 @@ Plane3* bisector(const Plane3* plane1, const Plane3* plane2);
 
 }
 
-#endif	/* BISECTOR_H */
+#endif /* BISECTOR_H */
 

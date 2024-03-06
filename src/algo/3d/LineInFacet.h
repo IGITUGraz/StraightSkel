@@ -5,15 +5,13 @@
  */
 
 #ifndef ALGO_3D_LINEINFACET_H
-#define	ALGO_3D_LINEINFACET_H
+#define ALGO_3D_LINEINFACET_H
 
-#include <list>
 #include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/Facet.h"
-#include "algo/3d/KernelWrapper.h"
 
 namespace algo { namespace _3d {
+
+using namespace data::_3d;
 
 /**
  * Checks if the intersection point of the given line is inside the facet.
@@ -24,5 +22,4 @@ bool IsLineInFacet(FacetSPtr facet, Line3SPtr line);
 
 } }
 
-#endif	/* ALGO_3D_LINEINFACET_H */
-
+#endif /* ALGO_3D_LINEINFACET_H */

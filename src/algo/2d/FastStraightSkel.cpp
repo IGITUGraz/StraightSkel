@@ -4,7 +4,26 @@
  * @date   2015-09-28
  */
 
-#include "FastStraightSkel.h"
+#include "algo/2d/FastStraightSkel.h"
+
+#include "debug.h"
+#include "util/Timer.h"
+#include "algo/Controller.h"
+#include "algo/2d/KernelWrapper.h"
+#include "data/2d/Polygon.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/skel/StraightSkeleton.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/Arc.h"
+#include "data/2d/skel/ConstOffsetEvent.h"
+#include "data/2d/skel/EdgeEvent.h"
+#include "data/2d/skel/SplitEvent.h"
+#include "data/2d/skel/TriangleEvent.h"
+#include "data/2d/skel/SkelVertexData.h"
+#include "data/2d/skel/SkelEdgeData.h"
+#include "util/StringFactory.h"
+#include <list>
 
 namespace algo { namespace _2d {
 
@@ -78,23 +97,23 @@ void FastStraightSkel::run() {
         DEBUG_PRINT("== Fast Straight Skeleton 2D finished ==");
         double time = util::Timer::now() - t_start;
         skel_result_->appendDescription("time=" +
-                StringFactory::fromDouble(time) + "; ");
+                util::StringFactory::fromDouble(time) + "; ");
         //skel_result_->appendDescription("controller=" +
-        //        StringFactory::fromBoolean(controller_) + "; ");
+        //        util::StringFactory::fromBoolean(controller_) + "; ");
         DEBUG_VAR(skel_result_->toString());
     }
 }
 
 ThreadSPtr FastStraightSkel::startThread() {
-    return ThreadSPtr(new boost::thread(
-            boost::bind(&FastStraightSkel::run, this)));
+    return ThreadSPtr(new std::thread(
+            std::bind(&FastStraightSkel::run, this)));
 }
 
 NodeSPtr FastStraightSkel::createNode(VertexSPtr vertex) {
     NodeSPtr result = Node::create(vertex->getPoint());
     SkelVertexDataSPtr data;
     if (vertex->hasData()) {
-        data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+        data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
     } else {
         data = SkelVertexData::create(vertex);
     }
@@ -107,7 +126,7 @@ ArcSPtr FastStraightSkel::createArc(VertexSPtr vertex) {
     ArcSPtr result;
     EdgeSPtr edge_in = vertex->getEdgeIn();
     EdgeSPtr edge_out = vertex->getEdgeOut();
-    SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+    SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
 
     Line2SPtr line_in = edge_in->line();
     Line2SPtr line_out = edge_out->line();
@@ -118,7 +137,7 @@ ArcSPtr FastStraightSkel::createArc(VertexSPtr vertex) {
     EdgeSPtr edge_left = edge_in;
     double speed_in = 1.0;
     if (edge_in->hasData()) {
-        SkelEdgeDataSPtr data_in = dynamic_pointer_cast<SkelEdgeData>(
+        SkelEdgeDataSPtr data_in = std::dynamic_pointer_cast<SkelEdgeData>(
                 edge_in->getData());
         edge_left = data_in->getEdgeOrigin();
         speed_in = data_in->getSpeed();
@@ -126,7 +145,7 @@ ArcSPtr FastStraightSkel::createArc(VertexSPtr vertex) {
     EdgeSPtr edge_right = edge_out;
     double speed_out = 1.0;
     if (edge_out->hasData()) {
-        SkelEdgeDataSPtr data_out = dynamic_pointer_cast<SkelEdgeData>(
+        SkelEdgeDataSPtr data_out = std::dynamic_pointer_cast<SkelEdgeData>(
                 edge_out->getData());
         edge_right = data_out->getEdgeOrigin();
         speed_out = data_out->getSpeed();
@@ -149,7 +168,7 @@ bool FastStraightSkel::init(PolygonSPtr polygon) {
     WriteLock l(polygon->mutex());
     bool result = true;
     polygon->sortEdges();
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         EdgeSPtr edge_in = vertex->getEdgeIn();
@@ -183,7 +202,7 @@ EdgeEventSPtr FastStraightSkel::nextEvent(PolygonSPtr polygon, double offset, in
     }
 
     double height_min = std::numeric_limits<double>::max();
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
         VertexSPtr vertex_src = edge->getVertexSrc();
@@ -191,9 +210,9 @@ EdgeEventSPtr FastStraightSkel::nextEvent(PolygonSPtr polygon, double offset, in
         if (vertex_src->getPoint() == vertex_dst->getPoint()) {
             continue;
         }
-        SkelVertexDataSPtr data_src = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_src = std::dynamic_pointer_cast<SkelVertexData>(
                 vertex_src->getData());
-        SkelVertexDataSPtr data_dst = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_dst = std::dynamic_pointer_cast<SkelVertexData>(
                 vertex_dst->getData());
         if (data_src && data_dst) {
             ArcSPtr arc_src = data_src->getArc();
@@ -206,7 +225,7 @@ EdgeEventSPtr FastStraightSkel::nextEvent(PolygonSPtr polygon, double offset, in
             if (KernelWrapper::side(edge->line(), point) == direction) {
                 continue;
             }
-            SkelEdgeDataSPtr data = dynamic_pointer_cast<SkelEdgeData>(
+            SkelEdgeDataSPtr data = std::dynamic_pointer_cast<SkelEdgeData>(
                     edge->getData());
             double height = KernelWrapper::distance(edge->line(), point) /
                     data->getSpeed();
@@ -238,7 +257,7 @@ EdgeEventSPtr FastStraightSkel::nextEvent(PolygonSPtr polygon, double offset, in
             TriangleEventSPtr event_t = TriangleEvent::create();
             NodeSPtr node = result->getNode();
             VertexDataSPtr data = edge_c->getVertexSrc()->getData();
-            ArcSPtr arc = (dynamic_pointer_cast<SkelVertexData>(data))->getArc();
+            ArcSPtr arc = (std::dynamic_pointer_cast<SkelVertexData>(data))->getArc();
             node->addArc(arc);
             event_t->setEdge(edge_a);
             event_t->setNode(node);
@@ -252,7 +271,7 @@ EdgeEventSPtr FastStraightSkel::nextEvent(PolygonSPtr polygon, double offset, in
 PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
     PolygonSPtr result = Polygon::create();
 
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         EdgeSPtr edge_in = vertex->getEdgeIn();
@@ -260,7 +279,7 @@ PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
         if (edge_in && edge_out) {
             double speed_in = 1.0;
             if (edge_in->hasData()) {
-                SkelEdgeDataSPtr data_in = dynamic_pointer_cast<SkelEdgeData>(
+                SkelEdgeDataSPtr data_in = std::dynamic_pointer_cast<SkelEdgeData>(
                         edge_in->getData());
                 speed_in = data_in->getSpeed();
             }
@@ -268,7 +287,7 @@ PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
                     KernelWrapper::offsetLine(edge_in->line(), offset*speed_in);
             double speed_out = 1.0;
             if (edge_out->hasData()) {
-                SkelEdgeDataSPtr data_out = dynamic_pointer_cast<SkelEdgeData>(
+                SkelEdgeDataSPtr data_out = std::dynamic_pointer_cast<SkelEdgeData>(
                         edge_out->getData());
                 speed_out = data_out->getSpeed();
             }
@@ -280,7 +299,7 @@ PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
             SkelVertexDataSPtr offset_data = SkelVertexData::create(offset_vertex);
             SkelVertexDataSPtr data;
             if (vertex->hasData()) {
-                data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+                data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
                 offset_data->setArc(data->getArc());
             } else {
                 data = SkelVertexData::create(vertex);
@@ -290,12 +309,12 @@ PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
         }
     }
 
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
-        SkelVertexDataSPtr data_src = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_src = std::dynamic_pointer_cast<SkelVertexData>(
                 edge->getVertexSrc()->getData());
-        SkelVertexDataSPtr data_dst = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_dst = std::dynamic_pointer_cast<SkelVertexData>(
                 edge->getVertexDst()->getData());
         if (data_src && data_dst) {
             EdgeSPtr offset_edge = Edge::create(
@@ -303,7 +322,7 @@ PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
             SkelEdgeDataSPtr offset_data = SkelEdgeData::create(offset_edge);
             SkelEdgeDataSPtr data;
             if (edge->hasData()) {
-                data = dynamic_pointer_cast<SkelEdgeData>(edge->getData());
+                data = std::dynamic_pointer_cast<SkelEdgeData>(edge->getData());
                 offset_data->setEdgeOrigin(data->getEdgeOrigin());
                 offset_data->setSpeed(data->getSpeed());
             } else {
@@ -318,7 +337,7 @@ PolygonSPtr FastStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
 }
 
 void FastStraightSkel::appendEventNode(NodeSPtr node) {
-    list<ArcWPtr>::iterator it_a = node->arcs().begin();
+    std::list<ArcWPtr>::iterator it_a = node->arcs().begin();
     while (it_a != node->arcs().end()) {
         ArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -339,7 +358,7 @@ void FastStraightSkel::handleEvent(EdgeEventSPtr event, PolygonSPtr polygon) {
 
     if (event->getType() == AbstractEvent::EDGE_EVENT) {
         EdgeSPtr edge = event->getEdge();
-        SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+        SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
                 edge->getData());
         EdgeSPtr edge_result = edge_data->getOffsetEdge();
         VertexSPtr vertex_result = edge_result->getVertexSrc();
@@ -350,17 +369,17 @@ void FastStraightSkel::handleEvent(EdgeEventSPtr event, PolygonSPtr polygon) {
         edge_result->getVertexDst()->setEdgeOut(EdgeSPtr());
         polygon->removeVertex(edge_result->getVertexDst());
 
-        SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(
                 vertex_result->getData());
         data->setNode(node);
         ArcSPtr arc_out = createArc(vertex_result);
         skel_result_->addArc(arc_out);
     } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-        TriangleEventSPtr event_t = dynamic_pointer_cast<TriangleEvent>(event);
+        TriangleEventSPtr event_t = std::dynamic_pointer_cast<TriangleEvent>(event);
         EdgeSPtr edges_toremove[3];
         event_t->getEdges(edges_toremove);
         for (unsigned int i = 0; i<3; i++) {
-            SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+            SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
                     edges_toremove[i]->getData());
             polygon->removeEdge(edge_data->getOffsetEdge());
         }
@@ -368,7 +387,7 @@ void FastStraightSkel::handleEvent(EdgeEventSPtr event, PolygonSPtr polygon) {
         VertexSPtr vertices_toremove[3];
         event_t->getVertices(vertices_toremove);
         for (unsigned int i = 0; i<3; i++) {
-            SkelVertexDataSPtr vertex_data = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr vertex_data = std::dynamic_pointer_cast<SkelVertexData>(
                     vertices_toremove[i]->getData());
             polygon->removeVertex(vertex_data->getOffsetVertex());
         }

@@ -4,7 +4,9 @@
  * @date   2011-11-10
  */
 
-#include "Point3.h"
+#include "kernel/Point3.h"
+
+#include <stdexcept>
 
 namespace kernel {
 
@@ -50,7 +52,7 @@ double Point3::operator[](unsigned int i) const {
     } else if (i == 2) {
         return this->z_;
     } else {
-        throw out_of_range("Index out of bounds.");
+        throw std::out_of_range("Index out of bounds.");
     }
 }
 

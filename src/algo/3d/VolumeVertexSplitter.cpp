@@ -4,7 +4,21 @@
  * @date   2013-01-27
  */
 
-#include "VolumeVertexSplitter.h"
+#include "algo/3d/VolumeVertexSplitter.h"
+
+#include "debug.h"
+#include "algo/3d/SelfIntersection.h"
+#include "algo/3d/KernelWrapper.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/Polygon.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "util/ptrs.h"
+#include "util/Configuration.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -13,7 +27,7 @@ VolumeVertexSplitter::VolumeVertexSplitter() {
     optimization_ = 1;
     util::ConfigurationSPtr config = util::Configuration::getInstance();
     if (config->isLoaded()) {
-        string s_optimization = config->getString(
+        std::string s_optimization = config->getString(
                 "algo_3d_VolumeVertexSplitter", "optimization");
         if (s_optimization.compare("max") == 0) {
             optimization_ = -1;
@@ -60,7 +74,7 @@ double VolumeVertexSplitter::calcArea(FacetSPtr facet) {
 
 double VolumeVertexSplitter::calcSurfaceArea(PolyhedronSPtr polyhedron) {
     double result = 0.0;
-    list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+    std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
     while (it_f != polyhedron->facets().end()) {
         FacetSPtr facet = *it_f++;
         result += calcArea(facet);
@@ -70,12 +84,12 @@ double VolumeVertexSplitter::calcSurfaceArea(PolyhedronSPtr polyhedron) {
 
 
 void VolumeVertexSplitter::closeFacets(PolyhedronSPtr polyhedron) {
-    list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+    std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
     while (it_f != polyhedron->facets().end()) {
         FacetSPtr facet = *it_f++;
         VertexSPtr vertex_src = VertexSPtr();
         VertexSPtr vertex_dst = VertexSPtr();
-        list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
         while (it_e != facet->edges().end()) {
             EdgeSPtr edge = *it_e++;
             if (edge->getVertexDst()->degree() < 3) {
@@ -103,14 +117,14 @@ int VolumeVertexSplitter::compareSurfaceAreas(PolyhedronSPtr polyhedron_1, Polyh
     PolyhedronSPtr polyhedron_2_c = polyhedron_2->clone();
 
     // set destinations of edges
-    list<EdgeSPtr>::iterator it_e1 = polyhedron_1_c->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e1 = polyhedron_1_c->edges().begin();
     while (it_e1 != polyhedron_1_c->edges().end()) {
         EdgeSPtr edge_1 = *it_e1++;
         VertexSPtr vertex_1_dst = edge_1->getVertexDst();
         if (vertex_1_dst->degree() > 1) {
             continue;
         }
-        list<EdgeSPtr>::iterator it_e2 = polyhedron_2_c->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e2 = polyhedron_2_c->edges().begin();
         while (it_e2 != polyhedron_2_c->edges().end()) {
             EdgeSPtr edge_2 = *it_e2++;
             VertexSPtr vertex_2_dst = edge_2->getVertexDst();
@@ -155,10 +169,10 @@ PolyhedronSPtr VolumeVertexSplitter::splitVertex(VertexSPtr vertex) {
     }
     WriteLock l(polyhedron->mutex());
     vertex->sort();
-    list<combi> combinations = generateAllCombinations(vertex->degree());
+    std::list<combi> combinations = generateAllCombinations(vertex->degree());
     combi combi_opt_vol;
     PolyhedronSPtr poly_opt_vol;
-    list<combi>::iterator it_combi = combinations.begin();
+    std::list<combi>::iterator it_combi = combinations.begin();
     while (it_combi != combinations.end()) {
         combi combination = *it_combi++;
         PolyhedronSPtr poly_c = copyVertex(vertex);
@@ -193,8 +207,8 @@ PolyhedronSPtr VolumeVertexSplitter::splitVertex(VertexSPtr vertex) {
     return polyhedron;
 }
 
-string VolumeVertexSplitter::toString() const {
-    string result("VolumeVertexSplitter(");
+std::string VolumeVertexSplitter::toString() const {
+    std::string result("VolumeVertexSplitter(");
     if (optimization_ == -1) {
         result += "max";
     } else if (optimization_ == 1) {

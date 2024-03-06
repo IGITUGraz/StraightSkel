@@ -5,48 +5,40 @@
  */
 
 #ifndef UTIL_CONFIGURATION_H
-#define	UTIL_CONFIGURATION_H
+#define UTIL_CONFIGURATION_H
 
-#include <cstdlib>
+#include "util/ptrs.h"
 #include <string>
 #include <iostream>
-#include <fstream>
-#include <set>
 #include <map>
-#include "debug.h"
-#include "util/ptrs.h"
-#include "util/StringFuncs.h"
 
 namespace util {
-
-using std::string;
 
 class Configuration {
 public:
     virtual ~Configuration();
     static ConfigurationSPtr getInstance();
 
-    string findDefaultFilename();
+    std::string findDefaultFilename();
 
     void parse(std::istream& input);
-    bool load(const string& filename);
+    bool load(const std::string& filename);
     bool isLoaded() const;
 
-    bool contains(const string& section, const string& key);
+    bool contains(const std::string& section, const std::string& key);
 
-    string getString(const string& section, const string& key);
-    int getInt(const string& section, const string& key);
-    double getDouble(const string& section, const string& key);
-    bool getBool(const string& section, const string& key);
+    std::string getString(const std::string& section, const std::string& key);
+    int getInt(const std::string& section, const std::string& key);
+    double getDouble(const std::string& section, const std::string& key);
+    bool getBool(const std::string& section, const std::string& key);
 
 protected:
     Configuration();
     static ConfigurationSPtr instance_;
 
-    std::map<string, string> properties_;
+    std::map<std::string, std::string> properties_;
 };
 
 }
 
-#endif	/* UTIL_CONFIGURATION_H */
-
+#endif /* UTIL_CONFIGURATION_H */

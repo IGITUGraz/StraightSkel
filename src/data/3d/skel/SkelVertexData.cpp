@@ -4,7 +4,10 @@
  * @date   2012-04-05
  */
 
-#include "SkelVertexData.h"
+#include "data/3d/skel/SkelVertexData.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
 
 namespace data { namespace _3d { namespace skel {
 

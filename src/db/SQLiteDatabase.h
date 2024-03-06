@@ -5,31 +5,24 @@
  */
 
 #ifndef DB_SQLITEDATABASE_H
-#define	DB_SQLITEDATABASE_H
+#define DB_SQLITEDATABASE_H
 
-#include <string>
-#include <iostream>
-#include <sqlite3.h>
-#include "debug.h"
 #include "db/ptrs.h"
-#include "db/SQLiteStmt.h"
-#include "util/StringFactory.h"
+#include <sqlite3.h>
+#include <string>
 
 namespace db {
-
-using std::string;
-using util::StringFactory;
 
 class SQLiteDatabase {
 public:
     SQLiteDatabase();
     virtual ~SQLiteDatabase();
 
-    bool open(string &filename);
+    bool open(const std::string& filename);
     bool close();
     bool isOpened();
 
-    SQLiteStmtSPtr prepare(string& sql_query);
+    SQLiteStmtSPtr prepare(const std::string& sql_query);
 
     bool beginTransaction();
     bool endTransaction();
@@ -43,5 +36,4 @@ protected:
 
 }
 
-#endif	/* DB_SQLITEDATABASE_H */
-
+#endif /* DB_SQLITEDATABASE_H */

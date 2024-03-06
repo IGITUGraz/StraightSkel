@@ -4,7 +4,29 @@
  * @date   2015-11-04
  */
 
-#include "GraphChecker.h"
+#include "algo/3d/GraphChecker.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/Arc.h"
+#include "data/3d/skel/StraightSkeleton.h"
+#include "data/3d/skel/AbstractEvent.h"
+#include "data/3d/skel/EdgeEvent.h"
+#include "data/3d/skel/EdgeMergeEvent.h"
+#include "data/3d/skel/TriangleEvent.h"
+#include "data/3d/skel/DblEdgeMergeEvent.h"
+#include "data/3d/skel/DblTriangleEvent.h"
+#include "data/3d/skel/TetrahedronEvent.h"
+#include "data/3d/skel/VertexEvent.h"
+#include "data/3d/skel/FlipVertexEvent.h"
+#include "data/3d/skel/SurfaceEvent.h"
+#include "data/3d/skel/PolyhedronSplitEvent.h"
+#include "data/3d/skel/SplitMergeEvent.h"
+#include "data/3d/skel/EdgeSplitEvent.h"
+#include "data/3d/skel/PierceEvent.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -22,38 +44,38 @@ GraphCheckerSPtr GraphChecker::create() {
 NodeSPtr GraphChecker::getNode(AbstractEventSPtr event) {
     NodeSPtr result;
     if (event->getType() == AbstractEvent::EDGE_EVENT) {
-        result = dynamic_pointer_cast<EdgeEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<EdgeEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::EDGE_MERGE_EVENT) {
-        result = dynamic_pointer_cast<EdgeMergeEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<EdgeMergeEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-        result = dynamic_pointer_cast<TriangleEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<TriangleEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::DBL_EDGE_MERGE_EVENT) {
-        result = dynamic_pointer_cast<DblEdgeMergeEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<DblEdgeMergeEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::DBL_TRIANGLE_EVENT) {
-        result = dynamic_pointer_cast<DblTriangleEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<DblTriangleEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::TETRAHEDRON_EVENT) {
-        result = dynamic_pointer_cast<TetrahedronEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<TetrahedronEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::VERTEX_EVENT) {
-        result = dynamic_pointer_cast<VertexEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<VertexEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::FLIP_VERTEX_EVENT) {
-        result = dynamic_pointer_cast<FlipVertexEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<FlipVertexEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::SURFACE_EVENT) {
-        result = dynamic_pointer_cast<SurfaceEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<SurfaceEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::POLYHEDRON_SPLIT_EVENT) {
-        result = dynamic_pointer_cast<PolyhedronSplitEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<PolyhedronSplitEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::SPLIT_MERGE_EVENT) {
-        result = dynamic_pointer_cast<SplitMergeEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<SplitMergeEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::EDGE_SPLIT_EVENT) {
-        result = dynamic_pointer_cast<EdgeSplitEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<EdgeSplitEvent>(event)->getNode();
     } else if (event->getType() == AbstractEvent::PIERCE_EVENT) {
-        result = dynamic_pointer_cast<PierceEvent>(event)->getNode();
+        result = std::dynamic_pointer_cast<PierceEvent>(event)->getNode();
     }
     return result;
 }
 
 AbstractEventSPtr GraphChecker::findEvent(StraightSkeletonSPtr skel, NodeSPtr node) {
     AbstractEventSPtr result;
-    list<AbstractEventSPtr>::iterator it_e = skel->events().begin();
+    std::list<AbstractEventSPtr>::iterator it_e = skel->events().begin();
     while (it_e != skel->events().end()) {
         AbstractEventSPtr event = *it_e++;
         if (getNode(event) == node) {
@@ -64,9 +86,9 @@ AbstractEventSPtr GraphChecker::findEvent(StraightSkeletonSPtr skel, NodeSPtr no
     return result;
 }
 
-unsigned int GraphChecker::countVisitedChilds(const set<NodeSPtr>& visited, NodeSPtr node) {
+unsigned int GraphChecker::countVisitedChilds(const std::set<NodeSPtr>& visited, NodeSPtr node) {
     unsigned int result = 0;
-    list<ArcWPtr>::iterator it_a_wptr = node->arcs().begin();
+    std::list<ArcWPtr>::iterator it_a_wptr = node->arcs().begin();
     while (it_a_wptr != node->arcs().end()) {
         ArcWPtr arc_wptr = *it_a_wptr++;
         if (arc_wptr.expired()) continue;
@@ -90,16 +112,16 @@ unsigned int GraphChecker::countVisitedChilds(const set<NodeSPtr>& visited, Node
 bool GraphChecker::check(StraightSkeletonSPtr skel) {
     bool result = true;
 
-    set<NodeSPtr> hidden;
-    set<NodeSPtr> visited;
+    std::set<NodeSPtr> hidden;
+    std::set<NodeSPtr> visited;
 
     // initialization: visit all nodes on boundary
     PolyhedronSPtr polyhedron = skel->getPolyhedron();
-    list<NodeSPtr>::iterator lit_n = skel->nodes().begin();
+    std::list<NodeSPtr>::iterator lit_n = skel->nodes().begin();
     while (lit_n != skel->nodes().end()) {
         NodeSPtr node = *lit_n++;
         bool is_boundary = false;
-        list<VertexSPtr>::iterator lit_v = polyhedron->vertices().begin();
+        std::list<VertexSPtr>::iterator lit_v = polyhedron->vertices().begin();
         while (lit_v != polyhedron->vertices().end()) {
             VertexSPtr vertex = *lit_v++;
             if (node->getPoint() == vertex->getPoint()) {
@@ -123,7 +145,7 @@ bool GraphChecker::check(StraightSkeletonSPtr skel) {
     while (hidden.size() > 0) {
         size_hidden_begin = hidden.size();
         DEBUG_VAR(hidden.size());
-        set<NodeSPtr>::iterator it_n = hidden.begin();
+        std::set<NodeSPtr>::iterator it_n = hidden.begin();
         while (it_n != hidden.end()) {
             NodeSPtr node = *it_n++;
 
@@ -182,7 +204,7 @@ bool GraphChecker::check(StraightSkeletonSPtr skel) {
     DEBUG_VAR(result);
 
     if (result == 0) {
-        set<NodeSPtr>::iterator it_n = hidden.begin();
+        std::set<NodeSPtr>::iterator it_n = hidden.begin();
         while (it_n != hidden.end()) {
             NodeSPtr node = *it_n++;
             unsigned int num_visited_childs = countVisitedChilds(visited, node);

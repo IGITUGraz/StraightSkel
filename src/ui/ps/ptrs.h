@@ -5,9 +5,9 @@
  */
 
 #ifndef UI_PS_PTRS_H
-#define	UI_PS_PTRS_H
+#define UI_PS_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace ui { namespace ps {
 
@@ -24,5 +24,4 @@ typedef WEAK_PTR<PlanePSPrinter> PlanePSPrinterWPtr;
 
 } }
 
-#endif	/* UI_PS_PTRS_H */
-
+#endif /* UI_PS_PTRS_H */

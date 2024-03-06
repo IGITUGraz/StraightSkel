@@ -4,7 +4,9 @@
  * @date   2011-11-22
  */
 
-#include "EdgeData.h"
+#include "data/3d/EdgeData.h"
+
+#include "data/3d/Edge.h"
 
 namespace data { namespace _3d {
 

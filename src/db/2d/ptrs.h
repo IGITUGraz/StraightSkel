@@ -5,9 +5,9 @@
  */
 
 #ifndef DB_2D_PTRS_H
-#define	DB_2D_PTRS_H
+#define DB_2D_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace db { namespace _2d {
 
@@ -43,5 +43,4 @@ typedef WEAK_PTR<StraightSkeletonDAO> StraightSkeletonDAOWPtr;
 
 } }
 
-#endif	/* DB_2D_PTRS_H */
-
+#endif /* DB_2D_PTRS_H */

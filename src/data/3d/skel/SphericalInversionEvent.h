@@ -5,9 +5,8 @@
  */
 
 #ifndef DATA_3D_SKEL_SPHERICALINVERSIONEVENT_H
-#define	DATA_3D_SKEL_SPHERICALINVERSIONEVENT_H
+#define DATA_3D_SKEL_SPHERICALINVERSIONEVENT_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
 #include "data/3d/skel/ptrs.h"
 #include "data/3d/skel/SphericalAbstractEvent.h"
@@ -30,5 +29,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SPHERICALINVERSIONEVENT_H */
+#endif /* DATA_3D_SKEL_SPHERICALINVERSIONEVENT_H */
 

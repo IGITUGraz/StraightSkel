@@ -4,7 +4,26 @@
  * @date   2012-02-06
  */
 
-#include "SimpleStraightSkel.h"
+#include "algo/2d/SimpleStraightSkel.h"
+
+#include "debug.h"
+#include "util/Configuration.h"
+#include "util/Timer.h"
+#include "algo/Controller.h"
+#include "algo/2d/KernelWrapper.h"
+#include "data/2d/Polygon.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/skel/StraightSkeleton.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/Arc.h"
+#include "data/2d/skel/ConstOffsetEvent.h"
+#include "data/2d/skel/EdgeEvent.h"
+#include "data/2d/skel/SplitEvent.h"
+#include "data/2d/skel/TriangleEvent.h"
+#include "data/2d/skel/SkelVertexData.h"
+#include "data/2d/skel/SkelEdgeData.h"
+#include "util/StringFactory.h"
 
 namespace algo { namespace _2d {
 
@@ -51,9 +70,9 @@ void SimpleStraightSkel::run() {
         }
         double offset = 0.0;
         double offset_prev = 0.0;
-        list<AbstractEventSPtr> events = nextEvent(polygon, offset);
+        std::list<AbstractEventSPtr> events = nextEvent(polygon, offset);
         while (events.size() > 0) {
-            list<AbstractEventSPtr>::iterator it_e = events.begin();
+            std::list<AbstractEventSPtr>::iterator it_e = events.begin();
             while (it_e != events.end()) {
                 AbstractEventSPtr event = *it_e++;
                 DEBUG_VAL("-- Next Event: " << event->toString() << " --");
@@ -77,11 +96,11 @@ void SimpleStraightSkel::run() {
                         controller_->screenshot();
                     }
                 } else if (event->getType() == AbstractEvent::EDGE_EVENT) {
-                    handleEdgeEvent(dynamic_pointer_cast<EdgeEvent>(event), polygon);
+                    handleEdgeEvent(std::dynamic_pointer_cast<EdgeEvent>(event), polygon);
                 } else if (event->getType() == AbstractEvent::SPLIT_EVENT) {
-                    handleSplitEvent(dynamic_pointer_cast<SplitEvent>(event), polygon);
+                    handleSplitEvent(std::dynamic_pointer_cast<SplitEvent>(event), polygon);
                 } else  if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-                    handleTriangleEvent(dynamic_pointer_cast<TriangleEvent>(event), polygon);
+                    handleTriangleEvent(std::dynamic_pointer_cast<TriangleEvent>(event), polygon);
                 }
             }
             assert(polygon->isConsistent());
@@ -98,16 +117,16 @@ void SimpleStraightSkel::run() {
         DEBUG_PRINT("== Straight Skeleton 2D finished ==");
         double time = util::Timer::now() - t_start;
         skel_result_->appendDescription("time=" +
-                StringFactory::fromDouble(time) + "; ");
+                util::StringFactory::fromDouble(time) + "; ");
         //skel_result_->appendDescription("controller=" +
-        //        StringFactory::fromBoolean(controller_) + "; ");
+        //        util::StringFactory::fromBoolean(controller_) + "; ");
         DEBUG_VAR(skel_result_->toString());
     }
 }
 
 ThreadSPtr SimpleStraightSkel::startThread() {
-    return ThreadSPtr(new boost::thread(
-            boost::bind(&SimpleStraightSkel::run, this)));
+    return ThreadSPtr(new std::thread(
+            std::bind(&SimpleStraightSkel::run, this)));
 }
 
 
@@ -115,7 +134,7 @@ NodeSPtr SimpleStraightSkel::createNode(VertexSPtr vertex) {
     NodeSPtr result = Node::create(vertex->getPoint());
     SkelVertexDataSPtr data;
     if (vertex->hasData()) {
-        data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+        data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
     } else {
         data = SkelVertexData::create(vertex);
     }
@@ -129,7 +148,7 @@ ArcSPtr SimpleStraightSkel::createArc(VertexSPtr vertex) {
     ArcSPtr result;
     EdgeSPtr edge_in = vertex->getEdgeIn();
     EdgeSPtr edge_out = vertex->getEdgeOut();
-    SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+    SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
 
     Line2SPtr line_in = edge_in->line();
     Line2SPtr line_out = edge_out->line();
@@ -140,7 +159,7 @@ ArcSPtr SimpleStraightSkel::createArc(VertexSPtr vertex) {
     EdgeSPtr edge_left = edge_in;
     double speed_in = 1.0;
     if (edge_in->hasData()) {
-        SkelEdgeDataSPtr data_in = dynamic_pointer_cast<SkelEdgeData>(
+        SkelEdgeDataSPtr data_in = std::dynamic_pointer_cast<SkelEdgeData>(
                 edge_in->getData());
         edge_left = data_in->getEdgeOrigin();
         speed_in = data_in->getSpeed();
@@ -148,7 +167,7 @@ ArcSPtr SimpleStraightSkel::createArc(VertexSPtr vertex) {
     EdgeSPtr edge_right = edge_out;
     double speed_out = 1.0;
     if (edge_out->hasData()) {
-        SkelEdgeDataSPtr data_out = dynamic_pointer_cast<SkelEdgeData>(
+        SkelEdgeDataSPtr data_out = std::dynamic_pointer_cast<SkelEdgeData>(
                 edge_out->getData());
         edge_right = data_out->getEdgeOrigin();
         speed_out = data_out->getSpeed();
@@ -171,7 +190,7 @@ bool SimpleStraightSkel::init(PolygonSPtr polygon) {
     WriteLock l(polygon->mutex());
     bool result = true;
     polygon->sortEdges();
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         EdgeSPtr edge_in = vertex->getEdgeIn();
@@ -197,15 +216,15 @@ bool SimpleStraightSkel::init(PolygonSPtr polygon) {
     return result;
 }
 
-list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, double offset) {
+std::list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, double offset) {
     ReadLock l(polygon->mutex());
-    list<EdgeEventSPtr> result;
+    std::list<EdgeEventSPtr> result;
     if (polygon->edges().size() < 3) {
         return result;
     }
 
     double height_min = std::numeric_limits<double>::max();
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
         VertexSPtr vertex_src = edge->getVertexSrc();
@@ -213,9 +232,9 @@ list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, doubl
         if (vertex_src->getPoint() == vertex_dst->getPoint()) {
             continue;
         }
-        SkelVertexDataSPtr data_src = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_src = std::dynamic_pointer_cast<SkelVertexData>(
                 vertex_src->getData());
-        SkelVertexDataSPtr data_dst = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_dst = std::dynamic_pointer_cast<SkelVertexData>(
                 vertex_dst->getData());
         if (data_src && data_dst) {
             ArcSPtr arc_src = data_src->getArc();
@@ -228,7 +247,7 @@ list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, doubl
             if (KernelWrapper::side(edge->line(), point) < 0) {
                 continue;
             }
-            SkelEdgeDataSPtr data = dynamic_pointer_cast<SkelEdgeData>(
+            SkelEdgeDataSPtr data = std::dynamic_pointer_cast<SkelEdgeData>(
                     edge->getData());
             double height = KernelWrapper::distance(edge->line(), point) /
                     data->getSpeed();
@@ -251,9 +270,9 @@ list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, doubl
 
     // check if triangle event
     if (result.size() > 0) {
-        list<EdgeEventSPtr>::iterator it_e = result.begin();
+        std::list<EdgeEventSPtr>::iterator it_e = result.begin();
         while (it_e != result.end()) {
-            list<EdgeEventSPtr>::iterator it_current = it_e;
+            std::list<EdgeEventSPtr>::iterator it_current = it_e;
             EdgeEventSPtr event = *it_e++;
             if (event->getType() == AbstractEvent::EDGE_EVENT) {
                 EdgeSPtr edge_a = event->getEdge();
@@ -263,15 +282,15 @@ list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, doubl
                     TriangleEventSPtr event_t = TriangleEvent::create();
                     NodeSPtr node = event->getNode();
                     VertexDataSPtr data = edge_c->getVertexSrc()->getData();
-                    ArcSPtr arc = (dynamic_pointer_cast<SkelVertexData>(data))->getArc();
+                    ArcSPtr arc = (std::dynamic_pointer_cast<SkelVertexData>(data))->getArc();
                     node->addArc(arc);
                     event_t->setEdge(edge_a);
                     event_t->setNode(node);
                     result.push_back(event_t);
 
-                    list<EdgeEventSPtr>::iterator it_e2 = it_e;
+                    std::list<EdgeEventSPtr>::iterator it_e2 = it_e;
                     while (it_e2 != result.end()) {
-                        list<EdgeEventSPtr>::iterator it_current_2 = it_e2;
+                        std::list<EdgeEventSPtr>::iterator it_current_2 = it_e2;
                         EdgeEventSPtr event_2 = *it_e2++;
                         if (event_2->getEdge() == edge_b ||
                                 event_2->getEdge() == edge_c) {
@@ -291,14 +310,14 @@ list<EdgeEventSPtr> SimpleStraightSkel::nextEdgeEvent(PolygonSPtr polygon, doubl
 
 Point2SPtr SimpleStraightSkel::crashAt(VertexSPtr vertex, EdgeSPtr edge) {
     Point2SPtr result;
-    SkelVertexDataSPtr vertex_data = dynamic_pointer_cast<SkelVertexData>(
+    SkelVertexDataSPtr vertex_data = std::dynamic_pointer_cast<SkelVertexData>(
             vertex->getData());
     ArcSPtr arc = vertex_data->getArc();
     Line2SPtr line_arc = arc->line();
 
     Point2SPtr p_vertex = vertex->getPoint();
     EdgeSPtr edge_vertex = vertex->getEdgeOut();
-    SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+    SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
             edge_vertex->getData());
     Line2SPtr line_edge_vertex_offset = KernelWrapper::offsetLine(
             edge_vertex->line(), edge_data->getSpeed());
@@ -314,7 +333,7 @@ Point2SPtr SimpleStraightSkel::crashAt(VertexSPtr vertex, EdgeSPtr edge) {
     if (!p_edge) {  // parallel
         return result;
     }
-    edge_data = dynamic_pointer_cast<SkelEdgeData>(edge->getData());
+    edge_data = std::dynamic_pointer_cast<SkelEdgeData>(edge->getData());
     Line2SPtr line_edge_offset = KernelWrapper::offsetLine(
             line_edge, edge_data->getSpeed());
     Point2SPtr p_edge_offset = KernelWrapper::intersection(
@@ -328,9 +347,9 @@ Point2SPtr SimpleStraightSkel::crashAt(VertexSPtr vertex, EdgeSPtr edge) {
         double dist_vertex = distance * speed_vertex/(speed_vertex+speed_edge);
         Point2SPtr p_crash = KernelWrapper::offsetPoint(p_vertex, arc->getDirection(), dist_vertex);
         if (KernelWrapper::side(line_edge, p_crash) >= 0) {
-            SkelVertexDataSPtr data_src = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr data_src = std::dynamic_pointer_cast<SkelVertexData>(
                     edge->getVertexSrc()->getData());
-            SkelVertexDataSPtr data_dst = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr data_dst = std::dynamic_pointer_cast<SkelVertexData>(
                     edge->getVertexDst()->getData());
             ArcSPtr arc_src = data_src->getArc();
             ArcSPtr arc_dst = data_dst->getArc();
@@ -343,15 +362,15 @@ Point2SPtr SimpleStraightSkel::crashAt(VertexSPtr vertex, EdgeSPtr edge) {
     return result;
 }
 
-list<SplitEventSPtr> SimpleStraightSkel::nextSplitEvent(PolygonSPtr polygon, double offset) {
+std::list<SplitEventSPtr> SimpleStraightSkel::nextSplitEvent(PolygonSPtr polygon, double offset) {
     ReadLock l(polygon->mutex());
-    list<SplitEventSPtr> result;
+    std::list<SplitEventSPtr> result;
     double height_min = std::numeric_limits<double>::max();
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->isReflex()) {
-            list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+            std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
             while (it_e != polygon->edges().end()) {
                 EdgeSPtr edge = *it_e++;
                 if (edge == vertex->getEdgeIn() ||
@@ -367,7 +386,7 @@ list<SplitEventSPtr> SimpleStraightSkel::nextSplitEvent(PolygonSPtr polygon, dou
                 if (!p_crash) {
                     continue;
                 }
-                SkelEdgeDataSPtr data = dynamic_pointer_cast<SkelEdgeData>(
+                SkelEdgeDataSPtr data = std::dynamic_pointer_cast<SkelEdgeData>(
                         edge->getData());
                 double height = KernelWrapper::distance(edge->line(), p_crash) /
                         data->getSpeed();
@@ -377,7 +396,7 @@ list<SplitEventSPtr> SimpleStraightSkel::nextSplitEvent(PolygonSPtr polygon, dou
                     }
                     NodeSPtr node = Node::create(p_crash);
                     node->setHeight(height + offset);
-                    SkelVertexDataSPtr vertex_data = dynamic_pointer_cast<SkelVertexData>(
+                    SkelVertexDataSPtr vertex_data = std::dynamic_pointer_cast<SkelVertexData>(
                             vertex->getData());
                     ArcSPtr arc = vertex_data->getArc();
                     node->addArc(arc);
@@ -394,8 +413,8 @@ list<SplitEventSPtr> SimpleStraightSkel::nextSplitEvent(PolygonSPtr polygon, dou
     return result;
 }
 
-list<AbstractEventSPtr> SimpleStraightSkel::nextEvent(PolygonSPtr polygon, double offset) {
-    list<AbstractEventSPtr> result;
+std::list<AbstractEventSPtr> SimpleStraightSkel::nextEvent(PolygonSPtr polygon, double offset) {
+    std::list<AbstractEventSPtr> result;
     if (!polygon) {
         return result;
     }
@@ -412,21 +431,21 @@ list<AbstractEventSPtr> SimpleStraightSkel::nextEvent(PolygonSPtr polygon, doubl
         ConstOffsetEventSPtr event = ConstOffsetEvent::create(next_offset);
         result.push_back(event);
     }
-    list<EdgeEventSPtr> edge_events = nextEdgeEvent(polygon, offset);
-    list<EdgeEventSPtr>::iterator it_ee = edge_events.begin();
+    std::list<EdgeEventSPtr> edge_events = nextEdgeEvent(polygon, offset);
+    std::list<EdgeEventSPtr>::iterator it_ee = edge_events.begin();
     while (it_ee != edge_events.end()) {
         EdgeEventSPtr event = *it_ee++;
         result.push_back(event);
     }
-    list<SplitEventSPtr> split_events = nextSplitEvent(polygon, offset);
-    list<SplitEventSPtr>::iterator it_se = split_events.begin();
+    std::list<SplitEventSPtr> split_events = nextSplitEvent(polygon, offset);
+    std::list<SplitEventSPtr>::iterator it_se = split_events.begin();
     while (it_se != split_events.end()) {
         SplitEventSPtr event = *it_se++;
         result.push_back(event);
     }
     if (result.size() > 0) {
         double offset_min = std::numeric_limits<double>::max();
-        list<AbstractEventSPtr>::iterator it_e = result.begin();
+        std::list<AbstractEventSPtr>::iterator it_e = result.begin();
         while (it_e != result.end()) {
             AbstractEventSPtr event = *it_e++;
             if (event->getOffset() < offset_min) {
@@ -435,7 +454,7 @@ list<AbstractEventSPtr> SimpleStraightSkel::nextEvent(PolygonSPtr polygon, doubl
         }
         it_e = result.begin();
         while (it_e != result.end()) {
-            list<AbstractEventSPtr>::iterator it_current = it_e;
+            std::list<AbstractEventSPtr>::iterator it_current = it_e;
             AbstractEventSPtr event = *it_e++;
             if (event->getOffset() > offset_min) {
                 result.erase(it_current);
@@ -448,7 +467,7 @@ list<AbstractEventSPtr> SimpleStraightSkel::nextEvent(PolygonSPtr polygon, doubl
 PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
     PolygonSPtr result = Polygon::create();
 
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         EdgeSPtr edge_in = vertex->getEdgeIn();
@@ -456,7 +475,7 @@ PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
         if (edge_in && edge_out) {
             double speed_in = 1.0;
             if (edge_in->hasData()) {
-                SkelEdgeDataSPtr data_in = dynamic_pointer_cast<SkelEdgeData>(
+                SkelEdgeDataSPtr data_in = std::dynamic_pointer_cast<SkelEdgeData>(
                         edge_in->getData());
                 speed_in = data_in->getSpeed();
             }
@@ -464,7 +483,7 @@ PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
                     KernelWrapper::offsetLine(edge_in->line(), offset*speed_in);
             double speed_out = 1.0;
             if (edge_out->hasData()) {
-                SkelEdgeDataSPtr data_out = dynamic_pointer_cast<SkelEdgeData>(
+                SkelEdgeDataSPtr data_out = std::dynamic_pointer_cast<SkelEdgeData>(
                         edge_out->getData());
                 speed_out = data_out->getSpeed();
             }
@@ -476,7 +495,7 @@ PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
             SkelVertexDataSPtr offset_data = SkelVertexData::create(offset_vertex);
             SkelVertexDataSPtr data;
             if (vertex->hasData()) {
-                data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+                data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
                 offset_data->setArc(data->getArc());
             } else {
                 data = SkelVertexData::create(vertex);
@@ -486,12 +505,12 @@ PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
         }
     }
 
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
-        SkelVertexDataSPtr data_src = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_src = std::dynamic_pointer_cast<SkelVertexData>(
                 edge->getVertexSrc()->getData());
-        SkelVertexDataSPtr data_dst = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr data_dst = std::dynamic_pointer_cast<SkelVertexData>(
                 edge->getVertexDst()->getData());
         if (data_src && data_dst) {
             EdgeSPtr offset_edge = Edge::create(
@@ -499,7 +518,7 @@ PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
             SkelEdgeDataSPtr offset_data = SkelEdgeData::create(offset_edge);
             SkelEdgeDataSPtr data;
             if (edge->hasData()) {
-                data = dynamic_pointer_cast<SkelEdgeData>(edge->getData());
+                data = std::dynamic_pointer_cast<SkelEdgeData>(edge->getData());
                 offset_data->setEdgeOrigin(data->getEdgeOrigin());
                 offset_data->setSpeed(data->getSpeed());
             } else {
@@ -514,7 +533,7 @@ PolygonSPtr SimpleStraightSkel::shiftEdges(PolygonSPtr polygon, double offset) {
 }
 
 void SimpleStraightSkel::appendEventNode(NodeSPtr node) {
-    list<ArcWPtr>::iterator it_a = node->arcs().begin();
+    std::list<ArcWPtr>::iterator it_a = node->arcs().begin();
     while (it_a != node->arcs().end()) {
         ArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -534,7 +553,7 @@ void SimpleStraightSkel::handleEdgeEvent(EdgeEventSPtr event, PolygonSPtr polygo
     appendEventNode(node);
 
     EdgeSPtr edge = event->getEdge();
-    SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+    SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
             edge->getData());
     EdgeSPtr edge_result = edge_data->getOffsetEdge();
     VertexSPtr vertex_result = edge_result->getVertexSrc();
@@ -545,7 +564,7 @@ void SimpleStraightSkel::handleEdgeEvent(EdgeEventSPtr event, PolygonSPtr polygo
     edge_result->getVertexDst()->setEdgeOut(EdgeSPtr());
     polygon->removeVertex(edge_result->getVertexDst());
 
-    SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(
+    SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(
             vertex_result->getData());
     data->setNode(node);
     ArcSPtr arc_out = createArc(vertex_result);
@@ -561,22 +580,22 @@ void SimpleStraightSkel::handleSplitEvent(SplitEventSPtr event, PolygonSPtr poly
     NodeSPtr node = event->getNode();
     appendEventNode(node);
 
-    SkelVertexDataSPtr vertex_data = dynamic_pointer_cast<SkelVertexData>(
+    SkelVertexDataSPtr vertex_data = std::dynamic_pointer_cast<SkelVertexData>(
             event->getVertex()->getData());
     VertexSPtr vertex = vertex_data->getOffsetVertex();
     vertex->setPoint(node->getPoint());
-    SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+    SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
             event->getEdge()->getData());
     EdgeSPtr edge = edge_data->getOffsetEdge();
 
     VertexSPtr vertex_left = vertex;
     VertexSPtr vertex_right = Vertex::create(vertex->getPoint());
-    SkelVertexDataSPtr vertex_data_left = dynamic_pointer_cast<SkelVertexData>(vertex_left->getData());
+    SkelVertexDataSPtr vertex_data_left = std::dynamic_pointer_cast<SkelVertexData>(vertex_left->getData());
     SkelVertexDataSPtr vertex_data_right = SkelVertexData::create(vertex_right);
 
     EdgeSPtr edge_left = edge;
     EdgeSPtr edge_right = Edge::create(edge->getVertexSrc(), vertex_right);
-    SkelEdgeDataSPtr edge_data_left = dynamic_pointer_cast<SkelEdgeData>(edge_left->getData());
+    SkelEdgeDataSPtr edge_data_left = std::dynamic_pointer_cast<SkelEdgeData>(edge_left->getData());
     SkelEdgeDataSPtr edge_data_right = SkelEdgeData::create(edge_right);
     edge_data_right->setEdgeOrigin(edge_data_left->getEdgeOrigin());
     edge_data_right->setSpeed(edge_data_left->getSpeed());
@@ -609,7 +628,7 @@ void SimpleStraightSkel::handleTriangleEvent(TriangleEventSPtr event, PolygonSPt
     EdgeSPtr edges_toremove[3];
     event->getEdges(edges_toremove);
     for (unsigned int i = 0; i<3; i++) {
-        SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+        SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
                 edges_toremove[i]->getData());
         polygon->removeEdge(edge_data->getOffsetEdge());
     }
@@ -617,7 +636,7 @@ void SimpleStraightSkel::handleTriangleEvent(TriangleEventSPtr event, PolygonSPt
     VertexSPtr vertices_toremove[3];
     event->getVertices(vertices_toremove);
     for (unsigned int i = 0; i<3; i++) {
-        SkelVertexDataSPtr vertex_data = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr vertex_data = std::dynamic_pointer_cast<SkelVertexData>(
                 vertices_toremove[i]->getData());
         polygon->removeVertex(vertex_data->getOffsetVertex());
     }

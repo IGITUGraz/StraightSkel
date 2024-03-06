@@ -5,10 +5,9 @@
  */
 
 #ifndef POINT2_H
-#define	POINT2_H
+#define POINT2_H
 
-#include <stdexcept>
-#include "Vector2.h"
+#include "kernel/Vector2.h"
 
 namespace kernel {
 
@@ -32,5 +31,4 @@ protected:
 
 }
 
-#endif	/* POINT2_H */
-
+#endif /* POINT2_H */

@@ -5,7 +5,7 @@
  */
 
 #ifndef CGAL_KERNEL_H
-#define	CGAL_KERNEL_H
+#define CGAL_KERNEL_H
 
 #include "config.h"
 
@@ -35,5 +35,4 @@ typedef K::Sphere_3       Sphere3;
 
 #endif  /* USE_CGAL */
 
-#endif	/* CGAL_KERNEL_H */
-
+#endif /* CGAL_KERNEL_H */

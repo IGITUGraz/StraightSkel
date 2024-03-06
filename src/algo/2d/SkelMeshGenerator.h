@@ -5,27 +5,17 @@
  */
 
 #ifndef ALGO_2D_SKELMESHGENERATOR_H
-#define	ALGO_2D_SKELMESHGENERATOR_H
+#define ALGO_2D_SKELMESHGENERATOR_H
 
-#include <list>
-#include "debug.h"
-#include "boost_thread.h"
+#include "typedefs_thread.h"
 #include "data/2d/ptrs.h"
-#include "data/2d/Polygon.h"
 #include "data/2d/skel/ptrs.h"
-#include "data/2d/skel/StraightSkeleton.h"
 #include "data/2d/mesh/ptrs.h"
-#include "data/2d/mesh/Mesh.h"
-#include "data/2d/mesh/MeshEdgeData.h"
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
 #include "algo/2d/ptrs.h"
-#include "algo/2d/KernelWrapper.h"
-#include "algo/2d/MeshModifier.h"
 
 namespace algo { namespace _2d {
 
-using std::list;
 using namespace data::_2d;
 using namespace data::_2d::skel;
 using namespace data::_2d::mesh;
@@ -72,5 +62,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_2D_SKELMESHGENERATOR_H */
-
+#endif /* ALGO_2D_SKELMESHGENERATOR_H */

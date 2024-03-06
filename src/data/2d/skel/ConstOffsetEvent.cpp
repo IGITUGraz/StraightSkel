@@ -4,7 +4,7 @@
  * @date   2012-04-06
  */
 
-#include "ConstOffsetEvent.h"
+#include "data/2d/skel/ConstOffsetEvent.h"
 
 namespace data { namespace _2d { namespace skel {
 

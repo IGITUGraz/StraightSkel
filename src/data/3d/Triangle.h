@@ -5,18 +5,13 @@
  */
 
 #ifndef DATA_3D_TRIANGLE_H
-#define	DATA_3D_TRIANGLE_H
+#define DATA_3D_TRIANGLE_H
 
+#include "data/3d/ptrs.h"
 #include <list>
 #include <string>
-#include "debug.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/Facet.h"
 
 namespace data { namespace _3d {
-
-using std::list;
-using std::string;
 
 class Triangle {
 public:
@@ -26,8 +21,8 @@ public:
 
     FacetSPtr getFacet() const;
     void setFacet(FacetSPtr facet);
-    list<TriangleSPtr>::iterator getFacetListIt() const;
-    void setFacetListIt(list<TriangleSPtr>::iterator list_it);
+    std::list<TriangleSPtr>::iterator getFacetListIt() const;
+    void setFacetListIt(std::list<TriangleSPtr>::iterator list_it);
 
     VertexSPtr getVertex(unsigned int index) const;
     void setVertices(VertexSPtr vertices[3]);
@@ -37,16 +32,15 @@ public:
     int getID() const;
     void setID(int id);
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     FacetWPtr facet_;
-    list<TriangleSPtr>::iterator facet_list_it_;
+    std::list<TriangleSPtr>::iterator facet_list_it_;
     VertexSPtr vertices_[3];
     int id_;
 };
 
 } }
 
-#endif	/* DATA_3D_TRIANGLE_H */
-
+#endif /* DATA_3D_TRIANGLE_H */

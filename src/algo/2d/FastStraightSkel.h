@@ -5,31 +5,16 @@
  */
 
 #ifndef ALGO_2D_FASTSTRAIGHTSKEL_H
-#define	ALGO_2D_FASTSTRAIGHTSKEL_H
+#define ALGO_2D_FASTSTRAIGHTSKEL_H
 
-#include <list>
-#include "boost_thread.h"
-#include "debug.h"
-#include "util/Timer.h"
+#include "typedefs_thread.h"
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
 #include "algo/2d/ptrs.h"
-#include "algo/2d/KernelWrapper.h"
-#include "data/2d/Polygon.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
+#include "data/2d/ptrs.h"
 #include "data/2d/skel/ptrs.h"
-#include "data/2d/skel/StraightSkeleton.h"
-#include "data/2d/skel/Node.h"
-#include "data/2d/skel/Arc.h"
-#include "data/2d/skel/EdgeEvent.h"
-#include "data/2d/skel/SkelVertexData.h"
-#include "data/2d/skel/SkelEdgeData.h"
 
 namespace algo { namespace _2d {
 
-using std::list;
-using boost::dynamic_pointer_cast;
 using namespace data::_2d;
 using namespace data::_2d::skel;
 
@@ -70,4 +55,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_2D_FASTSTRAIGHTSKEL_H */
+#endif /* ALGO_2D_FASTSTRAIGHTSKEL_H */

@@ -5,21 +5,18 @@
  */
 
 #ifndef DB_2D_POLYGONDAO_H
-#define	DB_2D_POLYGONDAO_H
+#define DB_2D_POLYGONDAO_H
 
-#include <list>
-#include <map>
-#include "boost_thread.h"
+#include "typedefs_thread.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/Polygon.h"
 #include "db/ptrs.h"
 #include "db/2d/ptrs.h"
 #include "db/2d/DAOFactory.h"
+#include <string>
 
 namespace db { namespace _2d {
 
-using std::list;
-using std::map;
 using data::_2d::Polygon;
 using data::_2d::PolygonSPtr;
 
@@ -27,7 +24,7 @@ class PolygonDAO {
 friend class DAOFactory;
 public:
     virtual ~PolygonDAO();
-    string getTableSchema() const;
+    std::string getTableSchema() const;
     int createPolyID(PolygonSPtr polygon);
     int insert(PolygonSPtr polygon);
     bool del(PolygonSPtr polygon);
@@ -40,5 +37,4 @@ protected:
 
 } }
 
-#endif	/* DB_2D_POLYGONDAO_H */
-
+#endif /* DB_2D_POLYGONDAO_H */

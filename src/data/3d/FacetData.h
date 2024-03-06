@@ -5,10 +5,9 @@
  */
 
 #ifndef DATA_3D_FACETDATA_H
-#define	DATA_3D_FACETDATA_H
+#define DATA_3D_FACETDATA_H
 
 #include "data/3d/ptrs.h"
-#include "data/3d/Facet.h"
 
 namespace data { namespace _3d {
 
@@ -32,5 +31,5 @@ protected:
 
 } }
 
-#endif	/* DATA_3D_FACETDATA_H */
+#endif /* DATA_3D_FACETDATA_H */
 

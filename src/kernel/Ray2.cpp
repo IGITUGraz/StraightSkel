@@ -4,7 +4,7 @@
  * @date   2012-02-13
  */
 
-#include "Ray2.h"
+#include "kernel/Ray2.h"
 
 namespace kernel {
 

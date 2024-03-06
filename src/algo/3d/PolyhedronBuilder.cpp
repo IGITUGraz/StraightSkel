@@ -4,7 +4,13 @@
  * @date   2012-04-03
  */
 
-#include "PolyhedronBuilder.h"
+#include "algo/3d/PolyhedronBuilder.h"
+
+#include "algo/3d/KernelWrapper.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Vertex.h"
 
 namespace algo { namespace _3d {
 

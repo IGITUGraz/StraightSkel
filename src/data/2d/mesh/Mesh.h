@@ -5,29 +5,18 @@
  */
 
 #ifndef DATA_2D_MESH_MESH_H
-#define	DATA_2D_MESH_MESH_H
+#define DATA_2D_MESH_MESH_H
 
+#include "typedefs_thread.h"
+#include "data/2d/ptrs.h"
+#include "data/2d/mesh/ptrs.h"
 #include <list>
 #include <map>
 #include <string>
-#include "debug.h"
-#include "boost_thread.h"
-#include "util/StringFactory.h"
-#include "data/2d/ptrs.h"
-#include "data/2d/mesh/ptrs.h"
-#include "data/2d/mesh/MeshVertex.h"
-#include "data/2d/mesh/MeshCell.h"
-#include "data/2d/mesh/MeshRay.h"
 
 namespace data { namespace _2d { namespace mesh {
 
-using std::list;
-using std::map;
-using std::string;
-using std::stringstream;
-using util::StringFactory;
-
-class Mesh : public boost::enable_shared_from_this<Mesh> {
+class Mesh : public std::enable_shared_from_this<Mesh> {
 public:
     virtual ~Mesh();
     static MeshSPtr create();
@@ -42,23 +31,22 @@ public:
 
     SharedMutex& mutex();
 
-    map<Point2SPtr, MeshVertexSPtr>& vertices();
-    list<MeshCellSPtr>& cells();
-    list<MeshRaySPtr>& rays();
+    std::map<Point2SPtr, MeshVertexSPtr>& vertices();
+    std::list<MeshCellSPtr>& cells();
+    std::list<MeshRaySPtr>& rays();
 
     bool isConsistent() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Mesh();
     mutable SharedMutex mutex_;
-    map<Point2SPtr, MeshVertexSPtr> vertices_;
-    list<MeshCellSPtr> cells_;
-    list<MeshRaySPtr> rays_;
+    std::map<Point2SPtr, MeshVertexSPtr> vertices_;
+    std::list<MeshCellSPtr> cells_;
+    std::list<MeshRaySPtr> rays_;
 };
 
 } } }
 
-#endif	/* DATA_2D_MESH_MESH_H */
-
+#endif /* DATA_2D_MESH_MESH_H */

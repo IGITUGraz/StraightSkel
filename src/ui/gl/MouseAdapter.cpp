@@ -4,7 +4,10 @@
  * @date   2011-12-22
  */
 
-#include "MouseAdapter.h"
+#include "ui/gl/MouseAdapter.h"
+
+#include "util/Configuration.h"
+#include "ui/gl/Camera.h"
 
 namespace ui { namespace gl {
 
@@ -41,7 +44,7 @@ MouseAdapterSPtr MouseAdapter::create(CameraSPtr camera) {
     return result;
 }
 
-int MouseAdapter::toButton(const string& button) {
+int MouseAdapter::toButton(const std::string& button) {
     int result = -1;
     if (button.compare("MOUSE1") == 0) {
         result = 0;
@@ -61,7 +64,7 @@ void MouseAdapter::loadConfig(util::ConfigurationSPtr config) {
     if (!config->isLoaded()) {
         return;
     }
-    string section("ui_gl_MouseAdapter");
+    std::string section("ui_gl_MouseAdapter");
     int button = -1;
     button = toButton(config->getString(section, "b_look"));
     if (button != -1) b_look_ = button;

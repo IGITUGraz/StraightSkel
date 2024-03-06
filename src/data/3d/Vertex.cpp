@@ -4,7 +4,15 @@
  * @date   2011-11-26
  */
 
-#include "Vertex.h"
+#include "data/3d/Vertex.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "util/StringFactory.h"
+#include <algorithm>
 
 namespace data { namespace _3d {
 
@@ -44,11 +52,11 @@ void Vertex::setPoint(Point3SPtr point) {
 
 void Vertex::addEdge(EdgeSPtr edge) {
     EdgeWPtr edge_wptr(edge);
-    list<EdgeWPtr>::iterator it = edges_.insert(edges_.end(), edge_wptr);
+    std::list<EdgeWPtr>::iterator it = edges_.insert(edges_.end(), edge_wptr);
     VertexSPtr vertex_src = edge->getVertexSrc();
     VertexSPtr vertex_dst = edge->getVertexDst();
     if (vertex_src == shared_from_this() && vertex_dst == shared_from_this()) {
-        list<EdgeWPtr>::iterator it_e =
+        std::list<EdgeWPtr>::iterator it_e =
                 std::find(edges_.begin(), edges_.end(), edge_wptr);
         if (it_e == edge->getVertexSrcListIt()) {
             edge->setVertexDstListIt(it);
@@ -66,11 +74,11 @@ bool Vertex::removeEdge(EdgeSPtr edge) {
     bool result = false;
     if (edge->getVertexSrc() == shared_from_this()) {
         edges_.erase(edge->getVertexSrcListIt());
-        edge->setVertexSrcListIt(list<EdgeWPtr>::iterator());
+        edge->setVertexSrcListIt(std::list<EdgeWPtr>::iterator());
         result = true;
     } else if (edge->getVertexDst() == shared_from_this()) {
         edges_.erase(edge->getVertexDstListIt());
-        edge->setVertexDstListIt(list<EdgeWPtr>::iterator());
+        edge->setVertexDstListIt(std::list<EdgeWPtr>::iterator());
         result = true;
     }
     return result;
@@ -78,7 +86,7 @@ bool Vertex::removeEdge(EdgeSPtr edge) {
 
 EdgeSPtr Vertex::firstEdge() const {
     EdgeSPtr result;
-    list<EdgeWPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -100,7 +108,7 @@ EdgeSPtr Vertex::getEdge(unsigned int i) {
 
 EdgeSPtr Vertex::findEdge(VertexSPtr dst) const {
     EdgeSPtr result = EdgeSPtr();
-    list<EdgeWPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -122,7 +130,7 @@ EdgeSPtr Vertex::findEdge(VertexSPtr dst) const {
 
 EdgeSPtr Vertex::findEdge(FacetSPtr facet) const {
     EdgeSPtr result = EdgeSPtr();
-    list<EdgeWPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -142,9 +150,9 @@ void Vertex::addFacet(FacetSPtr facet) {
 
 bool Vertex::removeFacet(FacetSPtr facet) {
     bool result = false;
-    list<FacetWPtr>::iterator it = facets_.begin();
+    std::list<FacetWPtr>::iterator it = facets_.begin();
     while (it != facets_.end()) {
-        list<FacetWPtr>::iterator it_current = it;
+        std::list<FacetWPtr>::iterator it_current = it;
         FacetWPtr facet_wptr = *it++;
         if (!facet_wptr.expired()) {
             if (facet_wptr.lock() == facet) {
@@ -159,7 +167,7 @@ bool Vertex::removeFacet(FacetSPtr facet) {
 
 FacetSPtr Vertex::firstFacet() const {
     FacetSPtr result;
-    list<FacetWPtr>::const_iterator it_f = facets_.begin();
+    std::list<FacetWPtr>::const_iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetWPtr facet_wptr = *it_f++;
         if (!facet_wptr.expired()) {
@@ -194,16 +202,16 @@ bool Vertex::containsFacet(FacetSPtr facet) const {
 }
 
 void Vertex::sortEdges() {
-    list<EdgeWPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
-        list<EdgeWPtr>::iterator it_current = it_e;
+        std::list<EdgeWPtr>::iterator it_current = it_e;
         EdgeWPtr edge_wptr = *it_e++;
         if (edge_wptr.expired()) {
             edges_.erase(it_current);
         }
     }
-    list<EdgeSPtr> tmp;
-    list<EdgeSPtr>::iterator it_e_tmp = tmp.begin();
+    std::list<EdgeSPtr> tmp;
+    std::list<EdgeSPtr>::iterator it_e_tmp = tmp.begin();
     if (edges_.size() > 0) {
         EdgeSPtr first = EdgeSPtr();
         EdgeSPtr edge = EdgeSPtr(edges_.front());
@@ -228,16 +236,16 @@ void Vertex::sortEdges() {
 }
 
 void Vertex::sortFacets() {
-    list<FacetWPtr>::iterator it_f = facets_.begin();
+    std::list<FacetWPtr>::iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
-        list<FacetWPtr>::iterator it_current = it_f;
+        std::list<FacetWPtr>::iterator it_current = it_f;
         FacetWPtr facet_wptr = *it_f++;
         if (facet_wptr.expired()) {
             facets_.erase(it_current);
         }
     }
-    list<FacetSPtr> tmp;
-    list<FacetSPtr>::iterator it_f_tmp = tmp.begin();
+    std::list<FacetSPtr> tmp;
+    std::list<FacetSPtr>::iterator it_f_tmp = tmp.begin();
     if (facets_.size() > 0) {
         FacetSPtr facet = FacetSPtr(facets_.front());
         EdgeSPtr edge_first = findEdge(facet);
@@ -264,26 +272,26 @@ void Vertex::sortFacets() {
 }
 
 void Vertex::sort() {
-    list<EdgeWPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
-        list<EdgeWPtr>::iterator it_current = it_e;
+        std::list<EdgeWPtr>::iterator it_current = it_e;
         EdgeWPtr edge_wptr = *it_e++;
         if (edge_wptr.expired()) {
             edges_.erase(it_current);
         }
     }
-    list<FacetWPtr>::iterator it_f = facets_.begin();
+    std::list<FacetWPtr>::iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
-        list<FacetWPtr>::iterator it_current = it_f;
+        std::list<FacetWPtr>::iterator it_current = it_f;
         FacetWPtr facet_wptr = *it_f++;
         if (facet_wptr.expired()) {
             facets_.erase(it_current);
         }
     }
-    list<EdgeSPtr> edges_tmp;
-    list<EdgeSPtr>::iterator it_e_tmp = edges_tmp.begin();
-    list<FacetSPtr> facets_tmp;
-    list<FacetSPtr>::iterator it_f_tmp = facets_tmp.begin();
+    std::list<EdgeSPtr> edges_tmp;
+    std::list<EdgeSPtr>::iterator it_e_tmp = edges_tmp.begin();
+    std::list<FacetSPtr> facets_tmp;
+    std::list<FacetSPtr>::iterator it_f_tmp = facets_tmp.begin();
     if (edges_.size() > 0) {
         EdgeSPtr edge_first = EdgeSPtr(edges_.front());
         EdgeSPtr edge;
@@ -335,11 +343,11 @@ void Vertex::setPolyhedron(PolyhedronSPtr polyhedron) {
     this->polyhedron_ = polyhedron;
 }
 
-list<VertexSPtr>::iterator Vertex::getPolyhedronListIt() const {
+std::list<VertexSPtr>::iterator Vertex::getPolyhedronListIt() const {
     return this->polyhedron_list_it_;
 }
 
-void Vertex::setPolyhedronListIt(list<VertexSPtr>::iterator list_it) {
+void Vertex::setPolyhedronListIt(std::list<VertexSPtr>::iterator list_it) {
     this->polyhedron_list_it_ = list_it;
 }
 
@@ -360,17 +368,17 @@ bool Vertex::hasData() const {
     return result;
 }
 
-list<EdgeWPtr>& Vertex::edges() {
+std::list<EdgeWPtr>& Vertex::edges() {
     return this->edges_;
 }
 
-list<FacetWPtr>& Vertex::facets() {
+std::list<FacetWPtr>& Vertex::facets() {
     return this->facets_;
 }
 
 VertexSPtr Vertex::next(FacetSPtr facet) const {
     VertexSPtr result = VertexSPtr();
-    list<VertexSPtr>::const_iterator it_v = facet->vertices().begin();
+    std::list<VertexSPtr>::const_iterator it_v = facet->vertices().begin();
     while (it_v != facet->vertices().end()) {
         VertexSPtr vertex = *it_v;
         if (vertex == shared_from_this()) {
@@ -382,7 +390,7 @@ VertexSPtr Vertex::next(FacetSPtr facet) const {
         it_v++;
     }
     if (it_v != facet->vertices().end()) {
-        list<VertexSPtr>::const_iterator it_v_begin = it_v++;
+        std::list<VertexSPtr>::const_iterator it_v_begin = it_v++;
         if (it_v == facet->vertices().end()) {
             it_v = facet->vertices().begin();
         }
@@ -406,7 +414,7 @@ VertexSPtr Vertex::next(FacetSPtr facet) const {
 
 VertexSPtr Vertex::prev(FacetSPtr facet) const {
     VertexSPtr result = VertexSPtr();
-    list<VertexSPtr>::const_reverse_iterator it_v = facet->vertices().rbegin();
+    std::list<VertexSPtr>::const_reverse_iterator it_v = facet->vertices().rbegin();
     while (it_v != facet->vertices().rend()) {
         VertexSPtr vertex = *it_v;
         if (vertex == shared_from_this()) {
@@ -418,7 +426,7 @@ VertexSPtr Vertex::prev(FacetSPtr facet) const {
         it_v++;
     }
     if (it_v != facet->vertices().rend()) {
-        list<VertexSPtr>::const_reverse_iterator it_v_begin = it_v++;
+        std::list<VertexSPtr>::const_reverse_iterator it_v_begin = it_v++;
         if (it_v == facet->vertices().rend()) {
             it_v = facet->vertices().rbegin();
         }
@@ -451,8 +459,8 @@ VertexSPtr Vertex::split(FacetSPtr facet_left, FacetSPtr facet_right) {
     result = Vertex::create(getPoint());
 
     // 1. select edges and facets for result
-    list<FacetSPtr> facets;
-    list<EdgeSPtr> edges;
+    std::list<FacetSPtr> facets;
+    std::list<EdgeSPtr> edges;
     FacetSPtr poly_curr = facet_right;
     EdgeSPtr edge_curr = findEdge(poly_curr);
     while (poly_curr != facet_left) {
@@ -464,7 +472,7 @@ VertexSPtr Vertex::split(FacetSPtr facet_left, FacetSPtr facet_right) {
     facets.insert(facets.end(), facet_left);
 
     // 2. split vertex
-    list<EdgeSPtr>::iterator it_e = edges.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges.begin();
     while (it_e != edges.end()) {
         EdgeSPtr edge = *it_e++;
         if (edge->getVertexSrc() == shared_from_this()) {
@@ -473,7 +481,7 @@ VertexSPtr Vertex::split(FacetSPtr facet_left, FacetSPtr facet_right) {
             edge->replaceVertexDst(result);
         }
     }
-    list<FacetSPtr>::iterator it_f = facets.begin();
+    std::list<FacetSPtr>::iterator it_f = facets.begin();
     while (it_f != facets.end()) {
         FacetSPtr facet = *it_f++;
         if (facet != facet_left && facet != facet_right) {
@@ -531,7 +539,7 @@ void Vertex::setID(int id) {
 
 unsigned int Vertex::degree() const {
     unsigned int result = 0;
-    list<EdgeWPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -546,7 +554,7 @@ bool Vertex::isReflex() const {
         return false;
     }
     bool result = true;
-    list<EdgeWPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -564,7 +572,7 @@ bool Vertex::isConvex() const {
         return false;
     }
     bool result = true;
-    list<EdgeWPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeWPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -577,21 +585,21 @@ bool Vertex::isConvex() const {
     return result;
 }
 
-string Vertex::toString() const {
-    string result("Vertex(");
+std::string Vertex::toString() const {
+    std::string result("Vertex(");
     if (id_ != -1) {
-        result += "id=" + StringFactory::fromInteger(id_) + ", ";
+        result += "id=" + util::StringFactory::fromInteger(id_) + ", ";
     } else {
-        result += StringFactory::fromPointer(this) + ", ";
+        result += util::StringFactory::fromPointer(this) + ", ";
     }
-    result += "<" + StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ", ";
-    result += StringFactory::fromDouble(getZ()) + ">";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ", ";
+    result += util::StringFactory::fromDouble(getZ()) + ">";
 //    if (edges_.size() > 0) {
-//        result += ", Edges:" + StringFactory::fromInteger(edges_.size());
+//        result += ", Edges:" + util::StringFactory::fromInteger(edges_.size());
 //    }
 //    if (facets_.size() > 0) {
-//        result += ", Facets:" + StringFactory::fromInteger(facets_.size());
+//        result += ", Facets:" + util::StringFactory::fromInteger(facets_.size());
 //    }
     result += ")";
     return result;

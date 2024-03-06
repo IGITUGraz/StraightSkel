@@ -4,7 +4,9 @@
  * @date   2012-02-25
  */
 
-#include "bisector.h"
+#include "kernel/bisector.h"
+
+#include <cmath>
 
 namespace kernel {
 

@@ -4,7 +4,12 @@
  * @date   2013-05-23
  */
 
-#include "NodeDAO.h"
+#include "db/2d/NodeDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/2d/PointDAO.h"
+#include "db/2d/StraightSkeletonDAO.h"
 
 namespace db { namespace _2d {
 
@@ -16,8 +21,8 @@ NodeDAO::~NodeDAO() {
     // intentionally does nothing
 }
 
-string NodeDAO::getTableSchema() const {
-    string schema("CREATE TABLE Nodes (\n"
+std::string NodeDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Nodes (\n"
             "  SkelID INTEGER NOT NULL,\n"
             "  NID INTEGER NOT NULL,\n"
             "  PointID INTEGER,\n"
@@ -30,7 +35,7 @@ string NodeDAO::getTableSchema() const {
 int NodeDAO::nextNID(int skelid) {
     int nid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(NID) FROM Nodes WHERE SkelID=?;");
+    std::string sql("SELECT MAX(NID) FROM Nodes WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -58,7 +63,7 @@ int NodeDAO::insert(NodeSPtr node) {
         int pointid = dao_point->insert(node->getPoint());
         if (pointid > 0) {
             int nid = nextNID(skelid);
-            string sql("INSERT INTO Nodes (SkelID, NID, PointID, height) "
+            std::string sql("INSERT INTO Nodes (SkelID, NID, PointID, height) "
                     "VALUES (?, ?, ?, ?);");
             SQLiteStmtSPtr stmt = db->prepare(sql);
             if (stmt) {
@@ -87,7 +92,7 @@ bool NodeDAO::del(NodeSPtr node) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Nodes WHERE SkelID=? AND NID=?;");
+    std::string sql("DELETE FROM Nodes WHERE SkelID=? AND NID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -113,7 +118,7 @@ bool NodeDAO::del(NodeSPtr node) {
 NodeSPtr NodeDAO::find(int skelid, int nid) {
     NodeSPtr result = NodeSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT PointID, height FROM Nodes WHERE SkelID=? AND NID=?;");
+    std::string sql("SELECT PointID, height FROM Nodes WHERE SkelID=? AND NID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);

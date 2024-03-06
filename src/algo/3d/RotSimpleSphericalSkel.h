@@ -5,40 +5,17 @@
  */
 
 #ifndef ALGO_3D_ROTSIMPLESPHERICALSKEL_H
-#define	ALGO_3D_ROTSIMPLESPHERICALSKEL_H
-
-#include <list>
-#include <limits>
-#include "boost_thread.h"
-#include "debug.h"
-
-#include "util/Configuration.h"
-
-#include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/SphericalPolygon.h"
-#include "data/3d/CircularVertex.h"
-#include "data/3d/CircularEdge.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/SphericalSkeleton.h"
-#include "data/3d/skel/CircularNode.h"
-#include "data/3d/skel/CircularArc.h"
-#include "data/3d/skel/SphericalAbstractEvent.h"
-#include "data/3d/skel/SphericalConstOffsetEvent.h"
-#include "data/3d/skel/SphericalEdgeEvent.h"
-#include "data/3d/skel/SphericalSplitEvent.h"
-#include "data/3d/skel/SphericalTriangleEvent.h"
+#define ALGO_3D_ROTSIMPLESPHERICALSKEL_H
 
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
 #include "algo/3d/ptrs.h"
 #include "algo/3d/AbstractSimpleSphericalSkel.h"
-#include "algo/3d/KernelWrapper.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
-using std::list;
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 using namespace data::_3d::skel;
 
@@ -66,7 +43,7 @@ public:
 
     SphericalAbstractEventSPtr nextEvent(SphericalPolygonSPtr polygon, double offset);
 
-    CircularEdgeSPtr findLongestEdge(list<CircularEdgeSPtr> edges);
+    CircularEdgeSPtr findLongestEdge(std::list<CircularEdgeSPtr> edges);
 
     double distanceOffset(CircularEdgeSPtr edge_begin, double offset, double speed_dst);
     double findMinDistance(CircularEdgeSPtr edge_begin, double offset);
@@ -87,5 +64,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_ROTSIMPLESPHERICALSKEL_H */
-
+#endif /* ALGO_3D_ROTSIMPLESPHERICALSKEL_H */

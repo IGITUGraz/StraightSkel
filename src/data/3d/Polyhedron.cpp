@@ -4,7 +4,16 @@
  * @date   2011-11-26
  */
 
-#include "Polyhedron.h"
+#include "data/3d/Polyhedron.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Triangle.h"
+#include "util/StringFactory.h"
+#include <sstream>
+#include <map>
 
 namespace data { namespace _3d {
 
@@ -32,18 +41,18 @@ PolyhedronSPtr Polyhedron::create(unsigned int num_facets, FacetSPtr facets[]) {
 }
 
 PolyhedronSPtr Polyhedron::clone() const {
-    map<VertexSPtr, VertexSPtr> vertices_c;
-    map<EdgeSPtr, EdgeSPtr> edges_c;
+    std::map<VertexSPtr, VertexSPtr> vertices_c;
+    std::map<EdgeSPtr, EdgeSPtr> edges_c;
     PolyhedronSPtr result = Polyhedron::create();
     result->setDescription(description_);
-    list<VertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         VertexSPtr vertex_c = vertex->clone();
         result->addVertex(vertex_c);
         vertices_c[vertex] = vertex_c;
     }
-    list<EdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         VertexSPtr src = vertices_c[edge->getVertexSrc()];
@@ -52,17 +61,17 @@ PolyhedronSPtr Polyhedron::clone() const {
         result->addEdge(edge_c);
         edges_c[edge] = edge_c;
     }
-    list<FacetSPtr>::const_iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::const_iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
         FacetSPtr facet_c = Facet::create();
         facet_c->setPlane(facet->getPlane());
-        list<VertexSPtr>::const_iterator it_v = facet->vertices().begin();
+        std::list<VertexSPtr>::const_iterator it_v = facet->vertices().begin();
         while (it_v != facet->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             facet_c->addVertex(vertices_c[vertex]);
         }
-        list<EdgeSPtr>::const_iterator it_e = facet->edges().begin();
+        std::list<EdgeSPtr>::const_iterator it_e = facet->edges().begin();
         while (it_e != facet->edges().end()) {
             EdgeSPtr edge = *it_e++;
             EdgeSPtr edge_c = edges_c[edge];
@@ -74,7 +83,7 @@ PolyhedronSPtr Polyhedron::clone() const {
             }
             facet_c->addEdge(edge_c);
         }
-        list<TriangleSPtr>::const_iterator it_t = facet->triangles().begin();
+        std::list<TriangleSPtr>::const_iterator it_t = facet->triangles().begin();
         while (it_t != facet->triangles().end()) {
             TriangleSPtr triangle = *it_t++;
             VertexSPtr vertices_t_c[3];
@@ -89,7 +98,7 @@ PolyhedronSPtr Polyhedron::clone() const {
 }
 
 void Polyhedron::addVertex(VertexSPtr vertex) {
-    list<VertexSPtr>::iterator it = vertices_.insert(vertices_.end(), vertex);
+    std::list<VertexSPtr>::iterator it = vertices_.insert(vertices_.end(), vertex);
     vertex->setPolyhedron(shared_from_this());
     vertex->setPolyhedronListIt(it);
 }
@@ -98,9 +107,9 @@ bool Polyhedron::removeVertex(VertexSPtr vertex) {
     bool result = false;
     if (vertex->getPolyhedron() == shared_from_this()) {
         vertices_.erase(vertex->getPolyhedronListIt());
-        vertex->setPolyhedronListIt(list<VertexSPtr>::iterator());
+        vertex->setPolyhedronListIt(std::list<VertexSPtr>::iterator());
         vertex->setPolyhedron(PolyhedronSPtr());
-        list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+        std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
         while (it_f != vertex->facets().end()) {
             FacetWPtr facet_wptr = *it_f++;
             if (!facet_wptr.expired()) {
@@ -108,7 +117,7 @@ bool Polyhedron::removeVertex(VertexSPtr vertex) {
                 this->removeFacet(facet);
             }
         }
-        list<EdgeWPtr>::iterator it_e = vertex->edges().begin();
+        std::list<EdgeWPtr>::iterator it_e = vertex->edges().begin();
         while (it_e != vertex->edges().end()) {
             EdgeWPtr edge_wptr = *it_e++;
             if (!edge_wptr.expired()) {
@@ -123,7 +132,7 @@ bool Polyhedron::removeVertex(VertexSPtr vertex) {
 
 VertexSPtr Polyhedron::findVertex(VertexSPtr needle) {
     VertexSPtr result = VertexSPtr();
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->getPoint() == needle->getPoint()) {
@@ -135,7 +144,7 @@ VertexSPtr Polyhedron::findVertex(VertexSPtr needle) {
 }
 
 void Polyhedron::addEdge(EdgeSPtr edge) {
-    list<EdgeSPtr>::iterator it = edges_.insert(edges_.end(), edge);
+    std::list<EdgeSPtr>::iterator it = edges_.insert(edges_.end(), edge);
     edge->setPolyhedron(shared_from_this());
     edge->setPolyhedronListIt(it);
     VertexSPtr vertex = edge->getVertexSrc();
@@ -152,7 +161,7 @@ bool Polyhedron::removeEdge(EdgeSPtr edge) {
     bool result = false;
     if (edge->getPolyhedron() == shared_from_this()) {
         edges_.erase(edge->getPolyhedronListIt());
-        edge->setPolyhedronListIt(list<EdgeSPtr>::iterator());
+        edge->setPolyhedronListIt(std::list<EdgeSPtr>::iterator());
         edge->setPolyhedron(PolyhedronSPtr());
         FacetSPtr facet = edge->getFacetL();
         if (facet) {
@@ -171,7 +180,7 @@ bool Polyhedron::removeEdge(EdgeSPtr edge) {
 
 EdgeSPtr Polyhedron::findEdge(EdgeSPtr needle) {
     EdgeSPtr result = EdgeSPtr();
-    list<EdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         if (edge->getVertexSrc()->getPoint() ==
@@ -193,18 +202,18 @@ EdgeSPtr Polyhedron::findEdge(EdgeSPtr needle) {
 }
 
 void Polyhedron::addFacet(FacetSPtr facet) {
-    list<FacetSPtr>::iterator it_f = facets_.insert(facets_.end(), facet);
+    std::list<FacetSPtr>::iterator it_f = facets_.insert(facets_.end(), facet);
     facet->setPolyhedronListIt(it_f);
     facet->setPolyhedron(shared_from_this());
     // add content of facet
-    list<VertexSPtr>::iterator it_v = facet->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = facet->vertices().begin();
     while (it_v != facet->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->getPolyhedron() != shared_from_this()) {
             this->addVertex(vertex);
         }
     }
-    list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
     while (it_e != facet->edges().end()) {
         EdgeSPtr edge = *it_e++;
         if (edge->getPolyhedron() != shared_from_this()) {
@@ -218,13 +227,13 @@ bool Polyhedron::removeFacet(FacetSPtr facet) {
     if (facet->getPolyhedron() == shared_from_this()) {
         facets_.erase(facet->getPolyhedronListIt());
         facet->setPolyhedron(PolyhedronSPtr());
-        facet->setPolyhedronListIt(list<FacetSPtr>::iterator());
-        list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+        facet->setPolyhedronListIt(std::list<FacetSPtr>::iterator());
+        std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
         while (it_e != facet->edges().end()) {
             EdgeSPtr edge = *it_e++;
             facet->removeEdge(edge);  // clears list iterators
         }
-        list<VertexSPtr>::iterator it_v = facet->vertices().begin();
+        std::list<VertexSPtr>::iterator it_v = facet->vertices().begin();
         while (it_v != facet->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             facet->removeVertex(vertex);
@@ -235,7 +244,7 @@ bool Polyhedron::removeFacet(FacetSPtr facet) {
 }
 
 void Polyhedron::initPlanes() {
-    list<FacetSPtr>::iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
         facet->initPlane();
@@ -243,17 +252,17 @@ void Polyhedron::initPlanes() {
 }
 
 void Polyhedron::clearData() {
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         vertex->setData(VertexDataSPtr());
     }
-    list<EdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         edge->setData(EdgeDataSPtr());
     }
-    list<FacetSPtr>::iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
         facet->setData(FacetDataSPtr());
@@ -264,22 +273,22 @@ SharedMutex& Polyhedron::mutex() {
     return this->mutex_;
 }
 
-list<VertexSPtr>& Polyhedron::vertices() {
+std::list<VertexSPtr>& Polyhedron::vertices() {
     return this->vertices_;
 }
 
-list<EdgeSPtr>& Polyhedron::edges() {
+std::list<EdgeSPtr>& Polyhedron::edges() {
     return this->edges_;
 }
 
-list<FacetSPtr>& Polyhedron::facets() {
+std::list<FacetSPtr>& Polyhedron::facets() {
     return this->facets_;
 }
 
 bool Polyhedron::isConsistent() const {
     bool result = true;
 
-    list<VertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->getPolyhedron() != shared_from_this()) {
@@ -287,7 +296,7 @@ bool Polyhedron::isConsistent() const {
             result = false;
             break;
         }
-        list<EdgeWPtr>::const_iterator it_e = vertex->edges().begin();
+        std::list<EdgeWPtr>::const_iterator it_e = vertex->edges().begin();
         while (it_e != vertex->edges().end()) {
             EdgeWPtr edge_wptr = *it_e++;
             if (edge_wptr.expired()) {
@@ -303,7 +312,7 @@ bool Polyhedron::isConsistent() const {
                 }
             }
         }
-        list<FacetWPtr>::const_iterator it_f = vertex->facets().begin();
+        std::list<FacetWPtr>::const_iterator it_f = vertex->facets().begin();
         while (it_f != vertex->facets().end()) {
             FacetWPtr facet_wptr = *it_f++;
             if (facet_wptr.expired()) {
@@ -320,7 +329,7 @@ bool Polyhedron::isConsistent() const {
         }
     }
 
-    list<EdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         if (edge->getPolyhedron() != shared_from_this()) {
@@ -375,7 +384,7 @@ bool Polyhedron::isConsistent() const {
         }
     }
 
-    list<FacetSPtr>::const_iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::const_iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
         if (facet->getPolyhedron() != shared_from_this()) {
@@ -383,7 +392,7 @@ bool Polyhedron::isConsistent() const {
             result = false;
             break;
         }
-        list<VertexSPtr>::const_iterator it_v = facet->vertices().begin();
+        std::list<VertexSPtr>::const_iterator it_v = facet->vertices().begin();
         while (it_v != facet->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             if (!vertex->containsFacet(facet)) {
@@ -393,7 +402,7 @@ bool Polyhedron::isConsistent() const {
                 break;
             }
         }
-        list<EdgeSPtr>::const_iterator it_e = facet->edges().begin();
+        std::list<EdgeSPtr>::const_iterator it_e = facet->edges().begin();
         while (it_e != facet->edges().end()) {
             EdgeSPtr edge = *it_e++;
             if (edge->getFacetL() != facet && edge->getFacetR() != facet) {
@@ -416,17 +425,17 @@ bool Polyhedron::isConsistent() const {
 }
 
 void Polyhedron::clear() {
-    list<FacetSPtr>::iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
         this->removeFacet(facet);
     }
-    list<EdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         this->removeEdge(edge);
     }
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         this->removeVertex(vertex);
@@ -442,22 +451,22 @@ void Polyhedron::setID(int id) {
 }
 
 void Polyhedron::resetAllIDs() {
-    list<FacetSPtr>::iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
-        list<TriangleSPtr>::iterator it_t = facet->triangles().begin();
+        std::list<TriangleSPtr>::iterator it_t = facet->triangles().begin();
         while (it_t != facet->triangles().end()) {
             TriangleSPtr triangle = *it_t++;
             triangle->setID(-1);
         }
         facet->setID(-1);
     }
-    list<EdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         edge->setID(-1);
     }
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         vertex->setID(-1);
@@ -465,43 +474,43 @@ void Polyhedron::resetAllIDs() {
     setID(-1);
 }
 
-string Polyhedron::getDescription() const {
+std::string Polyhedron::getDescription() const {
     return this->description_;
 }
 
-void Polyhedron::setDescription(string desc) {
+void Polyhedron::setDescription(const std::string& desc) {
     this->description_ = desc;
 }
 
-void Polyhedron::appendDescription(string desc) {
+void Polyhedron::appendDescription(const std::string& desc) {
     this->description_.append(desc);
 }
 
-string Polyhedron::toString() const {
-    stringstream sstr;
+std::string Polyhedron::toString() const {
+    std::stringstream sstr;
     sstr << "Polyhedron(";
     if (id_ != -1) {
-        sstr << "id=" << StringFactory::fromInteger(id_) << ", ";
+        sstr << "id=" << util::StringFactory::fromInteger(id_) << ", ";
     } else {
-        sstr << StringFactory::fromPointer(this) << ", ";
+        sstr << util::StringFactory::fromPointer(this) << ", ";
     }
-    sstr << "Vertices:" + StringFactory::fromInteger(vertices_.size()) + ", ";
-    sstr << "Edges:" + StringFactory::fromInteger(edges_.size()) + ", ";
-    sstr << "Facets:" + StringFactory::fromInteger(facets_.size()) + ",\n";
+    sstr << "Vertices:" + util::StringFactory::fromInteger(vertices_.size()) + ", ";
+    sstr << "Edges:" + util::StringFactory::fromInteger(edges_.size()) + ", ";
+    sstr << "Facets:" + util::StringFactory::fromInteger(facets_.size()) + ",\n";
 
-    list<FacetSPtr>::const_iterator it_f = facets_.begin();
+    std::list<FacetSPtr>::const_iterator it_f = facets_.begin();
     while (it_f != facets_.end()) {
         FacetSPtr facet = *it_f++;
         sstr << facet->toString() << "\n";
     }
     sstr << ")";
 
-  /*list<EdgeSPtr>::iterator it_e = edges_.begin();
+  /*std::list<EdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         EdgeSPtr edge = *it_e++;
         sstr << edge->toString() << "\n";
     }
-    list<VertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<VertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         VertexSPtr vertex = *it_v++;
         sstr << vertex->toString() << "\n";

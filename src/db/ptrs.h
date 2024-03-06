@@ -5,9 +5,9 @@
  */
 
 #ifndef DB_PTRS_H
-#define	DB_PTRS_H
+#define DB_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace db {
 
@@ -21,5 +21,4 @@ typedef WEAK_PTR<SQLiteStmt> SQLiteStmtWPtr;
 
 }
 
-#endif	/* DB_PTRS_H */
-
+#endif /* DB_PTRS_H */

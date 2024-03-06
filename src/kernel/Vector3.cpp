@@ -4,7 +4,10 @@
  * @date   2011-11-14
  */
 
-#include "Vector3.h"
+#include "kernel/Vector3.h"
+
+#include <cmath>
+#include <stdexcept>
 
 namespace kernel {
 
@@ -32,7 +35,7 @@ Vector3::~Vector3() {
 
 double Vector3::operator[](unsigned int i) const {
     if (i >= 3) {
-        throw out_of_range("Index out of bounds.");
+        throw std::out_of_range("Index out of bounds.");
     }
     return v_[i];
 }

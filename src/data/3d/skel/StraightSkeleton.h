@@ -5,27 +5,17 @@
  */
 
 #ifndef DATA_3D_SKEL_STRAIGHTSKELETON_H
-#define	DATA_3D_SKEL_STRAIGHTSKELETON_H
+#define DATA_3D_SKEL_STRAIGHTSKELETON_H
 
+#include "typedefs_thread.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
 #include <list>
 #include <string>
-#include "boost_thread.h"
-#include "util/StringFactory.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/AbstractEvent.h"
-#include "data/3d/skel/Node.h"
-#include "data/3d/skel/Arc.h"
-#include "data/3d/skel/Sheet.h"
 
 namespace data { namespace _3d { namespace skel {
 
-using std::list;
-using std::string;
-using std::stringstream;
-using boost::dynamic_pointer_cast;
-using util::StringFactory;
-
-class StraightSkeleton : public boost::enable_shared_from_this<StraightSkeleton> {
+class StraightSkeleton : public std::enable_shared_from_this<StraightSkeleton> {
 public:
     virtual ~StraightSkeleton();
 
@@ -44,10 +34,10 @@ public:
     bool removeSheet(SheetSPtr sheet);
 
     SharedMutex& mutex();
-    list<AbstractEventSPtr>& events();
-    list<NodeSPtr>& nodes();
-    list<ArcSPtr>& arcs();
-    list<SheetSPtr>& sheets();
+    std::list<AbstractEventSPtr>& events();
+    std::list<NodeSPtr>& nodes();
+    std::list<ArcSPtr>& arcs();
+    std::list<SheetSPtr>& sheets();
 
     PolyhedronSPtr getPolyhedron() const;
     void setPolyhedron(PolyhedronSPtr polyhedron);
@@ -57,34 +47,33 @@ public:
 
     void resetAllIDs();
 
-    string getConfig() const;
-    void setConfig(string config);
-    void appendConfig(string config);
+    std::string getConfig() const;
+    void setConfig(const std::string& config);
+    void appendConfig(const std::string& config);
 
     bool isConsistent() const;
 
     int countEvents(int type) const;
 
-    string getDescription() const;
-    void setDescription(string desc);
-    void appendDescription(string desc);
+    std::string getDescription() const;
+    void setDescription(const std::string& desc);
+    void appendDescription(const std::string& desc);
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     StraightSkeleton();
     PolyhedronSPtr polyhedron_;
     mutable SharedMutex mutex_;
-    list<AbstractEventSPtr> events_;
-    list<NodeSPtr> nodes_;
-    list<ArcSPtr> arcs_;
-    list<SheetSPtr> sheets_;
+    std::list<AbstractEventSPtr> events_;
+    std::list<NodeSPtr> nodes_;
+    std::list<ArcSPtr> arcs_;
+    std::list<SheetSPtr> sheets_;
     int id_;
-    string config_;
-    string description_;
+    std::string config_;
+    std::string description_;
 };
 
 } } }
 
-#endif	/* DATA_3D_SKEL_STRAIGHTSKELETON_H */
-
+#endif /* DATA_3D_SKEL_STRAIGHTSKELETON_H */

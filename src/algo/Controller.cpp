@@ -4,7 +4,10 @@
  * @date   2012-02-23
  */
 
-#include "Controller.h"
+#include "algo/Controller.h"
+
+#include "util/Configuration.h"
+#include <string>
 
 namespace algo {
 
@@ -66,7 +69,7 @@ void Controller::wait() {
             next_step_ = false;
             break;
         }
-        boost_thread_sleep(sleep_ms);
+        thread_sleep(sleep_ms);
         current += sleep_ms;
     }
 }

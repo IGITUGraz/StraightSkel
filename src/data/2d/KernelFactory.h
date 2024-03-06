@@ -5,7 +5,7 @@
  */
 
 #ifndef DATA_2D_KERNELFACTORY_H
-#define	DATA_2D_KERNELFACTORY_H
+#define DATA_2D_KERNELFACTORY_H
 
 #include "config.h"
 #ifdef USE_CGAL
@@ -48,5 +48,5 @@ protected:
 
 } }
 
-#endif	/* DATA_2D_KERNELFACTORY_H */
+#endif /* DATA_2D_KERNELFACTORY_H */
 

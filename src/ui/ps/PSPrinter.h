@@ -5,31 +5,26 @@
  */
 
 #ifndef UI_PS_PSPRINTER_H
-#define	UI_PS_PSPRINTER_H
+#define UI_PS_PSPRINTER_H
 
+#include "ui/typedefs.h"
 #include <iostream>
 #include <string>
-#include "debug.h"
-#include "ui/typedefs.h"
-#include "ui/ps/ptrs.h"
 
 namespace ui { namespace ps {
-
-using std::ostream;
-using std::string;
 
 class PSPrinter {
 public:
     virtual ~PSPrinter();
 
-    void printHead(ostream& out);
-    void printComment(string comment, ostream& out);
-    void setLineWidth(float linewidth, ostream& out);
-    void setGray(float gray, ostream& out);
-    void printLine(const vec2f src, const vec2f dst, ostream& out);
+    void printHead(std::ostream& out);
+    void printComment(const std::string& comment, std::ostream& out);
+    void setLineWidth(float linewidth, std::ostream& out);
+    void setGray(float gray, std::ostream& out);
+    void printLine(const vec2f src, const vec2f dst, std::ostream& out);
     void printPath(unsigned int num_points, const vec2f points[],
-            bool closepath, bool fill, ostream& out);
-    void printCircle(const vec2f center, float radius, ostream& out);
+            bool closepath, bool fill, std::ostream& out);
+    void printCircle(const vec2f center, float radius, std::ostream& out);
 
 protected:
     PSPrinter();
@@ -39,5 +34,5 @@ protected:
 
 } }
 
-#endif	/* UI_PS_PSPRINTER_H */
+#endif /* UI_PS_PSPRINTER_H */
 

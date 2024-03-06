@@ -4,7 +4,7 @@
  * @date   2011-11-14
  */
 
-#include "Plane3.h"
+#include "kernel/Plane3.h"
 
 namespace kernel {
 

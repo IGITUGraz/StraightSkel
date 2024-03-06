@@ -5,27 +5,15 @@
  */
 
 #ifndef ALGO_3D_ABSTRACTVERTEXSPLITTER_H
-#define	ALGO_3D_ABSTRACTVERTEXSPLITTER_H
+#define ALGO_3D_ABSTRACTVERTEXSPLITTER_H
 
-#include <string>
-#include <limits>
-#include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Facet.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/SkelVertexData.h"
-#include "data/3d/skel/SkelEdgeData.h"
-#include "data/3d/skel/SkelFacetData.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/KernelWrapper.h"
-#include "algo/3d/SelfIntersection.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include <string>
 
 namespace algo { namespace _3d {
 
-using std::string;
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 using namespace data::_3d::skel;
 
@@ -50,7 +38,7 @@ public:
     static PolyhedronSPtr shiftFacets(PolyhedronSPtr polyhedron, double offset);
     static bool checkSplitted(PolyhedronSPtr polyhedron);
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     AbstractVertexSplitter();
@@ -60,5 +48,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_ABSTRACTVERTEXSPLITTER_H */
-
+#endif /* ALGO_3D_ABSTRACTVERTEXSPLITTER_H */

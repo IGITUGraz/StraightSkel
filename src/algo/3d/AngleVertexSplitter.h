@@ -5,20 +5,16 @@
  */
 
 #ifndef ALGO_3D_ANGLEVERTEXSPLITTER_H
-#define	ALGO_3D_ANGLEVERTEXSPLITTER_H
+#define ALGO_3D_ANGLEVERTEXSPLITTER_H
 
-#include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/SkelVertexData.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/KernelWrapper.h"
 #include "algo/3d/AbstractVertexSplitter.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/Facet.h"
+#include "data/3d/skel/ptrs.h"
 
 namespace algo { namespace _3d {
 
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 using namespace data::_3d::skel;
 
@@ -40,5 +36,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_ANGLEVERTEXSPLITTER_H */
-
+#endif /* ALGO_3D_ANGLEVERTEXSPLITTER_H */

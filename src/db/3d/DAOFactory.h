@@ -5,36 +5,20 @@
  */
 
 #ifndef DB_3D_DAOFACTORY_H
-#define	DB_3D_DAOFACTORY_H
+#define DB_3D_DAOFACTORY_H
 
-#include <cstdlib>
-#include <string>
-#include <fstream>
+
 #include "db/ptrs.h"
-#include "db/SQLiteDatabase.h"
 #include "db/3d/ptrs.h"
-#include "db/3d/PointDAO.h"
-#include "db/3d/PlaneDAO.h"
-#include "db/3d/VertexDAO.h"
-#include "db/3d/EdgeDAO.h"
-#include "db/3d/TriangleDAO.h"
-#include "db/3d/FacetDAO.h"
-#include "db/3d/PolyhedronDAO.h"
-#include "db/3d/NodeDAO.h"
-#include "db/3d/ArcDAO.h"
-#include "db/3d/SheetDAO.h"
-#include "db/3d/EventDAO.h"
-#include "db/3d/StraightSkeletonDAO.h"
+#include <string>
 
 namespace db { namespace _3d {
-
-using std::string;
 
 class DAOFactory {
 public:
     virtual ~DAOFactory();
 
-    static string findDefaultFilename();
+    static std::string findDefaultFilename();
     static bool createTables();
     static SQLiteDatabaseSPtr getDB();
 
@@ -76,5 +60,4 @@ protected:
 
 } }
 
-#endif	/* DB_3D_DAOFACTORY_H */
-
+#endif /* DB_3D_DAOFACTORY_H */

@@ -5,9 +5,9 @@
  */
 
 #ifndef SPHERE3_H
-#define	SPHERE3_H
+#define SPHERE3_H
 
-#include "Point3.h"
+#include "kernel/Point3.h"
 
 namespace kernel {
 
@@ -27,5 +27,5 @@ protected:
 
 }
 
-#endif	/* SPHERE3_H */
+#endif /* SPHERE3_H */
 

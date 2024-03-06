@@ -5,12 +5,10 @@
  */
 
 #ifndef ALGO_CONTROLLER_H
-#define	ALGO_CONTROLLER_H
+#define ALGO_CONTROLLER_H
 
-#include <string>
-#include "boost_thread.h"
+#include "typedefs_thread.h"
 #include "algo/ptrs.h"
-#include "util/Configuration.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/skel/ptrs.h"
 #include "data/3d/ptrs.h"
@@ -80,5 +78,4 @@ protected:
 
 }
 
-#endif	/* ALGO_CONTROLLER_H */
-
+#endif /* ALGO_CONTROLLER_H */

@@ -5,14 +5,13 @@
  */
 
 #ifndef PROJECTION_H
-#define	PROJECTION_H
+#define PROJECTION_H
 
-#include <cmath>
-#include "Point2.h"
-#include "Line2.h"
-#include "Point3.h"
-#include "Line3.h"
-#include "Plane3.h"
+#include "kernel/Point2.h"
+#include "kernel/Line2.h"
+#include "kernel/Point3.h"
+#include "kernel/Line3.h"
+#include "kernel/Plane3.h"
 
 namespace kernel {
 
@@ -23,5 +22,5 @@ Point3* projection(const Line3* line, const Point3* point);
 
 }
 
-#endif	/* PROJECTION_H */
+#endif /* PROJECTION_H */
 

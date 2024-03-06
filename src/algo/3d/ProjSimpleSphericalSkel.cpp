@@ -4,7 +4,28 @@
  * @date   2012-12-03
  */
 
-#include "ProjSimpleSphericalSkel.h"
+#include "algo/3d/ProjSimpleSphericalSkel.h"
+
+#include "debug.h"
+#include "typedefs_thread.h"
+#include "algo/Controller.h"
+#include "algo/3d/KernelWrapper.h"
+#include "data/3d/SphericalPolygon.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/skel/SphericalSkeleton.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/SphericalSkelVertexData.h"
+#include "data/3d/skel/SphericalSkelEdgeData.h"
+#include "data/3d/skel/SphericalAbstractEvent.h"
+#include "data/3d/skel/SphericalConstOffsetEvent.h"
+#include "data/3d/skel/SphericalEdgeEvent.h"
+#include "data/3d/skel/SphericalSplitEvent.h"
+#include "data/3d/skel/SphericalTriangleEvent.h"
+#include "util/Configuration.h"
+#include <list>
+#include <limits>
 
 namespace algo { namespace _3d {
 
@@ -58,11 +79,11 @@ void ProjSimpleSphericalSkel::run() {
                 event->setPolygonResult(polygon);
                 skel_result_->addEvent(event);
             } else if (event->getType() == SphericalAbstractEvent::EDGE_EVENT) {
-                handleEdgeEvent(dynamic_pointer_cast<SphericalEdgeEvent>(event), polygon);
+                handleEdgeEvent(std::dynamic_pointer_cast<SphericalEdgeEvent>(event), polygon);
             } else if (event->getType() == SphericalAbstractEvent::SPLIT_EVENT) {
-                handleSplitEvent(dynamic_pointer_cast<SphericalSplitEvent>(event), polygon);
+                handleSplitEvent(std::dynamic_pointer_cast<SphericalSplitEvent>(event), polygon);
             } else if (event->getType() == SphericalAbstractEvent::TRIANGLE_EVENT) {
-                handleTriangleEvent(dynamic_pointer_cast<SphericalTriangleEvent>(event), polygon);
+                handleTriangleEvent(std::dynamic_pointer_cast<SphericalTriangleEvent>(event), polygon);
             }
             assert(polygon->isConsistent());
             assert(skel_result_->isConsistent());
@@ -104,7 +125,7 @@ void ProjSimpleSphericalSkel::initRotationAxes(SphericalPolygonSPtr polygon) {
     Vector3SPtr normal = KernelFactory::createVector3(0.0, 0.0, 1.0);  // TODO
     Plane3SPtr plane_rot_axes = KernelFactory::createPlane3(p_center, normal);
     skel_result_->setRotAxesPlane(plane_rot_axes);
-    list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         CircularEdgeSPtr edge = *it_e++;
         Point3SPtr p_src = edge->getVertexSrc()->getPoint();
@@ -122,7 +143,7 @@ void ProjSimpleSphericalSkel::initRotationAxes(SphericalPolygonSPtr polygon) {
         }
         SphericalSkelEdgeDataSPtr data;
         if (edge->hasData()) {
-            data = dynamic_pointer_cast<SphericalSkelEdgeData>(edge->getData());
+            data = std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge->getData());
         } else {
             data = SphericalSkelEdgeData::create(edge);
         }
@@ -132,7 +153,7 @@ void ProjSimpleSphericalSkel::initRotationAxes(SphericalPolygonSPtr polygon) {
 
 void ProjSimpleSphericalSkel::initConstSpeeds(SphericalPolygonSPtr polygon) {
     Plane3SPtr plane_rot_axes = skel_result_->getRotAxesPlane();
-    list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         CircularEdgeSPtr edge = *it_e++;
         CircularEdgeSPtr edge_origin = getEdgeOrigin(edge);
@@ -141,7 +162,7 @@ void ProjSimpleSphericalSkel::initConstSpeeds(SphericalPolygonSPtr polygon) {
         double speed = 1.0 / sin(angle);
         SphericalSkelEdgeDataSPtr data;
         if (edge->hasData()) {
-            data = dynamic_pointer_cast<SphericalSkelEdgeData>(edge->getData());
+            data = std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge->getData());
         } else {
             data = SphericalSkelEdgeData::create(edge);
         }
@@ -152,7 +173,7 @@ void ProjSimpleSphericalSkel::initConstSpeeds(SphericalPolygonSPtr polygon) {
 bool ProjSimpleSphericalSkel::init(SphericalPolygonSPtr polygon) {
     WriteLock l(polygon->mutex());
     bool result = true;
-    list<CircularVertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<CircularVertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         CircularVertexSPtr vertex = *it_v++;
         CircularEdgeSPtr edge_in = vertex->getEdgeIn();
@@ -160,7 +181,7 @@ bool ProjSimpleSphericalSkel::init(SphericalPolygonSPtr polygon) {
         if (edge_in && edge_out) {
             SphericalSkelVertexDataSPtr data;
             if (vertex->hasData()) {
-                data = dynamic_pointer_cast<SphericalSkelVertexData>(vertex->getData());
+                data = std::dynamic_pointer_cast<SphericalSkelVertexData>(vertex->getData());
             } else {
                 data = SphericalSkelVertexData::create(vertex);
             }
@@ -212,7 +233,7 @@ double ProjSimpleSphericalSkel::offsetTo(CircularEdgeSPtr edge, Point3SPtr point
     Sphere3SPtr sphere = edge->getPolygon()->getSphere();
     Point3SPtr p_center = KernelFactory::createPoint3(sphere);
     SphericalSkelEdgeDataSPtr data =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(
             edge->getData());
     Line3SPtr rotation_axis = data->getRotationAxis();
     Plane3SPtr plane_edge = edge->supportingPlane();
@@ -237,7 +258,7 @@ SphericalEdgeEventSPtr ProjSimpleSphericalSkel::nextEdgeEvent(SphericalPolygonSP
     ReadLock l(polygon->mutex());
     SphericalEdgeEventSPtr result;
     double offset_max = -std::numeric_limits<double>::infinity();
-    list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         CircularEdgeSPtr edge = *it_e++;
         if (isTriangle(edge)) {
@@ -262,10 +283,10 @@ SphericalEdgeEventSPtr ProjSimpleSphericalSkel::nextEdgeEvent(SphericalPolygonSP
             node->setPoint(point);
             result->setEdge(edge);
             SphericalSkelVertexDataSPtr data_src =
-                    dynamic_pointer_cast<SphericalSkelVertexData>(
+                    std::dynamic_pointer_cast<SphericalSkelVertexData>(
                     edge->getVertexSrc()->getData());
             SphericalSkelVertexDataSPtr data_dst =
-                    dynamic_pointer_cast<SphericalSkelVertexData>(
+                    std::dynamic_pointer_cast<SphericalSkelVertexData>(
                     edge->getVertexDst()->getData());
             node->addArc(data_src->getArc());
             node->addArc(data_dst->getArc());
@@ -279,14 +300,14 @@ SphericalSplitEventSPtr ProjSimpleSphericalSkel::nextSplitEvent(SphericalPolygon
     ReadLock l(polygon->mutex());
     SphericalSplitEventSPtr result;
     double offset_max = -std::numeric_limits<double>::infinity();
-    list<CircularVertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<CircularVertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         CircularVertexSPtr vertex = *it_v++;
         if (!isReflex(vertex)) {
             // no split event
             continue;
         }
-        list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
+        std::list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
         while (it_e != polygon->edges().end()) {
             CircularEdgeSPtr edge = *it_e++;
             if (edge == vertex->getEdgeIn() ||
@@ -317,7 +338,7 @@ SphericalSplitEventSPtr ProjSimpleSphericalSkel::nextSplitEvent(SphericalPolygon
                 result->setVertex(vertex);
                 result->setEdge(edge);
                 SphericalSkelVertexDataSPtr data =
-                        dynamic_pointer_cast<SphericalSkelVertexData>(
+                        std::dynamic_pointer_cast<SphericalSkelVertexData>(
                         vertex->getData());
                 node->addArc(data->getArc());
                 offset_max = offset_current;
@@ -331,7 +352,7 @@ SphericalTriangleEventSPtr ProjSimpleSphericalSkel::nextTriangleEvent(SphericalP
     ReadLock l(polygon->mutex());
     SphericalTriangleEventSPtr result;
     double offset_max = -std::numeric_limits<double>::infinity();
-    list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         CircularEdgeSPtr edge = *it_e++;
         if (!isTriangle(edge)) {
@@ -357,7 +378,7 @@ SphericalTriangleEventSPtr ProjSimpleSphericalSkel::nextTriangleEvent(SphericalP
             result->setEdgeBegin(edge);
             for (unsigned int i = 0; i < 3; i++) {
                 SphericalSkelVertexDataSPtr data =
-                    dynamic_pointer_cast<SphericalSkelVertexData>(
+                    std::dynamic_pointer_cast<SphericalSkelVertexData>(
                     edge->getVertexSrc()->getData());
                 node->addArc(data->getArc());
                 edge = edge->next();
@@ -411,7 +432,7 @@ SphericalPolygonSPtr ProjSimpleSphericalSkel::shiftEdges(SphericalPolygonSPtr po
     Point3SPtr p_center = KernelFactory::createPoint3(sphere);
     double radius = polygon->getRadius();
 
-    list<CircularVertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<CircularVertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         CircularVertexSPtr vertex = *it_v++;
         CircularEdgeSPtr edge_in = vertex->getEdgeIn();
@@ -419,7 +440,7 @@ SphericalPolygonSPtr ProjSimpleSphericalSkel::shiftEdges(SphericalPolygonSPtr po
         bool has_valid_rot_axis_in = hasValidRotationAxis(edge_in);
         bool has_valid_rot_axis_out = hasValidRotationAxis(edge_out);
         SphericalSkelVertexDataSPtr data =
-                dynamic_pointer_cast<SphericalSkelVertexData>(vertex->getData());
+                std::dynamic_pointer_cast<SphericalSkelVertexData>(vertex->getData());
         CircularArcSPtr arc = data->getArc();
         CircularVertexSPtr vertex_rotated;
         Point3SPtr p_in;
@@ -429,7 +450,7 @@ SphericalPolygonSPtr ProjSimpleSphericalSkel::shiftEdges(SphericalPolygonSPtr po
             double angle = angleTo(edge_in);
             Plane3SPtr plane_edge = edge_in->supportingPlane();
             SphericalSkelEdgeDataSPtr data_edge =
-                    dynamic_pointer_cast<SphericalSkelEdgeData>(edge_in->getData());
+                    std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge_in->getData());
             Line3SPtr rotation_axis = data_edge->getRotationAxis();
             if (angle > M_PI/2.0) {
                 angle = M_PI - angle;
@@ -457,7 +478,7 @@ SphericalPolygonSPtr ProjSimpleSphericalSkel::shiftEdges(SphericalPolygonSPtr po
             double angle = angleTo(edge_out);
             Plane3SPtr plane_edge = edge_out->supportingPlane();
             SphericalSkelEdgeDataSPtr data_edge =
-                    dynamic_pointer_cast<SphericalSkelEdgeData>(edge_out->getData());
+                    std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge_out->getData());
             Line3SPtr rotation_axis = data_edge->getRotationAxis();
             if (angle > M_PI/2.0) {
                 angle = M_PI - angle;
@@ -503,16 +524,16 @@ SphericalPolygonSPtr ProjSimpleSphericalSkel::shiftEdges(SphericalPolygonSPtr po
         result->addVertex(vertex_rotated);
     }
 
-    list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<CircularEdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         CircularEdgeSPtr edge = *it_e++;
         SphericalSkelEdgeDataSPtr data =
-                dynamic_pointer_cast<SphericalSkelEdgeData>(edge->getData());
+                std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge->getData());
         SphericalSkelVertexDataSPtr data_src =
-                dynamic_pointer_cast<SphericalSkelVertexData>(
+                std::dynamic_pointer_cast<SphericalSkelVertexData>(
                 edge->getVertexSrc()->getData());
         SphericalSkelVertexDataSPtr data_dst =
-                dynamic_pointer_cast<SphericalSkelVertexData>(
+                std::dynamic_pointer_cast<SphericalSkelVertexData>(
                 edge->getVertexDst()->getData());
         CircularVertexSPtr vertex_src_rotated = data_src->getOffsetVertex();
         CircularVertexSPtr vertex_dst_rotated = data_dst->getOffsetVertex();
@@ -543,13 +564,13 @@ void ProjSimpleSphericalSkel::handleEdgeEvent(SphericalEdgeEventSPtr event, Sphe
 
     // remove edge and link adjacent edges
     SphericalSkelEdgeDataSPtr edge_data =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(
             event->getEdge()->getData());
     CircularEdgeSPtr edge_toremove = edge_data->getOffsetEdge();
     CircularVertexSPtr vertex = edge_toremove->getVertexSrc();
     CircularVertexSPtr vertex_dst = edge_toremove->getVertexDst();
     SphericalSkelVertexDataSPtr vertex_data =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             vertex->getData());
     polygon->removeEdge(edge_toremove);
     vertex->setEdgeOut(vertex_dst->getEdgeOut());
@@ -576,12 +597,12 @@ void ProjSimpleSphericalSkel::handleSplitEvent(SphericalSplitEventSPtr event, Sp
 
     // split edge
     SphericalSkelVertexDataSPtr vertex_data =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             event->getVertex()->getData());
     CircularVertexSPtr vertex = vertex_data->getOffsetVertex();
     vertex->setPoint(node->getPoint());
     SphericalSkelEdgeDataSPtr edge_data =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(
             event->getEdge()->getData());
     CircularEdgeSPtr edge = edge_data->getOffsetEdge();
     CircularVertexSPtr vertex_dst = edge->getVertexDst();
@@ -590,7 +611,7 @@ void ProjSimpleSphericalSkel::handleSplitEvent(SphericalSplitEventSPtr event, Sp
     edge->setVertexDst(vertex);
     vertex->setEdgeIn(edge);
     SphericalSkelVertexDataSPtr vertex_data_r =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             vertex->getData());
     CircularVertexSPtr vertex_l = CircularVertex::create(node->getPoint());
     SphericalSkelVertexDataSPtr vertex_data_l =
@@ -629,7 +650,7 @@ void ProjSimpleSphericalSkel::handleTriangleEvent(SphericalTriangleEventSPtr eve
     event->getEdges(edges);
     for (unsigned int i = 0; i < 3; i++) {
         SphericalSkelEdgeDataSPtr data =
-                dynamic_pointer_cast<SphericalSkelEdgeData>(
+                std::dynamic_pointer_cast<SphericalSkelEdgeData>(
                 edges[i]->getData());
         CircularEdgeSPtr offset_edge = data->getOffsetEdge();
         polygon->removeEdge(offset_edge);
@@ -640,7 +661,7 @@ void ProjSimpleSphericalSkel::handleTriangleEvent(SphericalTriangleEventSPtr eve
     event->getVertices(vertices);
     for (unsigned int i = 0; i < 3; i++) {
         SphericalSkelVertexDataSPtr data =
-                dynamic_pointer_cast<SphericalSkelVertexData>(
+                std::dynamic_pointer_cast<SphericalSkelVertexData>(
                 vertices[i]->getData());
         CircularVertexSPtr offset_vertex = data->getOffsetVertex();
         polygon->removeVertex(offset_vertex);

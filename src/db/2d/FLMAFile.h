@@ -5,20 +5,13 @@
  */
 
 #ifndef DB_2D_FLMAFILE_H
-#define	DB_2D_FLMAFILE_H
+#define DB_2D_FLMAFILE_H
 
-#include <string>
-#include <fstream>
-#include <vector>
-#include "util/StringFuncs.h"
-#include "util/Configuration.h"
 #include "db/2d/AbstractFile.h"
+#include <string>
 
 namespace db { namespace _2d {
 
-using std::string;
-using std::ifstream;
-using std::vector;
 using namespace data::_2d;
 
 /**
@@ -27,13 +20,12 @@ using namespace data::_2d;
 class FLMAFile : public AbstractFile {
 public:
     virtual ~FLMAFile();
-    static PolygonSPtr load(string filename);
-    static bool save(string filename, PolygonSPtr polygon);
+    static PolygonSPtr load(const std::string& filename);
+    static bool save(const std::string& filename, PolygonSPtr polygon);
 protected:
     FLMAFile();
 };
 
 } }
 
-#endif	/* DB_2D_FLMAFILE_H */
-
+#endif /* DB_2D_FLMAFILE_H */

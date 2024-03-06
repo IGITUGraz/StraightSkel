@@ -4,7 +4,12 @@
  * @date   2012-02-02
  */
 
-#include "AbstractEvent.h"
+#include "data/2d/skel/AbstractEvent.h"
+
+#include "debug.h"
+#include "data/2d/skel/Node.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _2d { namespace skel {
 
@@ -38,11 +43,11 @@ void AbstractEvent::setSkel(StraightSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<AbstractEventSPtr>::iterator AbstractEvent::getListIt() const {
+std::list<AbstractEventSPtr>::iterator AbstractEvent::getListIt() const {
     return this->list_it_;
 }
 
-void AbstractEvent::setListIt(list<AbstractEventSPtr>::iterator list_it) {
+void AbstractEvent::setListIt(std::list<AbstractEventSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -62,8 +67,8 @@ int AbstractEvent::getType() const {
     return this->type_;
 }
 
-string AbstractEvent::toString() const {
-    stringstream sstr;
+std::string AbstractEvent::toString() const {
+    std::stringstream sstr;
     switch (getType()) {
         case CONST_OFFSET_EVENT:
             sstr << "ConstOffsetEvent";
@@ -80,7 +85,7 @@ string AbstractEvent::toString() const {
         default:
             sstr << "AbstractEvent";
     }
-    sstr << "(offset=" << StringFactory::fromDouble(getOffset()) << ")";
+    sstr << "(offset=" << util::StringFactory::fromDouble(getOffset()) << ")";
     return sstr.str();
 }
 

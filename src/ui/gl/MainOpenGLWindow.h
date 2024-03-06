@@ -5,68 +5,25 @@
  */
 
 #ifndef UI_GL_MAINOPENGLWINDOW_H
-#define	UI_GL_MAINOPENGLWINDOW_H
+#define UI_GL_MAINOPENGLWINDOW_H
 
-#include <cmath>
-#include <list>
-#include "boost_thread.h"
-
-#include "ui/gl/ptrs.h"
-#include "ui/gl/OpenGLWindow.h"
-#include "ui/gl/KeyboardAdapter.h"
-#include "ui/gl/MouseAdapter.h"
-
-#include "ui/ps/ptrs.h"
-#include "ui/ps/PlanePSPrinter.h"
-#include "ui/ps/SpacePSPrinter.h"
-#include "ui/ps/CutPatternPrinter.h"
-
-#include "data/2d/ptrs.h"
-#include "data/2d/Polygon.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
-#include "data/2d/VertexData.h"
-#include "data/2d/EdgeData.h"
-#include "data/2d/skel/ptrs.h"
-#include "data/2d/skel/StraightSkeleton.h"
-#include "data/2d/mesh/ptrs.h"
-#include "data/2d/mesh/Mesh.h"
-
-#include "data/3d/ptrs.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Facet.h"
-#include "data/3d/Triangle.h"
-#include "data/3d/VertexData.h"
-#include "data/3d/EdgeData.h"
-#include "data/3d/SphericalPolygon.h"
-#include "data/3d/CircularVertex.h"
-#include "data/3d/CircularEdge.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/StraightSkeleton.h"
-#include "data/3d/skel/SphericalSkeleton.h"
-
-#include "db/2d/DAOFactory.h"
-#include "db/2d/PolygonDAO.h"
-#include "db/2d/StraightSkeletonDAO.h"
-#include "db/3d/DAOFactory.h"
-#include "db/3d/PolyhedronDAO.h"
-#include "db/3d/StraightSkeletonDAO.h"
-#include "db/3d/OBJFile.h"
-
+#include "typedefs_thread.h"
 #include "algo/ptrs.h"
 #include "algo/Controller.h"
-
-#include "algo/3d/KernelWrapper.h"
-
+#include "data/2d/ptrs.h"
+#include "data/2d/skel/ptrs.h"
+#include "data/2d/mesh/ptrs.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include "ui/gl/ptrs.h"
+#include "ui/gl/OpenGLWindow.h"
+#include "ui/ps/ptrs.h"
 #include "util/Configuration.h"
+#include <cmath>
+#include <list>
 
 namespace ui { namespace gl {
 
-using std::list;
-using std::iterator;
-using boost::dynamic_pointer_cast;
 using algo::ControllerSPtr;
 using data::_2d::PolygonSPtr;
 using data::_3d::PolyhedronSPtr;
@@ -166,5 +123,4 @@ protected:
 
 } }
 
-#endif	/* UI_GL_MAINOPENGLWINDOW_H */
-
+#endif /* UI_GL_MAINOPENGLWINDOW_H */

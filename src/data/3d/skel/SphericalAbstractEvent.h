@@ -5,22 +5,14 @@
  */
 
 #ifndef DATA_3D_SKEL_SPHERICALABSTRACTEVENT_H
-#define	DATA_3D_SKEL_SPHERICALABSTRACTEVENT_H
+#define DATA_3D_SKEL_SPHERICALABSTRACTEVENT_H
 
-#include <list>
-#include <string>
-#include <sstream>
-#include "debug.h"
 #include "data/3d/ptrs.h"
 #include "data/3d/skel/ptrs.h"
-#include "util/StringFactory.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _3d { namespace skel {
-
-using std::list;
-using std::string;
-using std::stringstream;
-using util::StringFactory;
 
 class SphericalAbstractEvent {
 public:
@@ -30,8 +22,8 @@ public:
     void setPolygonResult(SphericalPolygonSPtr polygon);
     SphericalSkeletonSPtr getSkel() const;
     void setSkel(SphericalSkeletonSPtr skel);
-    list<SphericalAbstractEventSPtr>::iterator getListIt() const;
-    void setListIt(list<SphericalAbstractEventSPtr>::iterator list_it);
+    std::list<SphericalAbstractEventSPtr>::iterator getListIt() const;
+    void setListIt(std::list<SphericalAbstractEventSPtr>::iterator list_it);
 
     virtual void setHighlight(bool highlight);
     virtual double getOffset() const = 0;  // abstract
@@ -51,18 +43,17 @@ public:
 
     virtual int getType() const;
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     SphericalAbstractEvent();
 
     SphericalPolygonSPtr polygon_result_;
     SphericalSkeletonWPtr skel_;
-    list<SphericalAbstractEventSPtr>::iterator list_it_;
+    std::list<SphericalAbstractEventSPtr>::iterator list_it_;
     int type_;
 };
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SPHERICALABSTRACTEVENT_H */
-
+#endif /* DATA_3D_SKEL_SPHERICALABSTRACTEVENT_H */

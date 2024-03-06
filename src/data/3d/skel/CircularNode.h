@@ -5,23 +5,16 @@
  */
 
 #ifndef DATA_3D_SKEL_CIRCULARNODE_H
-#define	DATA_3D_SKEL_CIRCULARNODE_H
+#define DATA_3D_SKEL_CIRCULARNODE_H
 
-#include <list>
-#include <string>
-#include "debug.h"
-#include "util/StringFactory.h"
 #include "data/3d/ptrs.h"
 #include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/CircularArc.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _3d { namespace skel {
 
-using std::list;
-using std::string;
-using util::StringFactory;
-
-class CircularNode : public boost::enable_shared_from_this<CircularNode> {
+class CircularNode : public std::enable_shared_from_this<CircularNode> {
 public:
     virtual ~CircularNode();
 
@@ -35,8 +28,8 @@ public:
 
     SphericalSkeletonSPtr getSkel() const;
     void setSkel(SphericalSkeletonSPtr skel);
-    list<CircularNodeSPtr>::iterator getListIt() const;
-    void setListIt(list<CircularNodeSPtr>::iterator list_it);
+    std::list<CircularNodeSPtr>::iterator getListIt() const;
+    void setListIt(std::list<CircularNodeSPtr>::iterator list_it);
 
     void addArc(CircularArcSPtr arc);
     bool removeArc(CircularArcSPtr arc);
@@ -44,7 +37,7 @@ public:
 
     void clear();
 
-    list<CircularArcWPtr>& arcs();
+    std::list<CircularArcWPtr>& arcs();
 
     unsigned int degree();
 
@@ -52,18 +45,17 @@ public:
     double getY() const;
     double getZ() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     CircularNode(Point3SPtr point);
     Point3SPtr point_;
     double offset_;
-    list<CircularArcWPtr> arcs_;  // every CircularNode has 3 CircularArcs
+    std::list<CircularArcWPtr> arcs_;  // every CircularNode has 3 CircularArcs
     SphericalSkeletonWPtr skel_;
-    list<CircularNodeSPtr>::iterator list_it_;
+    std::list<CircularNodeSPtr>::iterator list_it_;
 };
 
 } } }
 
-#endif	/* DATA_3D_SKEL_CIRCULARNODE_H */
-
+#endif /* DATA_3D_SKEL_CIRCULARNODE_H */

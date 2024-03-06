@@ -4,7 +4,14 @@
  * @date   2012-09-11
  */
 
-#include "DblTriangleEvent.h"
+#include "data/3d/skel/DblTriangleEvent.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/SkelVertexData.h"
+#include "data/3d/skel/SkelEdgeData.h"
 
 namespace data { namespace _3d { namespace skel {
 

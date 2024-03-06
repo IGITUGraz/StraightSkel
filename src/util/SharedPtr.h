@@ -5,40 +5,38 @@
  */
 
 #ifndef UTIL_SHAREDPTR_H
-#define	UTIL_SHAREDPTR_H
+#define UTIL_SHAREDPTR_H
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <iostream>
 #include "util/StackTrace.h"
+#include <iostream>
+#include <memory>
 
 namespace util {
 
-template<class T> class SharedPtr : public boost::shared_ptr<T> {
+template<class T> class SharedPtr : public std::shared_ptr<T> {
 public:
-    SharedPtr() : boost::shared_ptr<T>() {}
-    explicit SharedPtr(T* p) : boost::shared_ptr<T>(p) {}
-    template<class Y> SharedPtr(const SharedPtr<Y>& r) : boost::shared_ptr<T>(r) {}
-    SharedPtr(const boost::shared_ptr<T>& r) : boost::shared_ptr<T>(r) {}
-    SharedPtr(const boost::weak_ptr<T>& r) : boost::shared_ptr<T>(r) {}
+    SharedPtr() : std::shared_ptr<T>() {}
+    explicit SharedPtr(T* p) : std::shared_ptr<T>(p) {}
+    template<class Y> SharedPtr(const SharedPtr<Y>& r) : std::shared_ptr<T>(r) {}
+    SharedPtr(const std::shared_ptr<T>& r) : std::shared_ptr<T>(r) {}
+    SharedPtr(const std::weak_ptr<T>& r) : std::shared_ptr<T>(r) {}
 
-    T& operator*() const {
+    T& operator*() const {  
         if (this->use_count() == 0) {
             std::cerr << "Error: Shared Pointer is invalid." << std::endl;
             StackTrace::print(std::cerr);
         }
-        return boost::shared_ptr<T>::operator*();
+        return std::shared_ptr<T>::operator*();
     }
     T* operator->() const {
         if (this->use_count() == 0) {
             std::cerr << "Error: Shared Pointer is invalid." << std::endl;
             StackTrace::print(std::cerr);
         }
-        return boost::shared_ptr<T>::operator->();
+        return std::shared_ptr<T>::operator->();
     }
 };
 
 }
 
-#endif	/* UTIL_SHAREDPTR_H */
-
+#endif /* UTIL_SHAREDPTR_H */

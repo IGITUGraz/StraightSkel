@@ -5,9 +5,8 @@
  */
 
 #ifndef DATA_2D_SKEL_SKELEDGEDATA_H
-#define	DATA_2D_SKEL_SKELEDGEDATA_H
+#define DATA_2D_SKEL_SKELEDGEDATA_H
 
-#include "debug.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/EdgeData.h"
 #include "data/2d/skel/ptrs.h"
@@ -38,5 +37,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_2D_SKEL_SKELEDGEDATA_H */
+#endif /* DATA_2D_SKEL_SKELEDGEDATA_H */
 

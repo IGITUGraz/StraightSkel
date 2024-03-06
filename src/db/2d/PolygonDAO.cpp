@@ -4,7 +4,14 @@
  * @date   2012-01-27
  */
 
-#include "PolygonDAO.h"
+#include "db/2d/PolygonDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/2d/VertexDAO.h"
+#include "db/2d/EdgeDAO.h"
+#include <list>
+#include <map>
 
 namespace db { namespace _2d {
 
@@ -16,8 +23,8 @@ PolygonDAO::~PolygonDAO() {
     // intentionally does nothing
 }
 
-string PolygonDAO::getTableSchema() const {
-    string schema("CREATE TABLE Polygons (\n"
+std::string PolygonDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Polygons (\n"
             "  PolyID INTEGER PRIMARY KEY,\n"
             "  description TEXT,\n"
             "  created INTEGER\n"
@@ -28,7 +35,7 @@ string PolygonDAO::getTableSchema() const {
 int PolygonDAO::nextPolyID() {
     int polyid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(PolyID) FROM Polygons;");
+    std::string sql("SELECT MAX(PolyID) FROM Polygons;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         polyid = 1;
@@ -43,7 +50,7 @@ int PolygonDAO::createPolyID(PolygonSPtr polygon) {
     int result = -1;
     int polyid = nextPolyID();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("INSERT INTO Polygons (PolyID, description, created) "
+    std::string sql("INSERT INTO Polygons (PolyID, description, created) "
             "VALUES (?, ?, strftime('%s','now'));");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
@@ -68,7 +75,7 @@ int PolygonDAO::insert(PolygonSPtr polygon) {
     int polyid = createPolyID(polygon);
     if (polyid > 0) {
         VertexDAOSPtr dao_vertex = DAOFactory::getVertexDAO();
-        list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+        std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
         while (it_v != polygon->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             if (vertex->getID() > 0) {
@@ -78,7 +85,7 @@ int PolygonDAO::insert(PolygonSPtr polygon) {
             }
         }
         EdgeDAOSPtr dao_edge = DAOFactory::getEdgeDAO();
-        list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
         while (it_e != polygon->edges().end()) {
             EdgeSPtr edge = *it_e++;
             if (edge->getID() > 0) {
@@ -103,7 +110,7 @@ bool PolygonDAO::del(PolygonSPtr polygon) {
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     bool trans_started = db->beginTransaction();
-    string sql("DELETE FROM Polygons WHERE PolyID=?;");
+    std::string sql("DELETE FROM Polygons WHERE PolyID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyid);
@@ -134,16 +141,16 @@ PolygonSPtr PolygonDAO::find(int polyid) {
     PolygonSPtr result = PolygonSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     VertexDAOSPtr dao_vertex = DAOFactory::getVertexDAO();
-    string sql("SELECT PolyID, description FROM Polygons WHERE PolyID=?;");
+    std::string sql("SELECT PolyID, description FROM Polygons WHERE PolyID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyid);
         if (stmt->execute() > 0) {
             result = Polygon::create();
             result->setID(polyid);
-            string description = stmt->getString(1);
+            std::string description = stmt->getString(1);
             result->setDescription(description);
-            map<int, VertexSPtr> vertices;
+            std::map<int, VertexSPtr> vertices;
             sql = "SELECT VID FROM Vertices WHERE PolyID=? ORDER BY VID ASC;";
             SQLiteStmtSPtr stmt_v = db->prepare(sql);
             if (stmt_v) {

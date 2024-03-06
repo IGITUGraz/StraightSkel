@@ -5,33 +5,18 @@
  */
 
 #ifndef UI_PS_SPACEPSPRINTER_H
-#define	UI_PS_SPACEPSPRINTER_H
+#define UI_PS_SPACEPSPRINTER_H
 
-#include <iostream>
-#include <list>
-#include "boost_thread.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
 #include "ui/vecmath.h"
 #include "ui/ps/ptrs.h"
 #include "ui/ps/PSPrinter.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/SphericalPolygon.h"
-#include "data/3d/CircularEdge.h"
-#include "data/3d/CircularVertex.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/StraightSkeleton.h"
-#include "data/3d/skel/Arc.h"
-#include "data/3d/skel/Node.h"
-#include "data/3d/skel/SphericalSkeleton.h"
-#include "data/3d/skel/CircularArc.h"
-#include "data/3d/skel/CircularNode.h"
+#include <iostream>
+#include <list>
 
 namespace ui { namespace ps {
 
-using std::ostream;
-using std::list;
 using data::_3d::PolyhedronSPtr;
 using data::_3d::SphericalPolygonSPtr;
 
@@ -50,37 +35,37 @@ public:
     void setCamEye(const vec3f cam_eye);
     void setCamCenter(const vec3f cam_center);
 
-    void printCommentCamera(ostream& out);
+    void printCommentCamera(std::ostream& out);
 
     /**
      * p_2 = P * V * p_3
      */
     void to2d(const vec3f p3, vec2f& p2);
 
-    void printLine3(const vec3f src, const vec3f dst, ostream& out);
+    void printLine3(const vec3f src, const vec3f dst, std::ostream& out);
 
-    void printPolyhedron(PolyhedronSPtr polyhedron, ostream& out);
+    void printPolyhedron(PolyhedronSPtr polyhedron, std::ostream& out);
     void printPolyhedronShade(PolyhedronSPtr polyhedron,
-            float min_gray, float max_gray, bool print_edges, ostream& out);
-    void printSkel(data::_3d::skel::StraightSkeletonSPtr skel, ostream& out);
+            float min_gray, float max_gray, bool print_edges, std::ostream& out);
+    void printSkel(data::_3d::skel::StraightSkeletonSPtr skel, std::ostream& out);
 
     float to2dRadius(const vec3f center, float radius);
 
-    void printSphere(const vec3f center, float radius, ostream& out);
+    void printSphere(const vec3f center, float radius, std::ostream& out);
     void printCircularEdge(const vec3f center, const vec3f axis,
-            const vec3f src, const vec3f dst, ostream& out);
+            const vec3f src, const vec3f dst, std::ostream& out);
 
     void printSphericalPolygon(
-            SphericalPolygonSPtr sphericalpolygon, ostream& out);
+            SphericalPolygonSPtr sphericalpolygon, std::ostream& out);
     void printSphericalIntersections(
-            SphericalPolygonSPtr sphericalpolygon, ostream& out);
+            SphericalPolygonSPtr sphericalpolygon, std::ostream& out);
     void printSphericalSkel(
-            data::_3d::skel::SphericalSkeletonSPtr sphericalskel, ostream& out);
+            data::_3d::skel::SphericalSkeletonSPtr sphericalskel, std::ostream& out);
 
 protected:
     SpacePSPrinter();
 
-    list<data::_3d::FacetSPtr> getFacetsToShade(PolyhedronSPtr polyhedron);
+    std::list<data::_3d::FacetSPtr> getFacetsToShade(PolyhedronSPtr polyhedron);
 
     /**
      * index = row + 4*column
@@ -95,5 +80,4 @@ protected:
 
 } }
 
-#endif	/* UI_PS_SPACEPSPRINTER_H */
-
+#endif /* UI_PS_SPACEPSPRINTER_H */

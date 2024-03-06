@@ -5,7 +5,7 @@
  */
 
 #ifndef ALGO_2D_KERNELWRAPPER_H
-#define	ALGO_2D_KERNELWRAPPER_H
+#define ALGO_2D_KERNELWRAPPER_H
 
 #include "config.h"
 #ifdef USE_CGAL
@@ -56,5 +56,5 @@ protected:
 
 } }
 
-#endif	/* ALGO_2D_KERNELWRAPPER_H */
+#endif /* ALGO_2D_KERNELWRAPPER_H */
 

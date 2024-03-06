@@ -4,7 +4,14 @@
  * @date   2012-02-03
  */
 
-#include "SplitEvent.h"
+#include "data/2d/skel/SplitEvent.h"
+
+#include "debug.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/SkelVertexData.h"
+#include "data/2d/skel/SkelEdgeData.h"
 
 namespace data { namespace _2d { namespace skel {
 

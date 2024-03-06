@@ -5,14 +5,10 @@
  */
 
 #ifndef ALGO_2D_MESHMODIFIER_H
-#define	ALGO_2D_MESHMODIFIER_H
+#define ALGO_2D_MESHMODIFIER_H
 
-#include "debug.h"
 #include "data/2d/ptrs.h"
-#include "data/2d/KernelFactory.h"
 #include "data/2d/mesh/ptrs.h"
-#include "data/2d/mesh/Mesh.h"
-#include "algo/2d/KernelWrapper.h"
 
 namespace algo { namespace _2d {
 
@@ -36,5 +32,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_2D_MESHMODIFIER_H */
-
+#endif /* ALGO_2D_MESHMODIFIER_H */

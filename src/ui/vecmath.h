@@ -5,7 +5,7 @@
  */
 
 #ifndef UI_VECMATH_H
-#define	UI_VECMATH_H
+#define UI_VECMATH_H
 
 #include <cmath>
 #include "ui/typedefs.h"
@@ -23,4 +23,4 @@ float angle(const vec3f v1, const vec3f v2);
 
 }
 
-#endif	/* UI_VECMATH_H */
+#endif /* UI_VECMATH_H */

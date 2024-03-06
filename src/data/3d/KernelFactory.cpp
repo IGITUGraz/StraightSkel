@@ -4,7 +4,9 @@
  * @date   2011-11-26
  */
 
-#include "KernelFactory.h"
+#include "data/3d/KernelFactory.h"
+
+#include "debug.h"
 
 namespace data { namespace _3d {
 

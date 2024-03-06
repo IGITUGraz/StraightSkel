@@ -4,7 +4,22 @@
  * @date   2013-01-11
  */
 
-#include "AbstractSimpleSphericalSkel.h"
+#include "algo/3d/AbstractSimpleSphericalSkel.h"
+
+#include "debug.h"
+#include "algo/Controller.h"
+#include "algo/3d/KernelWrapper.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Facet.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/SphericalPolygon.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/SphericalSkeleton.h"
+#include "data/3d/skel/SphericalSkelVertexData.h"
+#include "data/3d/skel/SphericalSkelEdgeData.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -25,8 +40,8 @@ int AbstractSimpleSphericalSkel::getType() const {
 
 
 ThreadSPtr AbstractSimpleSphericalSkel::startThread() {
-    return ThreadSPtr(new boost::thread(
-            boost::bind(&AbstractSimpleSphericalSkel::run, this)));
+    return ThreadSPtr(new std::thread(
+            std::bind(&AbstractSimpleSphericalSkel::run, this)));
 }
 
 
@@ -35,7 +50,7 @@ CircularEdgeSPtr AbstractSimpleSphericalSkel::getEdgeOrigin(CircularEdgeSPtr edg
     CircularVertexSPtr vertex_dst = edge->getVertexDst();
     if (vertex_dst->hasData()) {
         SphericalSkelVertexDataSPtr data_dst =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             vertex_dst->getData());
         CircularArcSPtr arc_dst = data_dst->getArc();
         if (arc_dst) {
@@ -45,7 +60,7 @@ CircularEdgeSPtr AbstractSimpleSphericalSkel::getEdgeOrigin(CircularEdgeSPtr edg
     CircularVertexSPtr vertex_src = edge->getVertexSrc();
     if (vertex_src->hasData()) {
         SphericalSkelVertexDataSPtr data_src =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             vertex_src->getData());
         CircularArcSPtr arc_src = data_src->getArc();
         if (arc_src) {
@@ -59,15 +74,15 @@ CircularEdgeSPtr AbstractSimpleSphericalSkel::getEdgeOrigin(CircularEdgeSPtr edg
 CircularArcSPtr AbstractSimpleSphericalSkel::createArc(CircularVertexSPtr vertex) {
     CircularArcSPtr result;
     SphericalSkelVertexDataSPtr data =
-            dynamic_pointer_cast<SphericalSkelVertexData>(vertex->getData());
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(vertex->getData());
     data->setArc(CircularArcSPtr());
     CircularNodeSPtr node = data->getNode();
     CircularEdgeSPtr edge_l = getEdgeOrigin(vertex->getEdgeIn());
     CircularEdgeSPtr edge_r = getEdgeOrigin(vertex->getEdgeOut());
     SphericalSkelEdgeDataSPtr data_l =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(edge_l->getData());
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge_l->getData());
     SphericalSkelEdgeDataSPtr data_r =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(edge_r->getData());
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge_r->getData());
     Plane3SPtr plane_l_origin = data_l->getFacetOrigin()->plane();
     Plane3SPtr plane_r_origin = data_r->getFacetOrigin()->plane();
     Plane3SPtr plane_bisector;
@@ -100,10 +115,10 @@ Point3SPtr AbstractSimpleSphericalSkel::vanishesAt(CircularEdgeSPtr edge) {
     Point3SPtr p_center = KernelFactory::createPoint3(polygon->getSphere());
     double radius = polygon->getRadius();
     SphericalSkelVertexDataSPtr data_src =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             edge->getVertexSrc()->getData());
     SphericalSkelVertexDataSPtr data_dst =
-            dynamic_pointer_cast<SphericalSkelVertexData>(
+            std::dynamic_pointer_cast<SphericalSkelVertexData>(
             edge->getVertexDst()->getData());
     CircularArcSPtr arc_src = data_src->getArc();
     CircularArcSPtr arc_dst = data_dst->getArc();
@@ -132,13 +147,13 @@ Point3SPtr AbstractSimpleSphericalSkel::crashAt(CircularVertexSPtr vertex, Circu
     CircularEdgeSPtr edge_in_origin = getEdgeOrigin(edge_in);
     CircularEdgeSPtr edge_out_origin = getEdgeOrigin(edge_out);
     SphericalSkelEdgeDataSPtr data_origin =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(
             edge_origin->getData());
     SphericalSkelEdgeDataSPtr data_in_origin =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(
             edge_in_origin->getData());
     SphericalSkelEdgeDataSPtr data_out_origin =
-            dynamic_pointer_cast<SphericalSkelEdgeData>(
+            std::dynamic_pointer_cast<SphericalSkelEdgeData>(
             edge_out_origin->getData());
     Plane3SPtr plane_origin = data_origin->getFacetOrigin()->plane();
     Plane3SPtr plane_in_origin = data_in_origin->getFacetOrigin()->plane();
@@ -152,7 +167,7 @@ Point3SPtr AbstractSimpleSphericalSkel::crashAt(CircularVertexSPtr vertex, Circu
         bool is_reflex = true;
 //        if (vertex->hasData()) {
 //            SphericalSkelVertexDataSPtr data =
-//                    dynamic_pointer_cast<SphericalSkelVertexData>(
+//                    std::dynamic_pointer_cast<SphericalSkelVertexData>(
 //                    vertex->getData());
 //            is_reflex = data->isReflex();
 //        }
@@ -174,10 +189,10 @@ Point3SPtr AbstractSimpleSphericalSkel::crashAt(CircularVertexSPtr vertex, Circu
         CircularVertexSPtr vertex_dst = edge->getVertexDst();
         if (vertex_src->isPointValid() && vertex_dst->isPointValid()) {
             SphericalSkelVertexDataSPtr data_src =
-                    dynamic_pointer_cast<SphericalSkelVertexData>(
+                    std::dynamic_pointer_cast<SphericalSkelVertexData>(
                     vertex_src->getData());
             SphericalSkelVertexDataSPtr data_dst =
-                    dynamic_pointer_cast<SphericalSkelVertexData>(
+                    std::dynamic_pointer_cast<SphericalSkelVertexData>(
                     vertex_dst->getData());
             if (data_src && data_dst) {
                 CircularArcSPtr arc_src = data_src->getArc();
@@ -221,7 +236,7 @@ bool AbstractSimpleSphericalSkel::isTriangle(CircularEdgeSPtr edge_begin) {
 
 
 void AbstractSimpleSphericalSkel::appendEventNode(CircularNodeSPtr node) {
-    list<CircularArcWPtr>::iterator it_a = node->arcs().begin();
+    std::list<CircularArcWPtr>::iterator it_a = node->arcs().begin();
     while (it_a != node->arcs().end()) {
         CircularArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {

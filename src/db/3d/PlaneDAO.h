@@ -5,18 +5,17 @@
  */
 
 #ifndef DB_3D_PLANEDAO_H
-#define	DB_3D_PLANEDAO_H
+#define DB_3D_PLANEDAO_H
 
-#include <string>
 #include "data/3d/ptrs.h"
 #include "data/3d/KernelFactory.h"
 #include "db/ptrs.h"
 #include "db/3d/ptrs.h"
 #include "db/3d/DAOFactory.h"
+#include <string>
 
 namespace db { namespace _3d {
 
-using std::string;
 using data::_3d::KernelFactory;
 using data::_3d::Plane3SPtr;
 
@@ -24,7 +23,7 @@ class PlaneDAO {
 friend class DAOFactory;
 public:
     virtual ~PlaneDAO();
-    string getTableSchema() const;
+    std::string getTableSchema() const;
     int insert(Plane3SPtr plane);
     bool del(Plane3SPtr plane);
     Plane3SPtr find(int plane_id);
@@ -36,5 +35,5 @@ protected:
 
 } }
 
-#endif	/* DB_3D_PLANEDAO_H */
+#endif /* DB_3D_PLANEDAO_H */
 
