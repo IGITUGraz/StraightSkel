@@ -1,0 +1,2 @@
+#!/bin/sh
+./StraightSkel 2d load "$@"

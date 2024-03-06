@@ -1,0 +1,42 @@
+diff -ru orig/StraightSkel/src/algo/2d/FastStraightSkel.cpp new/StraightSkel/src/algo/2d/FastStraightSkel.cpp
+--- orig/StraightSkel/src/algo/2d/FastStraightSkel.cpp	2015-12-15 15:27:18.000000000 +0100
++++ new/StraightSkel/src/algo/2d/FastStraightSkel.cpp	2021-08-04 19:03:58.769454042 +0200
+@@ -79,8 +79,8 @@
+         double time = util::Timer::now() - t_start;
+         skel_result_->appendDescription("time=" +
+                 StringFactory::fromDouble(time) + "; ");
+-        skel_result_->appendDescription("controller=" +
+-                StringFactory::fromBoolean(controller_) + "; ");
++        //skel_result_->appendDescription("controller=" +
++        //        StringFactory::fromBoolean(controller_) + "; ");
+         DEBUG_VAR(skel_result_->toString());
+     }
+ }
+diff -ru orig/StraightSkel/src/algo/2d/SimpleStraightSkel.cpp new/StraightSkel/src/algo/2d/SimpleStraightSkel.cpp
+--- orig/StraightSkel/src/algo/2d/SimpleStraightSkel.cpp	2015-12-15 15:31:21.000000000 +0100
++++ new/StraightSkel/src/algo/2d/SimpleStraightSkel.cpp	2021-08-04 19:03:58.769454042 +0200
+@@ -99,8 +99,8 @@
+         double time = util::Timer::now() - t_start;
+         skel_result_->appendDescription("time=" +
+                 StringFactory::fromDouble(time) + "; ");
+-        skel_result_->appendDescription("controller=" +
+-                StringFactory::fromBoolean(controller_) + "; ");
++        //skel_result_->appendDescription("controller=" +
++        //        StringFactory::fromBoolean(controller_) + "; ");
+         DEBUG_VAR(skel_result_->toString());
+     }
+ }
+diff -ru orig/StraightSkel/src/algo/3d/SimpleStraightSkel.cpp new/StraightSkel/src/algo/3d/SimpleStraightSkel.cpp
+--- orig/StraightSkel/src/algo/3d/SimpleStraightSkel.cpp	2016-01-27 21:38:11.000000000 +0100
++++ new/StraightSkel/src/algo/3d/SimpleStraightSkel.cpp	2021-08-04 19:03:58.769454042 +0200
+@@ -352,8 +352,8 @@
+         double time = util::Timer::now() - t_start;
+         skel_result_->appendDescription("time=" +
+                 StringFactory::fromDouble(time) + "; ");
+-        skel_result_->appendDescription("controller=" +
+-                StringFactory::fromBoolean(controller_) + "; ");
++        //skel_result_->appendDescription("controller=" +
++        //        StringFactory::fromBoolean(controller_) + "; ");
+         DEBUG_VAR(skel_result_->toString());
+     }
+ }
