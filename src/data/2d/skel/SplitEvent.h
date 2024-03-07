@@ -5,16 +5,11 @@
  */
 
 #ifndef DATA_2D_SKEL_SPLITEVENT_H
-#define	DATA_2D_SKEL_SPLITEVENT_H
+#define DATA_2D_SKEL_SPLITEVENT_H
 
-#include "debug.h"
 #include "data/2d/ptrs.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
 #include "data/2d/skel/ptrs.h"
 #include "data/2d/skel/AbstractEvent.h"
-#include "data/2d/skel/SkelVertexData.h"
-#include "data/2d/skel/SkelEdgeData.h"
 
 namespace data { namespace _2d { namespace skel {
 
@@ -39,5 +34,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_2D_SKEL_SPLITEVENT_H */
+#endif /* DATA_2D_SKEL_SPLITEVENT_H */
 

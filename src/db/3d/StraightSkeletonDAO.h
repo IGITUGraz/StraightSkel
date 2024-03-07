@@ -5,10 +5,8 @@
  */
 
 #ifndef DB_3D_STRAIGHTSKELETONDAO_H
-#define	DB_3D_STRAIGHTSKELETONDAO_H
+#define DB_3D_STRAIGHTSKELETONDAO_H
 
-#include <list>
-#include <map>
 #include "data/3d/skel/ptrs.h"
 #include "data/3d/skel/StraightSkeleton.h"
 #include "db/ptrs.h"
@@ -17,8 +15,6 @@
 
 namespace db { namespace _3d {
 
-using std::list;
-using std::map;
 using data::_3d::skel::StraightSkeleton;
 using data::_3d::skel::StraightSkeletonSPtr;
 
@@ -26,7 +22,7 @@ class StraightSkeletonDAO {
 friend class DAOFactory;
 public:
     virtual ~StraightSkeletonDAO();
-    string getTableSchema() const;
+    std::string getTableSchema() const;
     int createSkelID(StraightSkeletonSPtr skel);
     int insert(StraightSkeletonSPtr skel);
     bool del(StraightSkeletonSPtr skel);
@@ -40,5 +36,4 @@ private:
 
 } }
 
-#endif	/* DB_3D_STRAIGHTSKELETONDAO_H */
-
+#endif /* DB_3D_STRAIGHTSKELETONDAO_H */

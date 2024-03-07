@@ -5,10 +5,9 @@
  */
 
 #ifndef POINT3_H
-#define	POINT3_H
+#define POINT3_H
 
-#include <stdexcept>
-#include "Vector3.h"
+#include "kernel/Vector3.h"
 
 namespace kernel {
 
@@ -34,5 +33,4 @@ protected:
 
 }
 
-#endif	/* POINT3_H */
-
+#endif /* POINT3_H */

@@ -4,7 +4,15 @@
  * @date   2012-11-28
  */
 
-#include "SphericalPolygon.h"
+#include "data/3d/SphericalPolygon.h"
+
+#include "debug.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/KernelFactory.h"
+#include "util/StringFactory.h"
+#include <map>
+#include <sstream>
 
 namespace data { namespace _3d {
 
@@ -35,16 +43,16 @@ SphericalPolygonSPtr SphericalPolygon::create(Sphere3SPtr sphere,
 
 
 SphericalPolygonSPtr SphericalPolygon::clone() const {
-    map<CircularVertexSPtr, CircularVertexSPtr> vertices_c;
+    std::map<CircularVertexSPtr, CircularVertexSPtr> vertices_c;
     SphericalPolygonSPtr result = SphericalPolygon::create(sphere_);
-    list<CircularVertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::list<CircularVertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         CircularVertexSPtr vertex = *it_v++;
         CircularVertexSPtr vertex_c = vertex->clone();
         result->addVertex(vertex_c);
         vertices_c[vertex] = vertex_c;
     }
-    list<CircularEdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<CircularEdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         CircularEdgeSPtr edge = *it_e++;
         CircularVertexSPtr src = vertices_c[edge->getVertexSrc()];
@@ -61,7 +69,7 @@ Sphere3SPtr SphericalPolygon::getSphere() const {
 }
 
 void SphericalPolygon::addVertex(CircularVertexSPtr vertex) {
-    list<CircularVertexSPtr>::iterator it = vertices_.insert(vertices_.end(), vertex);
+    std::list<CircularVertexSPtr>::iterator it = vertices_.insert(vertices_.end(), vertex);
     vertex->setPolygon(shared_from_this());
     vertex->setListIt(it);
 }
@@ -71,7 +79,7 @@ bool SphericalPolygon::removeVertex(CircularVertexSPtr vertex) {
     if (vertex->getPolygon() == shared_from_this()) {
         vertices_.erase(vertex->getListIt());
         vertex->setPolygon(SphericalPolygonSPtr());
-        vertex->setListIt(list<CircularVertexSPtr>::iterator());
+        vertex->setListIt(std::list<CircularVertexSPtr>::iterator());
         CircularEdgeSPtr edge = vertex->getEdgeIn();
         if (edge) {
             this->removeEdge(edge);
@@ -88,7 +96,7 @@ bool SphericalPolygon::removeVertex(CircularVertexSPtr vertex) {
 }
 
 void SphericalPolygon::addEdge(CircularEdgeSPtr edge) {
-    list<CircularEdgeSPtr>::iterator it = edges_.insert(edges_.end(), edge);
+    std::list<CircularEdgeSPtr>::iterator it = edges_.insert(edges_.end(), edge);
     edge->setPolygon(shared_from_this());
     edge->setListIt(it);
     CircularVertexSPtr vertex = edge->getVertexSrc();
@@ -106,7 +114,7 @@ bool SphericalPolygon::removeEdge(CircularEdgeSPtr edge) {
     if (edge->getPolygon() == shared_from_this()) {
         edges_.erase(edge->getListIt());
         edge->setPolygon(SphericalPolygonSPtr());
-        edge->setListIt(list<CircularEdgeSPtr>::iterator());
+        edge->setListIt(std::list<CircularEdgeSPtr>::iterator());
         CircularVertexSPtr vertex = edge->getVertexSrc();
         if (vertex->getEdgeOut() == edge) {
             vertex->setEdgeOut(CircularEdgeSPtr());
@@ -121,12 +129,12 @@ bool SphericalPolygon::removeEdge(CircularEdgeSPtr edge) {
 }
 
 void SphericalPolygon::clear() {
-    list<CircularEdgeSPtr>::iterator it_e = edges_.begin();
+    std::list<CircularEdgeSPtr>::iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         CircularEdgeSPtr edge = *it_e++;
         this->removeEdge(edge);
     }
-    list<CircularVertexSPtr>::iterator it_v = vertices_.begin();
+    std::list<CircularVertexSPtr>::iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         CircularVertexSPtr vertex = *it_v++;
         this->removeVertex(vertex);
@@ -138,17 +146,17 @@ SharedMutex& SphericalPolygon::mutex() {
     return this->mutex_;
 }
 
-list<CircularVertexSPtr>& SphericalPolygon::vertices() {
+std::list<CircularVertexSPtr>& SphericalPolygon::vertices() {
     return this->vertices_;
 }
 
-list<CircularEdgeSPtr>& SphericalPolygon::edges() {
+std::list<CircularEdgeSPtr>& SphericalPolygon::edges() {
     return this->edges_;
 }
 
 bool SphericalPolygon::isConsistent() const  {
     bool result = true;
-    list<CircularVertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::list<CircularVertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         CircularVertexSPtr vertex = *it_v++;
         if (vertex->getPolygon() != shared_from_this()) {
@@ -170,7 +178,7 @@ bool SphericalPolygon::isConsistent() const  {
             }
         }
     }
-    list<CircularEdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<CircularEdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         CircularEdgeSPtr edge = *it_e++;
         if (edge->getPolygon() != shared_from_this()) {
@@ -213,24 +221,24 @@ double SphericalPolygon::getRadius() const {
     return result;
 }
 
-string SphericalPolygon::toString() const {
-    stringstream sstr;
+std::string SphericalPolygon::toString() const {
+    std::stringstream sstr;
     sstr << "SphericalPolygon(";
-    sstr << StringFactory::fromPointer(this) << ", ";
+    sstr << util::StringFactory::fromPointer(this) << ", ";
     Point3SPtr p_center = KernelFactory::createPoint3(sphere_);
     Vector3SPtr v_center = KernelFactory::createVector3(p_center);
-    sstr << "<" << StringFactory::fromDouble((*v_center)[0]) << ", "
-         << StringFactory::fromDouble((*v_center)[1]) << ", "
-         << StringFactory::fromDouble((*v_center)[2]) << ">, ";
-    sstr << "CircularVertices:" + StringFactory::fromInteger(vertices_.size()) + ", ";
-    sstr << "CircularEdges:" + StringFactory::fromInteger(edges_.size()) + ",\n";
-    list<CircularVertexSPtr>::const_iterator it_v = vertices_.begin();
+    sstr << "<" << util::StringFactory::fromDouble((*v_center)[0]) << ", "
+         << util::StringFactory::fromDouble((*v_center)[1]) << ", "
+         << util::StringFactory::fromDouble((*v_center)[2]) << ">, ";
+    sstr << "CircularVertices:" + util::StringFactory::fromInteger(vertices_.size()) + ", ";
+    sstr << "CircularEdges:" + util::StringFactory::fromInteger(edges_.size()) + ",\n";
+    std::list<CircularVertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         CircularVertexSPtr vertex = *it_v++;
         sstr << "\t" << vertex->toString() << "\n";
     }
     sstr << "\n";
-    list<CircularEdgeSPtr>::const_iterator it_e = edges_.begin();
+    std::list<CircularEdgeSPtr>::const_iterator it_e = edges_.begin();
     while (it_e != edges_.end()) {
         CircularEdgeSPtr edge = *it_e++;
         sstr << "\t" << edge->toString() << "\n";

@@ -4,7 +4,14 @@
  * @date   2013-12-18
  */
 
-#include "AbstractFile.h"
+#include "db/2d/AbstractFile.h"
+
+#include "data/2d/KernelFactory.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/Polygon.h"
+#include "debug.h"
+#include <cmath>
 
 namespace db { namespace _2d {
 
@@ -45,8 +52,8 @@ bool AbstractFile::hasCollinearEdges(VertexSPtr vertex, double epsilon) {
 
 int AbstractFile::mergeCollinearEdges(PolygonSPtr polygon, double epsilon) {
     int result = 0;
-    list<VertexSPtr> vertices_toremove;
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr> vertices_toremove;
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         if (hasCollinearEdges(vertex, epsilon)) {

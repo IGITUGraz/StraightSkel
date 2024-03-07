@@ -4,7 +4,14 @@
  * @date   2014-01-24
  */
 
-#include "Mesh.h"
+#include "data/2d/mesh/Mesh.h"
+
+#include "data/2d/mesh/MeshVertex.h"
+#include "data/2d/mesh/MeshCell.h"
+#include "data/2d/mesh/MeshRay.h"
+#include "debug.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _2d { namespace mesh {
 
@@ -36,10 +43,10 @@ bool Mesh::removeVertex(MeshVertexSPtr vertex) {
     bool result = false;
     if (vertex->getMesh() == shared_from_this()) {
         Point2SPtr point = vertex->getPoint();
-        map<Point2SPtr, MeshVertexSPtr>::iterator it = vertices_.find(point);
+        std::map<Point2SPtr, MeshVertexSPtr>::iterator it = vertices_.find(point);
         vertices_.erase(it);
         vertex->setMesh(MeshSPtr());
-        list<MeshCellWPtr>::iterator it_c = vertex->cells().begin();
+        std::list<MeshCellWPtr>::iterator it_c = vertex->cells().begin();
         while (it_c != vertex->cells().end()) {
             MeshCellWPtr cell_wptr = *it_c++;
             if (!cell_wptr.expired()) {
@@ -54,7 +61,7 @@ bool Mesh::removeVertex(MeshVertexSPtr vertex) {
 
 MeshVertexSPtr Mesh::getVertex(Point2SPtr point) const {
     MeshVertexSPtr result;
-    map<Point2SPtr, MeshVertexSPtr>::const_iterator it = vertices_.find(point);
+    std::map<Point2SPtr, MeshVertexSPtr>::const_iterator it = vertices_.find(point);
     if (it != vertices_.end()) {
         result = it->second;
     }
@@ -63,10 +70,10 @@ MeshVertexSPtr Mesh::getVertex(Point2SPtr point) const {
 }
 
 void Mesh::addCell(MeshCellSPtr cell) {
-    list<MeshCellSPtr>::iterator it = cells_.insert(cells_.end(), cell);
+    std::list<MeshCellSPtr>::iterator it = cells_.insert(cells_.end(), cell);
     cell->setMesh(shared_from_this());
     cell->setListIt(it);
-    list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+    std::list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
     while (it_v != cell->vertices().end()) {
         MeshVertexSPtr vertex = *it_v++;
         if (vertex->getMesh() != shared_from_this()) {
@@ -80,14 +87,14 @@ bool Mesh::removeCell(MeshCellSPtr cell) {
     if (cell->getMesh() == shared_from_this()) {
         cells_.erase(cell->getListIt());
         cell->setMesh(MeshSPtr());
-        cell->setListIt(list<MeshCellSPtr>::iterator());
+        cell->setListIt(std::list<MeshCellSPtr>::iterator());
         result = true;
     }
     return result;
 }
 
 void Mesh::addRay(MeshRaySPtr ray) {
-    list<MeshRaySPtr>::iterator it = rays_.insert(rays_.end(), ray);
+    std::list<MeshRaySPtr>::iterator it = rays_.insert(rays_.end(), ray);
     ray->setMesh(shared_from_this());
     ray->setListIt(it);
     MeshVertexSPtr vertex = ray->getSrc();
@@ -107,7 +114,7 @@ bool Mesh::removeRay(MeshRaySPtr ray) {
     if (ray->getMesh() == shared_from_this()) {
         rays_.erase(ray->getListIt());
         ray->setMesh(MeshSPtr());
-        ray->setListIt(list<MeshRaySPtr>::iterator());
+        ray->setListIt(std::list<MeshRaySPtr>::iterator());
         result = true;
     }
     return result;
@@ -117,22 +124,22 @@ SharedMutex& Mesh::mutex() {
     return this->mutex_;
 }
 
-map<Point2SPtr, MeshVertexSPtr>& Mesh::vertices() {
+std::map<Point2SPtr, MeshVertexSPtr>& Mesh::vertices() {
     return this->vertices_;
 }
 
-list<MeshCellSPtr>& Mesh::cells() {
+std::list<MeshCellSPtr>& Mesh::cells() {
     return this->cells_;
 }
 
-list<MeshRaySPtr>& Mesh::rays() {
+std::list<MeshRaySPtr>& Mesh::rays() {
     return this->rays_;
 }
 
 bool Mesh::isConsistent() const {
     bool result = true;
 
-    map<Point2SPtr, MeshVertexSPtr>::const_iterator it_v = vertices_.begin();
+    std::map<Point2SPtr, MeshVertexSPtr>::const_iterator it_v = vertices_.begin();
     while (it_v != vertices_.end()) {
         Point2SPtr point = it_v->first;
         MeshVertexSPtr vertex = it_v->second;
@@ -145,7 +152,7 @@ bool Mesh::isConsistent() const {
             result = false;
             break;
         }
-        list<MeshCellWPtr>::const_iterator it_c = vertex->cells().begin();
+        std::list<MeshCellWPtr>::const_iterator it_c = vertex->cells().begin();
         while (it_c != vertex->cells().end()) {
             MeshCellWPtr cell_wptr = *it_c++;
             if (!cell_wptr.expired()) {
@@ -158,14 +165,14 @@ bool Mesh::isConsistent() const {
         }
     }
 
-    list<MeshCellSPtr>::const_iterator it_c = cells_.begin();
+    std::list<MeshCellSPtr>::const_iterator it_c = cells_.begin();
     while (it_c != cells_.end()) {
         MeshCellSPtr cell = *it_c++;
         if (cell->getMesh() != shared_from_this()) {
             result = false;
             break;
         }
-        list<MeshVertexSPtr>::const_iterator it_v = cell->vertices().begin();
+        std::list<MeshVertexSPtr>::const_iterator it_v = cell->vertices().begin();
         while (it_v != cell->vertices().end()) {
             MeshVertexSPtr vertex = *it_v++;
             if (!vertex->containsCell(cell)) {
@@ -178,12 +185,12 @@ bool Mesh::isConsistent() const {
     return result;
 }
 
-string Mesh::toString() const {
-    stringstream sstr;
+std::string Mesh::toString() const {
+    std::stringstream sstr;
     sstr << "Mesh(";
-    sstr << StringFactory::fromPointer(this) << ", \n";
-    map<unsigned int, unsigned int> cell_sizes;
-    list<MeshCellSPtr>::const_iterator it_m = cells_.begin();
+    sstr << util::StringFactory::fromPointer(this) << ", \n";
+    std::map<unsigned int, unsigned int> cell_sizes;
+    std::list<MeshCellSPtr>::const_iterator it_m = cells_.begin();
     while (it_m != cells_.end()) {
         MeshCellSPtr cell = *it_m++;
         unsigned int size = cell->vertices().size();
@@ -192,7 +199,7 @@ string Mesh::toString() const {
         }
         cell_sizes[size] += 1;
     }
-    map<unsigned int, unsigned int>::iterator it = cell_sizes.begin();
+    std::map<unsigned int, unsigned int>::iterator it = cell_sizes.begin();
     while (it != cell_sizes.end()) {
         sstr << it->first << ": " << it->second << "\n";
         it++;

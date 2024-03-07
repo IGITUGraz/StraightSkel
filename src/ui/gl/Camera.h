@@ -5,21 +5,14 @@
  */
 
 #ifndef UI_GL_CAMERA_H
-#define	UI_GL_CAMERA_H
+#define UI_GL_CAMERA_H
 
-#include <cmath>
-#include <string>
-#include <GL/gl.h>
-#include <stdexcept>
 #include "ui/gl/ptrs.h"
-#include "util/StringFactory.h"
-#include "util/Configuration.h"
+#include "util/ptrs.h"
+#include <GL/gl.h>
+#include <string>
 
 namespace ui { namespace gl {
-
-using std::string;
-using std::out_of_range;
-using util::StringFactory;
 
 /*!
  * Quake style camera movement
@@ -35,7 +28,7 @@ public:
     void reset();
     void topdown();
 
-    virtual string toString();
+    virtual std::string toString();
 
     GLdouble eye(unsigned int i);
     GLdouble center(unsigned int i);
@@ -66,5 +59,4 @@ protected:
 
 } }
 
-#endif	/* UI_GL_CAMERA_H */
-
+#endif /* UI_GL_CAMERA_H */

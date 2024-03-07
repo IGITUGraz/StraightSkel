@@ -5,25 +5,16 @@
  */
 
 #ifndef DATA_3D_SPHERICALPOLYGON_H
-#define	DATA_3D_SPHERICALPOLYGON_H
+#define DATA_3D_SPHERICALPOLYGON_H
 
-#include <list>
-#include <map>
-#include <string>
-#include <sstream>
-#include "boost_thread.h"
+#include "typedefs_thread.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/CircularVertex.h"
-#include "data/3d/CircularEdge.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _3d {
 
-using std::list;
-using std::map;
-using std::string;
-using std::stringstream;
-
-class SphericalPolygon : public boost::enable_shared_from_this<SphericalPolygon> {
+class SphericalPolygon : public std::enable_shared_from_this<SphericalPolygon> {
 public:
     virtual ~SphericalPolygon();
 
@@ -43,24 +34,23 @@ public:
     void clear();
 
     SharedMutex& mutex();
-    list<CircularVertexSPtr>& vertices();
-    list<CircularEdgeSPtr>& edges();
+    std::list<CircularVertexSPtr>& vertices();
+    std::list<CircularEdgeSPtr>& edges();
 
     bool isConsistent() const;
 
     double getRadius() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     SphericalPolygon(Sphere3SPtr sphere);
     mutable SharedMutex mutex_;
     Sphere3SPtr sphere_;
-    list<CircularVertexSPtr> vertices_;
-    list<CircularEdgeSPtr> edges_;
+    std::list<CircularVertexSPtr> vertices_;
+    std::list<CircularEdgeSPtr> edges_;
 };
 
 } }
 
-#endif	/* DATA_3D_SPHERICALPOLYGON_H */
-
+#endif /* DATA_3D_SPHERICALPOLYGON_H */

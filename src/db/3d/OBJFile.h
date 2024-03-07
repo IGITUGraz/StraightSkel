@@ -5,23 +5,13 @@
  */
 
 #ifndef DB_3D_OBJFILE_H
-#define	DB_3D_OBJFILE_H
+#define DB_3D_OBJFILE_H
 
-#include <string>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <exception>
-#include "util/StringFuncs.h"
-#include "util/Configuration.h"
 #include "db/3d/AbstractFile.h"
+#include <string>
 
 namespace db { namespace _3d {
 
-using std::string;
-using std::ifstream;
-using std::ofstream;
-using std::vector;
 using namespace data::_3d;
 
 /**
@@ -31,12 +21,12 @@ class OBJFile : public AbstractFile {
 public:
     virtual ~OBJFile();
 
-    static PolyhedronSPtr load(string filename);
+    static PolyhedronSPtr load(const std::string& filename);
 
     /**
      * It is impossible for an obj file to store holes inside a facet.
      */
-    static bool save(string filename, PolyhedronSPtr polyhedron);
+    static bool save(const std::string& filename, PolyhedronSPtr polyhedron);
 
 protected:
     OBJFile();
@@ -44,5 +34,4 @@ protected:
 
 } }
 
-#endif	/* DB_3D_OBJFILE_H */
-
+#endif /* DB_3D_OBJFILE_H */

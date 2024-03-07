@@ -6,10 +6,15 @@
 
 #include "db/SQLiteDatabase.h"
 
+#include "debug.h"
+#include "db/SQLiteStmt.h"
+#include "util/StringFactory.h"
+#include <iostream>
+
 namespace db {
 
 SQLiteDatabase::SQLiteDatabase() {
-    this->db_ = NULL;
+    this->db_ = nullptr;
     this->transaction_ = false;
 }
 
@@ -17,14 +22,14 @@ SQLiteDatabase::~SQLiteDatabase() {
     this->close();
 }
 
-bool SQLiteDatabase::open(string &filename) {
+bool SQLiteDatabase::open(const std::string& filename) {
     DEBUG_VAR(filename);
     bool result = false;
     if (SQLITE_OK == sqlite3_open(filename.c_str(), &db_)) {
         result = true;
     } else {
         this->printError();
-        this->db_ = NULL;
+        this->db_ = nullptr;
     }
     return result;
 }
@@ -33,7 +38,7 @@ bool SQLiteDatabase::close() {
     bool result = false;
     if (db_) {
         if (SQLITE_OK == sqlite3_close(db_)) {
-            db_ = NULL;
+            db_ = nullptr;
             result = true;
         }
     }
@@ -41,7 +46,7 @@ bool SQLiteDatabase::close() {
 }
 
 bool SQLiteDatabase::isOpened() {
-    return (db_ != NULL);
+    return (db_ != nullptr);
 }
 
 void SQLiteDatabase::printError() {
@@ -50,7 +55,7 @@ void SQLiteDatabase::printError() {
     }
 }
 
-SQLiteStmtSPtr SQLiteDatabase::prepare(string& sql_query) {
+SQLiteStmtSPtr SQLiteDatabase::prepare(const std::string& sql_query) {
     SQLiteStmtSPtr result = SQLiteStmtSPtr();
     if (db_) {
         sqlite3_stmt* stmt;

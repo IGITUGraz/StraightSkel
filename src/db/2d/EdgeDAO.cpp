@@ -4,7 +4,12 @@
  * @date   2012-01-27
  */
 
-#include "EdgeDAO.h"
+#include "db/2d/EdgeDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/2d/VertexDAO.h"
+#include "db/2d/PolygonDAO.h"
 
 namespace db { namespace _2d {
 
@@ -16,8 +21,8 @@ EdgeDAO::~EdgeDAO() {
     // intentionally does nothing
 }
 
-string EdgeDAO::getTableSchema() const {
-    string schema("CREATE TABLE Edges (\n"
+std::string EdgeDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Edges (\n"
             "  PolyID INTEGER NOT NULL,\n"
             "  EID INTEGER NOT NULL,\n"
             "  VID_SRC INTEGER,\n"
@@ -27,8 +32,8 @@ string EdgeDAO::getTableSchema() const {
     return schema;
 }
 
-string EdgeDAO::getTable2Schema() const {
-    string schema("CREATE TABLE SkelEdgeData (\n"
+std::string EdgeDAO::getTable2Schema() const {
+    std::string schema("CREATE TABLE SkelEdgeData (\n"
             "  PolyID INTEGER NOT NULL,\n"
             "  EID INTEGER NOT NULL,\n"
             "  speed REAL,\n"
@@ -40,7 +45,7 @@ string EdgeDAO::getTable2Schema() const {
 int EdgeDAO::nextEID(int polyid) {
     int eid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(EID) FROM Edges WHERE PolyID=?;");
+    std::string sql("SELECT MAX(EID) FROM Edges WHERE PolyID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyid);
@@ -76,7 +81,7 @@ int EdgeDAO::insert(EdgeSPtr edge) {
         } else {
             dao_vertex->insert(edge->getVertexDst());
         }
-        string sql("INSERT INTO Edges (PolyID, EID, VID_SRC, VID_DST) "
+        std::string sql("INSERT INTO Edges (PolyID, EID, VID_SRC, VID_DST) "
                 "VALUES (?, ?, ?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
@@ -88,7 +93,7 @@ int EdgeDAO::insert(EdgeSPtr edge) {
                 edge->setID(eid);
                 result = eid;
                 if (edge->hasData()) {
-                    SkelEdgeDataSPtr data = dynamic_pointer_cast<SkelEdgeData>(
+                    SkelEdgeDataSPtr data = std::dynamic_pointer_cast<SkelEdgeData>(
                             edge->getData());
                     sql = "INSERT INTO SkelEdgeData (PolyID, EID, speed) "
                             "VALUES (?, ?, ?);";
@@ -117,7 +122,7 @@ bool EdgeDAO::del(EdgeSPtr edge) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Edges WHERE PolyID=? AND EID=?;");
+    std::string sql("DELETE FROM Edges WHERE PolyID=? AND EID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyid);
@@ -145,7 +150,7 @@ bool EdgeDAO::del(EdgeSPtr edge) {
 EdgeSPtr EdgeDAO::find(int polyid, int eid) {
     EdgeSPtr result = EdgeSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT VID_SRC, VID_DST FROM Edges WHERE PolyID=? AND EID=?;");
+    std::string sql("SELECT VID_SRC, VID_DST FROM Edges WHERE PolyID=? AND EID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyid);

@@ -5,20 +5,13 @@
  */
 
 #ifndef DATA_3D_CIRCULAREDGE_H
-#define	DATA_3D_CIRCULAREDGE_H
+#define DATA_3D_CIRCULAREDGE_H
 
+#include "data/3d/ptrs.h"
 #include <list>
 #include <string>
-#include "debug.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/CircularVertex.h"
-#include "data/3d/SphericalPolygon.h"
 
 namespace data { namespace _3d {
-
-using std::list;
-using std::string;
 
 class CircularEdge {
 public:
@@ -32,8 +25,8 @@ public:
     void setVertexDst(CircularVertexSPtr dst);
     SphericalPolygonSPtr getPolygon() const;
     void setPolygon(SphericalPolygonSPtr polygon);
-    list<CircularEdgeSPtr>::iterator getListIt() const;
-    void setListIt(list<CircularEdgeSPtr>::iterator list_it);
+    std::list<CircularEdgeSPtr>::iterator getListIt() const;
+    void setListIt(std::list<CircularEdgeSPtr>::iterator list_it);
     CircularEdgeDataSPtr getData() const;
     void setData(CircularEdgeDataSPtr data);
     bool hasData() const;
@@ -46,7 +39,7 @@ public:
     CircularEdgeSPtr next() const;
     CircularEdgeSPtr prev() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     CircularEdge(CircularVertexSPtr src, CircularVertexSPtr dst);
@@ -54,12 +47,12 @@ protected:
     CircularVertexSPtr vertex_src_;
     CircularVertexSPtr vertex_dst_;
     SphericalPolygonWPtr polygon_;
-    list<CircularEdgeSPtr>::iterator list_it_;
+    std::list<CircularEdgeSPtr>::iterator list_it_;
     CircularEdgeDataSPtr data_;
     Plane3SPtr supporting_plane_;
 };
 
 } }
 
-#endif	/* DATA_3D_CIRCULAREDGE_H */
+#endif /* DATA_3D_CIRCULAREDGE_H */
 

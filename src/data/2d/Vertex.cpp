@@ -4,7 +4,12 @@
  * @date   2011-11-22
  */
 
-#include "Vertex.h"
+#include "data/2d/Vertex.h"
+
+#include "data/2d/Edge.h"
+#include "debug.h"
+#include "util/StringFactory.h"
+#include <cmath>
 
 namespace data { namespace _2d {
 
@@ -77,11 +82,11 @@ void Vertex::setPolygon(PolygonSPtr polygon) {
     this->polygon_ = polygon;
 }
 
-list<VertexSPtr>::iterator Vertex::getListIt() const {
+std::list<VertexSPtr>::iterator Vertex::getListIt() const {
     return this->list_it_;
 }
 
-void Vertex::setListIt(list<VertexSPtr>::iterator list_it) {
+void Vertex::setListIt(std::list<VertexSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -168,15 +173,15 @@ bool Vertex::isReflex() const {
     return result;
 }
 
-string Vertex::toString() const {
-    string result("Vertex(");
+std::string Vertex::toString() const {
+    std::string result("Vertex(");
     if (id_ != -1) {
-        result += "id=" + StringFactory::fromInteger(id_) + ", ";
+        result += "id=" + util::StringFactory::fromInteger(id_) + ", ";
     } else {
-        result += StringFactory::fromPointer(this) + ", ";
+        result += util::StringFactory::fromPointer(this) + ", ";
     }
-    result += "<" + StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ">)";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ">)";
     return result;
 }
 

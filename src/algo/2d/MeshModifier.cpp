@@ -4,7 +4,14 @@
  * @date   2014-04-27
  */
 
-#include "MeshModifier.h"
+#include "algo/2d/MeshModifier.h"
+
+#include "debug.h"
+#include "algo/2d/KernelWrapper.h"
+#include "data/2d/mesh/Mesh.h"
+#include "data/2d/mesh/MeshCell.h"
+#include "data/2d/mesh/MeshVertex.h"
+#include "data/2d/KernelFactory.h"
 
 namespace algo { namespace _2d {
 
@@ -18,13 +25,13 @@ MeshModifier::~MeshModifier() {
 
 void MeshModifier::splitEdge(MeshVertexSPtr v_src, MeshVertexSPtr v_dst,
         MeshVertexSPtr v_insert) {
-    list<MeshCellSPtr> cells_common;
-    list<MeshCellWPtr>::iterator it_c1 = v_src->cells().begin();
+    std::list<MeshCellSPtr> cells_common;
+    std::list<MeshCellWPtr>::iterator it_c1 = v_src->cells().begin();
     while (it_c1 != v_src->cells().end()) {
         MeshCellWPtr cell_src_wptr = *it_c1++;
         if (cell_src_wptr.expired()) continue;
         MeshCellSPtr cell_src(cell_src_wptr);
-        list<MeshCellWPtr>::iterator it_c2 = v_dst->cells().begin();
+        std::list<MeshCellWPtr>::iterator it_c2 = v_dst->cells().begin();
         while (it_c2 != v_dst->cells().end()) {
             MeshCellWPtr cell_dst_wptr = *it_c2++;
             if (cell_dst_wptr.expired()) continue;
@@ -34,7 +41,7 @@ void MeshModifier::splitEdge(MeshVertexSPtr v_src, MeshVertexSPtr v_dst,
             }
         }
     }
-    list<MeshCellSPtr>::iterator it_c = cells_common.begin();
+    std::list<MeshCellSPtr>::iterator it_c = cells_common.begin();
     while (it_c != cells_common.end()) {
         MeshCellSPtr cell = *it_c++;
         if (v_src->next(cell) == v_dst) {
@@ -51,7 +58,7 @@ MeshCellSPtr MeshModifier::splitCell(MeshCellSPtr cell,
     if (cell->containsVertex(v_src) && cell->containsVertex(v_dst)) {
         result = MeshCell::create();
         Line2SPtr line = KernelFactory::createLine2(v_src->getPoint(), v_dst->getPoint());
-        list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+        std::list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
         while (it_v != cell->vertices().end()) {
             MeshVertexSPtr vertex = *it_v++;
             if (vertex == v_src || vertex == v_dst) {
@@ -76,10 +83,10 @@ void MeshModifier::mergeCells(MeshCellSPtr cell_1, MeshCellSPtr cell_2) {
     MeshVertexSPtr vertex_common_1;
     MeshVertexSPtr vertex_common_2;
     MeshVertexSPtr vertex_1_prev;
-    list<MeshVertexSPtr>::iterator it_v1 = cell_1->vertices().begin();
+    std::list<MeshVertexSPtr>::iterator it_v1 = cell_1->vertices().begin();
     while (it_v1 != cell_1->vertices().end()) {
         MeshVertexSPtr vertex_1 = *it_v1++;
-        list<MeshVertexSPtr>::iterator it_v2 = cell_2->vertices().begin();
+        std::list<MeshVertexSPtr>::iterator it_v2 = cell_2->vertices().begin();
         while (it_v2 != cell_2->vertices().end()) {
             MeshVertexSPtr vertex_2 = *it_v2++;
             if (vertex_1 == vertex_2) {
@@ -103,13 +110,13 @@ void MeshModifier::mergeCells(MeshCellSPtr cell_1, MeshCellSPtr cell_2) {
         vertex_1_prev = vertex_1;
     }
     if (vertex_common_1 && vertex_common_2) {
-        list<MeshVertexSPtr> vertices_tomove;
+        std::list<MeshVertexSPtr> vertices_tomove;
         MeshVertexSPtr vertex_current = vertex_common_1->next(cell_2);
         while (vertex_current != vertex_common_2) {
             vertices_tomove.push_back(vertex_current);
             vertex_current = vertex_current->next(cell_2);
         }
-        list<MeshVertexSPtr>::iterator it_v = vertices_tomove.begin();
+        std::list<MeshVertexSPtr>::iterator it_v = vertices_tomove.begin();
         while (it_v != vertices_tomove.end()) {
             MeshVertexSPtr vertex = *it_v++;
             cell_2->removeVertex(vertex);
@@ -136,12 +143,12 @@ void MeshModifier::mergeVertices(MeshVertexSPtr vertex_1,
 
     MeshCellSPtr cell_common_1;
     MeshCellSPtr cell_common_2;
-    list<MeshCellWPtr>::iterator it_c1 = vertex_1->cells().begin();
+    std::list<MeshCellWPtr>::iterator it_c1 = vertex_1->cells().begin();
     while (it_c1 != vertex_1->cells().end()) {
         MeshCellWPtr cell_1_wptr = *it_c1++;
         if (cell_1_wptr.expired()) continue;
         MeshCellSPtr cell_1(cell_1_wptr);
-        list<MeshCellWPtr>::iterator it_c2 = vertex_2->cells().begin();
+        std::list<MeshCellWPtr>::iterator it_c2 = vertex_2->cells().begin();
         while (it_c2 != vertex_2->cells().end()) {
             MeshCellWPtr cell_2_wptr = *it_c2++;
             if (cell_2_wptr.expired()) continue;
@@ -165,13 +172,13 @@ void MeshModifier::mergeVertices(MeshVertexSPtr vertex_1,
             cell_common_1 = cell_common_2;
             cell_common_2 = cell_tmp;
         }
-        list<MeshCellSPtr> cells_tomove;
+        std::list<MeshCellSPtr> cells_tomove;
         MeshCellSPtr cell_current = cell_common_1->next(vertex_2);
         while (cell_current != cell_common_2) {
             cells_tomove.push_back(cell_current);
             cell_current = cell_current->next(vertex_2);
         }
-        list<MeshCellSPtr>::iterator it_c = cells_tomove.begin();
+        std::list<MeshCellSPtr>::iterator it_c = cells_tomove.begin();
         while (it_c != cells_tomove.end()) {
             MeshCellSPtr cell = *it_c++;
             cell->addVertexBefore(vertex_2, vertex_1);

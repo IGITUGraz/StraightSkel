@@ -5,11 +5,9 @@
  */
 
 #ifndef DATA_3D_CIRCULAREDGEDATA_H
-#define	DATA_3D_CIRCULAREDGEDATA_H
+#define DATA_3D_CIRCULAREDGEDATA_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/CircularEdge.h"
 
 namespace data { namespace _3d {
 
@@ -34,5 +32,5 @@ protected:
 
 } }
 
-#endif	/* DATA_3D_CIRCULAREDGEDATA_H */
+#endif /* DATA_3D_CIRCULAREDGEDATA_H */
 

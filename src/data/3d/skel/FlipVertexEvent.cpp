@@ -4,7 +4,12 @@
  * @date   2012-11-22
  */
 
-#include "FlipVertexEvent.h"
+#include "data/3d/skel/FlipVertexEvent.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/SkelVertexData.h"
 
 namespace data { namespace _3d { namespace skel {
 

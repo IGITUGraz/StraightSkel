@@ -4,7 +4,24 @@
  * @date   2012-11-14
  */
 
-#include "SpacePSPrinter.h"
+#include "ui/ps/SpacePSPrinter.h"
+
+#include "debug.h"
+#include "typedefs_thread.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Facet.h"
+#include "data/3d/SphericalPolygon.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/skel/StraightSkeleton.h"
+#include "data/3d/skel/Arc.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/SphericalSkeleton.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/CircularNode.h"
 
 namespace ui { namespace ps {
 
@@ -72,7 +89,7 @@ void SpacePSPrinter::setCamCenter(const vec3f cam_center) {
     }
 }
 
-void SpacePSPrinter::printCommentCamera(ostream& out) {
+void SpacePSPrinter::printCommentCamera(std::ostream& out) {
     out << "% cam_eye = <"
         << cam_eye_[0] << ", "
         << cam_eye_[1] << ", "
@@ -117,7 +134,7 @@ void SpacePSPrinter::to2d(const vec3f p3, vec2f& p2) {
     p2[1] = ((p_nd[1] + 1.0f) * ((float)viewport_[3]/2.0f)) + (float)viewport_[1];
 }
 
-void SpacePSPrinter::printLine3(const vec3f src, const vec3f dst, ostream& out) {
+void SpacePSPrinter::printLine3(const vec3f src, const vec3f dst, std::ostream& out) {
     vec2f src2;
     vec2f dst2;
     to2d(src, src2);
@@ -125,13 +142,13 @@ void SpacePSPrinter::printLine3(const vec3f src, const vec3f dst, ostream& out) 
     printLine(src2, dst2, out);
 }
 
-void SpacePSPrinter::printPolyhedron(PolyhedronSPtr polyhedron, ostream& out) {
+void SpacePSPrinter::printPolyhedron(PolyhedronSPtr polyhedron, std::ostream& out) {
     if (!polyhedron) {
         DEBUG_PRINT("Warning: polyhedron is null.");
         return;
     }
     ReadLock l(polyhedron->mutex());
-    list<data::_3d::EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+    std::list<data::_3d::EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
     while (it_e != polyhedron->edges().end()) {
         data::_3d::EdgeSPtr edge = *it_e++;
         data::_3d::VertexSPtr vertex_src = edge->getVertexSrc();
@@ -148,10 +165,10 @@ void SpacePSPrinter::printPolyhedron(PolyhedronSPtr polyhedron, ostream& out) {
 }
 
 
-list<data::_3d::FacetSPtr> SpacePSPrinter::getFacetsToShade(PolyhedronSPtr polyhedron) {
-    list<data::_3d::FacetSPtr> result;
-    list<data::_3d::FacetSPtr> temp;
-    list<data::_3d::FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+std::list<data::_3d::FacetSPtr> SpacePSPrinter::getFacetsToShade(PolyhedronSPtr polyhedron) {
+    std::list<data::_3d::FacetSPtr> result;
+    std::list<data::_3d::FacetSPtr> temp;
+    std::list<data::_3d::FacetSPtr>::iterator it_f = polyhedron->facets().begin();
     while (it_f != polyhedron->facets().end()) {
         data::_3d::FacetSPtr facet = *it_f++;
         data::_3d::Plane3SPtr plane = facet->plane();
@@ -174,12 +191,12 @@ list<data::_3d::FacetSPtr> SpacePSPrinter::getFacetsToShade(PolyhedronSPtr polyh
     // a hint is better than nothing
     while (temp.size() > 0) {
         float max_dist = 0.0f;
-        list<data::_3d::FacetSPtr>::iterator it_max_f;
+        std::list<data::_3d::FacetSPtr>::iterator it_max_f = temp.begin();
         it_f = temp.begin();
         while (it_f != temp.end()) {
             data::_3d::FacetSPtr facet = *it_f;
             vec3f center = {0.0f, 0.0f, 0.0f};
-            list<data::_3d::VertexSPtr>::iterator it_v = facet->vertices().begin();
+            std::list<data::_3d::VertexSPtr>::iterator it_v = facet->vertices().begin();
             while (it_v != facet->vertices().end()) {
                 data::_3d::VertexSPtr vertex = *it_v++;
                 center[0] += (float)vertex->getX();
@@ -206,7 +223,7 @@ list<data::_3d::FacetSPtr> SpacePSPrinter::getFacetsToShade(PolyhedronSPtr polyh
 
 
 void SpacePSPrinter::printPolyhedronShade(PolyhedronSPtr polyhedron,
-            float min_gray, float max_gray, bool print_edges, ostream& out) {
+            float min_gray, float max_gray, bool print_edges, std::ostream& out) {
     if (!polyhedron) {
         DEBUG_PRINT("Warning: polyhedron is null.");
         return;
@@ -216,8 +233,8 @@ void SpacePSPrinter::printPolyhedronShade(PolyhedronSPtr polyhedron,
         dir_cam[i] = cam_eye_[i] - cam_center_[i];
     }
     ReadLock l(polyhedron->mutex());
-    list<data::_3d::FacetSPtr> facets = getFacetsToShade(polyhedron);
-    list<data::_3d::FacetSPtr>::iterator it_f = facets.begin();
+    std::list<data::_3d::FacetSPtr> facets = getFacetsToShade(polyhedron);
+    std::list<data::_3d::FacetSPtr>::iterator it_f = facets.begin();
     while (it_f != facets.end()) {
         data::_3d::FacetSPtr facet = *it_f++;
         data::_3d::Plane3SPtr plane = facet->plane();
@@ -228,7 +245,7 @@ void SpacePSPrinter::printPolyhedronShade(PolyhedronSPtr polyhedron,
         float angle_cam_norm = angle(dir_cam, norm);
         float gray = (cosf(angle_cam_norm) * (max_gray-min_gray)) + min_gray;
         setGray(gray, out);
-        list<data::_3d::VertexSPtr> vertices;
+        std::list<data::_3d::VertexSPtr> vertices;
         data::_3d::EdgeSPtr edge = facet->edges().front();
         data::_3d::EdgeSPtr edge_first;
         while (edge != edge_first) {
@@ -240,7 +257,7 @@ void SpacePSPrinter::printPolyhedronShade(PolyhedronSPtr polyhedron,
         }
         vec2f points[vertices.size()];
         unsigned int i = 0;
-        list<data::_3d::VertexSPtr>::iterator it_v = vertices.begin();
+        std::list<data::_3d::VertexSPtr>::iterator it_v = vertices.begin();
         while (it_v != vertices.end()) {
             data::_3d::VertexSPtr vertex = *it_v++;
             vec3f point3 = {(float)vertex->getX(),
@@ -253,7 +270,7 @@ void SpacePSPrinter::printPolyhedronShade(PolyhedronSPtr polyhedron,
 
         if (print_edges) {
             setGray(0.0f, out);
-            list<data::_3d::EdgeSPtr>::iterator it_e = facet->edges().begin();
+            std::list<data::_3d::EdgeSPtr>::iterator it_e = facet->edges().begin();
             while (it_e != facet->edges().end()) {
                 data::_3d::EdgeSPtr edge = *it_e++;
                 data::_3d::VertexSPtr vertex_src = edge->getVertexSrc();
@@ -271,9 +288,9 @@ void SpacePSPrinter::printPolyhedronShade(PolyhedronSPtr polyhedron,
     out << std::endl;
 }
 
-void SpacePSPrinter::printSkel(data::_3d::skel::StraightSkeletonSPtr skel, ostream& out) {
+void SpacePSPrinter::printSkel(data::_3d::skel::StraightSkeletonSPtr skel, std::ostream& out) {
     ReadLock l(skel->mutex());
-    list<data::_3d::skel::ArcSPtr>::iterator it_a = skel->arcs().begin();
+    std::list<data::_3d::skel::ArcSPtr>::iterator it_a = skel->arcs().begin();
     while (it_a != skel->arcs().end()) {
         data::_3d::skel::ArcSPtr arc = *it_a++;
         if (!arc->hasNodeDst()) {
@@ -322,7 +339,7 @@ float SpacePSPrinter::to2dRadius(const vec3f center, float radius) {
     return radius2;
 }
 
-void SpacePSPrinter::printSphere(const vec3f center, float radius, ostream& out) {
+void SpacePSPrinter::printSphere(const vec3f center, float radius, std::ostream& out) {
     vec2f center2;
     to2d(center, center2);
     float radius2 = to2dRadius(center, radius);
@@ -332,7 +349,7 @@ void SpacePSPrinter::printSphere(const vec3f center, float radius, ostream& out)
 }
 
 void SpacePSPrinter::printCircularEdge(const vec3f center, const vec3f axis,
-        const vec3f src, const vec3f dst, ostream& out) {
+        const vec3f src, const vec3f dst, std::ostream& out) {
     vec3f dir_src;
     vec3f dir_dst;
     for (unsigned int i = 0; i < 3; i++) {
@@ -390,14 +407,14 @@ void SpacePSPrinter::printCircularEdge(const vec3f center, const vec3f axis,
 }
 
 void SpacePSPrinter::printSphericalPolygon(
-        SphericalPolygonSPtr sphericalpolygon, ostream& out) {
+        SphericalPolygonSPtr sphericalpolygon, std::ostream& out) {
     data::_3d::Sphere3SPtr sphere = sphericalpolygon->getSphere();
     data::_3d::Point3SPtr p_center =
             data::_3d::KernelFactory::createPoint3(sphere);
     vec3f center = {(float)(*p_center)[0],
                     (float)(*p_center)[1],
                     (float)(*p_center)[2]};
-    list<data::_3d::CircularEdgeSPtr>::iterator it_e = sphericalpolygon->edges().begin();
+    std::list<data::_3d::CircularEdgeSPtr>::iterator it_e = sphericalpolygon->edges().begin();
     while (it_e != sphericalpolygon->edges().end()) {
         data::_3d::CircularEdgeSPtr edge = *it_e++;
         data::_3d::CircularVertexSPtr vertex_src = edge->getVertexSrc();
@@ -425,7 +442,7 @@ void SpacePSPrinter::printSphericalPolygon(
 }
 
 void SpacePSPrinter::printSphericalIntersections(
-        SphericalPolygonSPtr sphericalpolygon, ostream& out) {
+        SphericalPolygonSPtr sphericalpolygon, std::ostream& out) {
     data::_3d::Sphere3SPtr sphere = sphericalpolygon->getSphere();
     data::_3d::Point3SPtr p_center =
             data::_3d::KernelFactory::createPoint3(sphere);
@@ -434,7 +451,7 @@ void SpacePSPrinter::printSphericalIntersections(
                     (float)(*p_center)[2]};
     vec2f center2;
     to2d(center, center2);
-    list<data::_3d::CircularVertexSPtr>::iterator it_v = sphericalpolygon->vertices().begin();
+    std::list<data::_3d::CircularVertexSPtr>::iterator it_v = sphericalpolygon->vertices().begin();
     while (it_v != sphericalpolygon->vertices().end()) {
         data::_3d::CircularVertexSPtr vertex = *it_v++;
         vec3f point = {(float)vertex->getX(),
@@ -463,14 +480,14 @@ void SpacePSPrinter::printSphericalIntersections(
 }
 
 void SpacePSPrinter::printSphericalSkel(
-        data::_3d::skel::SphericalSkeletonSPtr sphericalskel, ostream& out) {
+        data::_3d::skel::SphericalSkeletonSPtr sphericalskel, std::ostream& out) {
     data::_3d::Sphere3SPtr sphere = sphericalskel->getSphere();
     data::_3d::Point3SPtr p_center =
             data::_3d::KernelFactory::createPoint3(sphere);
     vec3f center = {(float)(*p_center)[0],
                     (float)(*p_center)[1],
                     (float)(*p_center)[2]};
-    list<data::_3d::skel::CircularArcSPtr>::iterator it_a = sphericalskel->arcs().begin();
+    std::list<data::_3d::skel::CircularArcSPtr>::iterator it_a = sphericalskel->arcs().begin();
     while (it_a != sphericalskel->arcs().end()) {
         data::_3d::skel::CircularArcSPtr arc = *it_a++;
         if (!arc->hasNodeDst()) {

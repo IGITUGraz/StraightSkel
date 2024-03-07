@@ -5,9 +5,9 @@
  */
 
 #ifndef ALGO_PTRS_H
-#define	ALGO_PTRS_H
+#define ALGO_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace algo {
 
@@ -18,5 +18,4 @@ typedef WEAK_PTR<Controller> ControllerWPtr;
 
 }
 
-#endif	/* ALGO_PTRS_H */
-
+#endif /* ALGO_PTRS_H */

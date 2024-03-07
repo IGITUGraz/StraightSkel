@@ -5,61 +5,17 @@
  */
 
 #ifndef ALGO_3D_SIMPLESTRAIGHTSKEL_H
-#define	ALGO_3D_SIMPLESTRAIGHTSKEL_H
+#define ALGO_3D_SIMPLESTRAIGHTSKEL_H
 
-#include <list>
-#include <stdexcept>
-#include <limits>
-
-#include "boost_thread.h"
-#include "debug.h"
-#include "util/Configuration.h"
-#include "util/Timer.h"
-
-#include "data/3d/ptrs.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/skel/ptrs.h"
-#include "data/3d/skel/StraightSkeleton.h"
-#include "data/3d/skel/AbstractEvent.h"
-#include "data/3d/skel/ConstOffsetEvent.h"
-#include "data/3d/skel/EdgeEvent.h"
-#include "data/3d/skel/EdgeMergeEvent.h"
-#include "data/3d/skel/TriangleEvent.h"
-#include "data/3d/skel/DblEdgeMergeEvent.h"
-#include "data/3d/skel/DblTriangleEvent.h"
-#include "data/3d/skel/TetrahedronEvent.h"
-#include "data/3d/skel/VertexEvent.h"
-#include "data/3d/skel/FlipVertexEvent.h"
-#include "data/3d/skel/SurfaceEvent.h"
-#include "data/3d/skel/PolyhedronSplitEvent.h"
-#include "data/3d/skel/SplitMergeEvent.h"
-#include "data/3d/skel/EdgeSplitEvent.h"
-#include "data/3d/skel/PierceEvent.h"
-#include "data/3d/skel/Sheet.h"
-#include "data/3d/skel/Arc.h"
-#include "data/3d/skel/SkelVertexData.h"
-#include "data/3d/skel/SkelEdgeData.h"
-#include "data/3d/skel/SkelFacetData.h"
-
+#include "typedefs_thread.h"
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/KernelWrapper.h"
-#include "algo/3d/LineInFacet.h"
-#include "algo/3d/SelfIntersection.h"
-#include "algo/3d/PolyhedronTransformation.h"
-#include "algo/3d/AbstractVertexSplitter.h"
-#include "algo/3d/AngleVertexSplitter.h"
-#include "algo/3d/CombiVertexSplitter.h"
-#include "algo/3d/ConvexVertexSplitter.h"
-#include "algo/3d/VolumeVertexSplitter.h"
-#include "algo/3d/WeightVertexSplitter.h"
-#include "algo/3d/SphereVertexSplitter.h"
+#include "data/3d/ptrs.h"
+#include "data/3d/skel/ptrs.h"
+#include <list>
 
 namespace algo { namespace _3d {
 
-using std::list;
-using boost::dynamic_pointer_cast;
 using namespace data::_3d;
 using namespace data::_3d::skel;
 
@@ -69,6 +25,7 @@ public:
 
     static SimpleStraightSkelSPtr create(PolyhedronSPtr polyhedron);
     static SimpleStraightSkelSPtr create(PolyhedronSPtr polyhedron, ControllerSPtr controller);
+    static SimpleStraightSkelSPtr create(PolyhedronSPtr polyhedron, ControllerSPtr controller, const std::list<double>& save_offsets);
 
     void initVertexSplitter();
     void initEdgeEvent();
@@ -199,7 +156,7 @@ public:
     /**
      * Determines the next event.
      */
-    static AbstractEventSPtr nextEvent(PolyhedronSPtr polyhedron, double offset);
+    AbstractEventSPtr nextEvent(PolyhedronSPtr polyhedron, double offset);
 
     /**
      * Creates an offset polyhedron.
@@ -232,12 +189,14 @@ public:
 protected:
     SimpleStraightSkel(PolyhedronSPtr polyhedron);
     SimpleStraightSkel(PolyhedronSPtr polyhedron, ControllerSPtr controller);
+    SimpleStraightSkel(PolyhedronSPtr polyhedron, ControllerSPtr controller, const std::list<double>& save_offsets);
 
     static FacetSPtr getFacetSrc(EdgeSPtr edge);
     static FacetSPtr getFacetDst(EdgeSPtr edge);
 
     PolyhedronSPtr polyhedron_;
     ControllerSPtr controller_;
+    std::list<double> save_offsets_;
     bool use_fast_vertex_splitter_;
     AbstractVertexSplitterSPtr vertex_splitter_;
     int edge_event_;
@@ -246,5 +205,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_SIMPLESTRAIGHTSKEL_H */
-
+#endif /* ALGO_3D_SIMPLESTRAIGHTSKEL_H */

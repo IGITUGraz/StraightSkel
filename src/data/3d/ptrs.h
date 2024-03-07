@@ -5,9 +5,9 @@
  */
 
 #ifndef DATA_3D_PTRS_H
-#define	DATA_3D_PTRS_H
+#define DATA_3D_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 #include "config.h"
 #ifdef USE_CGAL
@@ -103,4 +103,4 @@ typedef WEAK_PTR<CircularEdgeData> CircularEdgeDataWPtr;
 
 } }
 
-#endif	/* DATA_3D_PTRS_H */
+#endif /* DATA_3D_PTRS_H */

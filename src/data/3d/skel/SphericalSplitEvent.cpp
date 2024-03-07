@@ -4,7 +4,14 @@
  * @date   2012-11-29
  */
 
-#include "SphericalSplitEvent.h"
+#include "data/3d/skel/SphericalSplitEvent.h"
+
+#include "debug.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/SphericalSkelVertexData.h"
+#include "data/3d/skel/SphericalSkelEdgeData.h"
 
 namespace data { namespace _3d { namespace skel {
 

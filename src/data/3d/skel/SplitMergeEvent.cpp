@@ -4,7 +4,12 @@
  * @date   2013-08-09
  */
 
-#include "SplitMergeEvent.h"
+#include "data/3d/skel/SplitMergeEvent.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/SkelVertexData.h"
 
 namespace data { namespace _3d { namespace skel {
 

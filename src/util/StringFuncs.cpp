@@ -4,11 +4,13 @@
  * @date   2013-12-16
  */
 
-#include "StringFuncs.h"
+#include "util/StringFuncs.h"
+
+#include <cstddef>
 
 namespace util {
 
-bool StringFuncs::startsWith(string str, string prefix) {
+bool StringFuncs::startsWith(const std::string& str, const std::string& prefix) {
     size_t len_str = str.length();
     size_t len_prefix = prefix.length();
     if (len_prefix > len_str) {
@@ -17,7 +19,7 @@ bool StringFuncs::startsWith(string str, string prefix) {
     return (0 == str.compare(0, len_prefix, prefix));
 }
 
-bool StringFuncs::endsWith(string str, string suffix) {
+bool StringFuncs::endsWith(const std::string& str, const std::string& suffix) {
     size_t len_str = str.length();
     size_t len_suffix = suffix.length();
     if (len_suffix > len_str) {
@@ -26,8 +28,8 @@ bool StringFuncs::endsWith(string str, string suffix) {
     return (0 == str.compare(len_str-len_suffix, len_suffix, suffix));
 }
 
-string StringFuncs::trim(string str) {
-    string result;
+std::string StringFuncs::trim(const std::string& str) {
+    std::string result;
     unsigned int length = str.length();
     for (int i = str.length()-1; i >= 0; i--) {
         const char chr = str.at(i);
@@ -51,12 +53,12 @@ string StringFuncs::trim(string str) {
     return result;
 }
 
-vector<string> StringFuncs::split(string str, string delim, bool keep_empty) {
-    vector<string> result;
-    string element;
+std::vector<std::string> StringFuncs::split(const std::string& str, const std::string& delim, bool keep_empty) {
+    std::vector<std::string> result;
+    std::string element;
     std::size_t pos = 0;
     std::size_t pos_delim = str.find_first_of(delim);
-    while (pos_delim != string::npos) {
+    while (pos_delim != std::string::npos) {
         element = str.substr(pos, pos_delim - pos);
         if (element.length() > 0 || keep_empty) {
             result.push_back(element);

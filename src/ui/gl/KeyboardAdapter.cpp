@@ -4,7 +4,13 @@
  * @date   2011-12-22
  */
 
-#include "KeyboardAdapter.h"
+#include "ui/gl/KeyboardAdapter.h"
+
+#include "debug.h"
+#include "algo/Controller.h"
+#include "util/Configuration.h"
+#include "ui/gl/Camera.h"
+#include "ui/gl/MainOpenGLWindow.h"
 
 namespace ui { namespace gl {
 
@@ -54,8 +60,8 @@ KeyboardAdapter::KeyboardAdapter(CameraSPtr camera, ControllerSPtr controller) {
     this->look_up_ = false;
     this->look_down_ = false;
 
-    this->thread_ = ThreadSPtr(new boost::thread(
-            boost::bind(&KeyboardAdapter::run, this)));
+    this->thread_ = ThreadSPtr(new std::thread(
+            std::bind(&KeyboardAdapter::run, this)));
 }
 
 KeyboardAdapter::~KeyboardAdapter() {
@@ -71,7 +77,7 @@ void KeyboardAdapter::setWindow(MainOpenGLWindowSPtr window) {
     this->window_ = window;
 }
 
-int KeyboardAdapter::toKey(const string& key) {
+int KeyboardAdapter::toKey(const std::string& key) {
     int result = 0;
     if (key.length() == 1) {
         result = (int)key.c_str()[0];
@@ -121,7 +127,7 @@ void KeyboardAdapter::loadConfig(util::ConfigurationSPtr config) {
     if (!config->isLoaded()) {
         return;
     }
-    string section("ui_gl_KeyboardAdapter");
+    std::string section("ui_gl_KeyboardAdapter");
     int key = 0;
     key = toKey(config->getString(section, "k_move_forward"));
     if (key != 0) k_move_forward_ = key;
@@ -260,7 +266,7 @@ void KeyboardAdapter::run() {
         if (look_right_) camera_->lookLR(speed_look_);
         if (look_up_) camera_->lookUD(speed_look_);
         if (look_down_) camera_->lookUD(-speed_look_);
-        boost_thread_sleep(10);
+        thread_sleep(10);
     }
 }
 

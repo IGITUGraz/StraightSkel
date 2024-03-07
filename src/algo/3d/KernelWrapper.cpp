@@ -4,7 +4,7 @@
  * @date   2012-03-08
  */
 
-#include "KernelWrapper.h"
+#include "algo/3d/KernelWrapper.h"
 
 namespace algo { namespace _3d {
 

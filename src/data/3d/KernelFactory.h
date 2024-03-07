@@ -5,9 +5,8 @@
  */
 
 #ifndef DATA_3D_KERNELFACTORY_H
-#define	DATA_3D_KERNELFACTORY_H
+#define DATA_3D_KERNELFACTORY_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
 
 namespace data { namespace _3d {
@@ -60,5 +59,4 @@ protected:
 
 } }
 
-#endif	/* DATA_3D_KERNELFACTORY_H */
-
+#endif /* DATA_3D_KERNELFACTORY_H */

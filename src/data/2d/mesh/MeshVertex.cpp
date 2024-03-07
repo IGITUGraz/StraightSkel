@@ -4,7 +4,11 @@
  * @date   2014-01-24
  */
 
-#include "MeshVertex.h"
+#include "data/2d/mesh/MeshVertex.h"
+
+#include "data/2d/mesh/MeshCell.h"
+#include "debug.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _2d { namespace mesh {
 
@@ -47,9 +51,9 @@ void MeshVertex::addCell(MeshCellSPtr cell) {
 
 bool MeshVertex::removeCell(MeshCellSPtr cell) {
     bool result = false;
-    list<MeshCellWPtr>::iterator it = cells_.begin();
+    std::list<MeshCellWPtr>::iterator it = cells_.begin();
     while (it != cells_.end()) {
-        list<MeshCellWPtr>::iterator it_current = it;
+        std::list<MeshCellWPtr>::iterator it_current = it;
         MeshCellWPtr cell_wptr = *it++;
         if (!cell_wptr.expired()) {
             if (cell_wptr.lock() == cell) {
@@ -64,7 +68,7 @@ bool MeshVertex::removeCell(MeshCellSPtr cell) {
 
 bool MeshVertex::containsCell(MeshCellSPtr cell) const {
     bool result = false;
-    list<MeshCellWPtr>::const_iterator it = cells_.begin();
+    std::list<MeshCellWPtr>::const_iterator it = cells_.begin();
     while (it != cells_.end()) {
         MeshCellWPtr cell_wptr = *it++;
         if (!cell_wptr.expired()) {
@@ -80,7 +84,7 @@ bool MeshVertex::containsCell(MeshCellSPtr cell) const {
 
 MeshCellSPtr MeshVertex::firstCell() const {
     MeshCellSPtr result;
-    list<MeshCellWPtr>::const_iterator it_c = cells_.begin();
+    std::list<MeshCellWPtr>::const_iterator it_c = cells_.begin();
     while (it_c != cells_.end()) {
         MeshCellWPtr cell_wptr = *it_c++;
         if (!cell_wptr.expired()) {
@@ -95,7 +99,7 @@ MeshCellSPtr MeshVertex::firstCell() const {
 
 MeshVertexSPtr MeshVertex::next(MeshCellSPtr cell) const {
     MeshVertexSPtr result;
-    list<MeshVertexSPtr>::const_iterator it_v = cell->vertices().begin();
+    std::list<MeshVertexSPtr>::const_iterator it_v = cell->vertices().begin();
     while (it_v != cell->vertices().end()) {
         MeshVertexSPtr vertex = *it_v++;
         if (vertex.get() == this) {
@@ -112,7 +116,7 @@ MeshVertexSPtr MeshVertex::next(MeshCellSPtr cell) const {
 
 MeshVertexSPtr MeshVertex::prev(MeshCellSPtr cell) const {
     MeshVertexSPtr result;
-    list<MeshVertexSPtr>::const_reverse_iterator it_v = cell->vertices().rbegin();
+    std::list<MeshVertexSPtr>::const_reverse_iterator it_v = cell->vertices().rbegin();
     while (it_v != cell->vertices().rend()) {
         MeshVertexSPtr vertex = *it_v++;
         if (vertex.get() == this) {
@@ -127,13 +131,13 @@ MeshVertexSPtr MeshVertex::prev(MeshCellSPtr cell) const {
     return result;
 }
 
-list<MeshCellWPtr>& MeshVertex::cells() {
+std::list<MeshCellWPtr>& MeshVertex::cells() {
     return this->cells_;
 }
 
 unsigned int MeshVertex::countCells() const {
     unsigned int result = 0;
-    list<MeshCellWPtr>::const_iterator it_c = cells_.begin();
+    std::list<MeshCellWPtr>::const_iterator it_c = cells_.begin();
     while (it_c != cells_.end()) {
         MeshCellWPtr cell_wptr = *it_c++;
         if (!cell_wptr.expired()) {
@@ -159,11 +163,11 @@ double MeshVertex::getY() const {
 #endif
 }
 
-string MeshVertex::toString() const {
-    string result("MeshVertex(");
-    result += StringFactory::fromPointer(this) + ", ";
-    result += "<" + StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ">)";
+std::string MeshVertex::toString() const {
+    std::string result("MeshVertex(");
+    result += util::StringFactory::fromPointer(this) + ", ";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ">)";
     return result;
 }
 

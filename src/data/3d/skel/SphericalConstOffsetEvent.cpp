@@ -4,7 +4,7 @@
  * @date   2012-11-29
  */
 
-#include "SphericalConstOffsetEvent.h"
+#include "data/3d/skel/SphericalConstOffsetEvent.h"
 
 namespace data { namespace _3d { namespace skel {
 

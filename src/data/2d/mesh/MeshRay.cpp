@@ -4,7 +4,9 @@
  * @date   2014-02-03
  */
 
-#include "MeshRay.h"
+#include "data/2d/mesh/MeshRay.h"
+
+#include "debug.h"
 
 namespace data { namespace _2d { namespace mesh {
 
@@ -34,11 +36,11 @@ void MeshRay::setMesh(MeshSPtr mesh) {
     this->mesh_ = mesh;
 }
 
-list<MeshRaySPtr>::iterator MeshRay::getListIt() const {
+std::list<MeshRaySPtr>::iterator MeshRay::getListIt() const {
     return this->list_it_;
 }
 
-void MeshRay::setListIt(list<MeshRaySPtr>::iterator list_it) {
+void MeshRay::setListIt(std::list<MeshRaySPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 

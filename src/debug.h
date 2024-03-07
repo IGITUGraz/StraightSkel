@@ -7,7 +7,7 @@
  */
 
 #ifndef DEBUG_H
-#define	DEBUG_H
+#define DEBUG_H
 
 #include <cstdio>
 #include <cassert>
@@ -47,5 +47,5 @@
 
 #endif
 
-#endif	/* DEBUG_H */
+#endif /* DEBUG_H */
 

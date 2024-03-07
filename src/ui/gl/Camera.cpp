@@ -4,7 +4,12 @@
  * @date   2011-12-19
  */
 
-#include "Camera.h"
+#include "ui/gl/Camera.h"
+
+#include "util/StringFactory.h"
+#include "util/Configuration.h"
+#include <cmath>
+#include <stdexcept>
 
 namespace ui { namespace gl {
 
@@ -26,7 +31,7 @@ void Camera::loadConfig(util::ConfigurationSPtr config) {
     if (!config->isLoaded()) {
         return;
     }
-    string section("ui_gl_Camera");
+    std::string section("ui_gl_Camera");
     eye_[0] = config->getDouble(section, "eye_x");
     eye_[1] = config->getDouble(section, "eye_y");
     eye_[2] = config->getDouble(section, "eye_z");
@@ -59,32 +64,32 @@ void Camera::topdown() {
 }
 
 
-string Camera::toString() {
-    string result;
-    result += "eye=" + StringFactory::fromDoubleArr(3, eye_) + "\n";
-    result += "center=" + StringFactory::fromDoubleArr(3, center_) + "\n";
-    result += "up=" + StringFactory::fromDoubleArr(3, up_) + "\n";
+std::string Camera::toString() {
+    std::string result;
+    result += "eye=" + util::StringFactory::fromDoubleArr(3, eye_) + "\n";
+    result += "center=" + util::StringFactory::fromDoubleArr(3, center_) + "\n";
+    result += "up=" + util::StringFactory::fromDoubleArr(3, up_) + "\n";
     return result;
 }
 
 
 GLdouble Camera::eye(unsigned int i) {
     if (i > 2) {
-        throw out_of_range("");
+        throw std::out_of_range("");
     }
     return eye_[i];
 }
 
 GLdouble Camera::center(unsigned int i) {
     if (i > 2) {
-        throw out_of_range("");
+        throw std::out_of_range("");
     }
     return center_[i];
 }
 
 GLdouble Camera::up(unsigned int i) {
     if (i > 2) {
-        throw out_of_range("");
+        throw std::out_of_range("");
     }
     return up_[i];
 }

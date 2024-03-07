@@ -5,9 +5,9 @@
  */
 
 #ifndef DATA_2D_MESH_PTRS_H
-#define	DATA_2D_MESH_PTRS_H
+#define DATA_2D_MESH_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace data { namespace _2d { namespace mesh {
 
@@ -32,5 +32,4 @@ typedef WEAK_PTR<MeshEdgeData> MeshEdgeDataWPtr;
 
 } } }
 
-#endif	/* DATA_2D_MESH_PTRS_H */
-
+#endif /* DATA_2D_MESH_PTRS_H */

@@ -4,7 +4,7 @@
  * @date   2011-11-11
  */
 
-#include "Segment3.h"
+#include "kernel/Segment3.h"
 
 namespace kernel {
 

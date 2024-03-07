@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.9)
 
 project(StraightSkel)
 
@@ -32,15 +32,10 @@ configure_file(${CMAKE_SOURCE_DIR}/src/config.h.in ${CMAKE_SOURCE_DIR}/src/confi
 
 # to get help about a cmake module run:
 # $ cmake --help-module FindBoost
-find_package(Boost REQUIRED)
-set(BOOST_COMPONENTS thread)
-if (Boost_VERSION GREATER 104700)
-    set(BOOST_COMPONENTS ${BOOST_COMPONENTS} system)
-endif()
 if(BUILD_TESTS)
     set(BOOST_COMPONENTS ${BOOST_COMPONENTS} unit_test_framework)
+    find_package(Boost REQUIRED ${BOOST_COMPONENTS})
 endif()
-find_package(Boost REQUIRED ${BOOST_COMPONENTS})
 
 
 # build util
@@ -119,6 +114,7 @@ set(data_3d_SOURCES
         src/data/3d/skel/Sheet.cpp
         src/data/3d/skel/AbstractEvent.cpp
         src/data/3d/skel/ConstOffsetEvent.cpp
+        src/data/3d/skel/SaveOffsetEvent.cpp
         src/data/3d/skel/EdgeEvent.cpp
         src/data/3d/skel/EdgeMergeEvent.cpp
         src/data/3d/skel/TriangleEvent.cpp
@@ -374,16 +370,3 @@ install(TARGETS skelalgo3d DESTINATION lib${LIB_SUFFIX})
 install(TARGETS skelui DESTINATION lib${LIB_SUFFIX})
 install(TARGETS StraightSkel DESTINATION bin)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/StraightSkel.ini DESTINATION etc/StraightSkel)
-
-
-# Qt4
-# http://developer.qt.nokia.com/quarterly/view/using_cmake_to_build_qt_projects
-#FIND_PACKAGE(Qt4 REQUIRED)
-#SET(QT_USE_QTOPENGL TRUE)
-#SET(QT_SOURCES src/ui/qt/glwidget.cpp src/ui/qt/main.cpp src/ui/qt/qtlogo.cpp src/ui/qt/window.cpp)
-#SET(QT_HEADERS src/ui/qt/glwidget.h src/ui/qt/qtlogo.h src/ui/qt/window.h)
-#QT4_WRAP_CPP(QT_HEADERS_MOC ${QT_HEADERS})
-#INCLUDE(${QT_USE_FILE})
-#ADD_DEFINITIONS(${QT_DEFINITIONS})
-#ADD_EXECUTABLE(${PROJECT_NAME} ${QT_SOURCES} ${QT_HEADERS_MOC})
-#TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${QT_LIBRARIES})

@@ -4,7 +4,11 @@
  * @date   2012-11-28
  */
 
-#include "SphericalAbstractEvent.h"
+#include "data/3d/skel/SphericalAbstractEvent.h"
+
+#include "debug.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _3d { namespace skel {
 
@@ -38,11 +42,11 @@ void SphericalAbstractEvent::setSkel(SphericalSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<SphericalAbstractEventSPtr>::iterator SphericalAbstractEvent::getListIt() const {
+std::list<SphericalAbstractEventSPtr>::iterator SphericalAbstractEvent::getListIt() const {
     return this->list_it_;
 }
 
-void SphericalAbstractEvent::setListIt(list<SphericalAbstractEventSPtr>::iterator list_it) {
+void SphericalAbstractEvent::setListIt(std::list<SphericalAbstractEventSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -54,8 +58,8 @@ int SphericalAbstractEvent::getType() const {
     return this->type_;
 }
 
-string SphericalAbstractEvent::toString() const {
-    stringstream sstr;
+std::string SphericalAbstractEvent::toString() const {
+    std::stringstream sstr;
     switch (getType()) {
         case CONST_OFFSET_EVENT:
             sstr << "ConstOffsetEvent";
@@ -96,7 +100,7 @@ string SphericalAbstractEvent::toString() const {
         default:
             sstr << "AbstractEvent";
     }
-    sstr << "(offset=" << StringFactory::fromDouble(getOffset()) << ")";
+    sstr << "(offset=" << util::StringFactory::fromDouble(getOffset()) << ")";
     return sstr.str();
 }
 

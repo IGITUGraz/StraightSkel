@@ -5,9 +5,9 @@
  */
 
 #ifndef ALGO_3D_PTRS_H
-#define	ALGO_3D_PTRS_H
+#define ALGO_3D_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace algo { namespace _3d {
 
@@ -61,5 +61,4 @@ typedef WEAK_PTR<GraphChecker> GraphCheckerWPtr;
 
 } }
 
-#endif	/* ALGO_3D_PTRS_H */
-
+#endif /* ALGO_3D_PTRS_H */

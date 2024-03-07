@@ -5,10 +5,10 @@
  */
 
 #ifndef RAY2_H
-#define	RAY2_H
+#define RAY2_H
 
-#include "Point2.h"
-#include "Vector2.h"
+#include "kernel/Point2.h"
+#include "kernel/Vector2.h"
 
 namespace kernel {
 
@@ -25,5 +25,5 @@ protected:
 
 }
 
-#endif	/* RAY2_H */
+#endif /* RAY2_H */
 

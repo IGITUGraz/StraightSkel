@@ -5,9 +5,9 @@
  */
 
 #ifndef UI_GL_PTRS_H
-#define	UI_GL_PTRS_H
+#define UI_GL_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace ui { namespace gl {
 
@@ -30,4 +30,4 @@ typedef WEAK_PTR<MouseAdapter> MouseAdapterWPtr;
 
 } }
 
-#endif	/* UI_GL_PTRS_H */
+#endif /* UI_GL_PTRS_H */

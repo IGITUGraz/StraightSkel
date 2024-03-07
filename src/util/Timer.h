@@ -5,7 +5,7 @@
  */
 
 #ifndef UTIL_TIMER_H
-#define	UTIL_TIMER_H
+#define UTIL_TIMER_H
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -21,5 +21,5 @@ protected:
 
 }
 
-#endif	/* UTIL_TIMER_H */
+#endif /* UTIL_TIMER_H */
 

@@ -4,7 +4,9 @@
  * @date   2011-11-26
  */
 
-#include "FacetData.h"
+#include "data/3d/FacetData.h"
+
+#include "data/3d/Facet.h"
 
 namespace data { namespace _3d {
 

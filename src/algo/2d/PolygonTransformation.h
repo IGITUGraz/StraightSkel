@@ -5,18 +5,13 @@
  */
 
 #ifndef ALGO_2D_POLYGONTRANSFORMATION_H
-#define	ALGO_2D_POLYGONTRANSFORMATION_H
+#define ALGO_2D_POLYGONTRANSFORMATION_H
 
-#include <cstdlib>
-#include <list>
 #include "data/2d/ptrs.h"
-#include "data/2d/Polygon.h"
-#include "algo/2d/KernelWrapper.h"
 
 namespace algo { namespace _2d {
 
 using namespace data::_2d;
-using std::list;
 
 class PolygonTransformation {
 public:
@@ -35,5 +30,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_2D_POLYGONTRANSFORMATION_H */
-
+#endif /* ALGO_2D_POLYGONTRANSFORMATION_H */

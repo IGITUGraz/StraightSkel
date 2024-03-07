@@ -5,20 +5,13 @@
  */
 
 #ifndef DATA_3D_CIRCULARVERTEX_H
-#define	DATA_3D_CIRCULARVERTEX_H
+#define DATA_3D_CIRCULARVERTEX_H
 
+#include "data/3d/ptrs.h"
 #include <list>
 #include <string>
-#include "debug.h"
-#include "util/StringFactory.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/CircularEdge.h"
 
 namespace data { namespace _3d {
-
-using std::list;
-using std::string;
-using util::StringFactory;
 
 class CircularVertex {
 public:
@@ -38,8 +31,8 @@ public:
     void setEdgeOut(CircularEdgeSPtr edge);
     SphericalPolygonSPtr getPolygon() const;
     void setPolygon(SphericalPolygonSPtr polygon);
-    list<CircularVertexSPtr>::iterator getListIt() const;
-    void setListIt(list<CircularVertexSPtr>::iterator list_it);
+    std::list<CircularVertexSPtr>::iterator getListIt() const;
+    void setListIt(std::list<CircularVertexSPtr>::iterator list_it);
     CircularVertexDataSPtr getData() const;
     void setData(CircularVertexDataSPtr data);
     bool hasData() const;
@@ -51,7 +44,7 @@ public:
     double getY() const;
     double getZ() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     CircularVertex(Point3SPtr point);
@@ -61,11 +54,11 @@ protected:
     CircularEdgeWPtr edge_in_;
     CircularEdgeWPtr edge_out_;
     SphericalPolygonWPtr polygon_;
-    list<CircularVertexSPtr>::iterator list_it_;
+    std::list<CircularVertexSPtr>::iterator list_it_;
     CircularVertexDataSPtr data_;
 };
 
 } }
 
-#endif	/* DATA_3D_CIRCULARVERTEX_H */
+#endif /* DATA_3D_CIRCULARVERTEX_H */
 

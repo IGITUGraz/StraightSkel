@@ -4,7 +4,11 @@
  * @date   2012-02-03
  */
 
-#include "Node.h"
+#include "data/2d/skel/Node.h"
+
+#include "debug.h"
+#include "data/2d/skel/Arc.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _2d { namespace skel {
 
@@ -52,11 +56,11 @@ void Node::setSkel(StraightSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<NodeSPtr>::iterator Node::getListIt() const {
+std::list<NodeSPtr>::iterator Node::getListIt() const {
     return this->list_it_;
 }
 
-void Node::setListIt(list<NodeSPtr>::iterator list_it) {
+void Node::setListIt(std::list<NodeSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -69,7 +73,7 @@ void Node::setID(int id) {
 }
 
 void Node::addArc(ArcSPtr arc) {
-    list<ArcWPtr>::iterator it = arcs_.insert(arcs_.end(), ArcWPtr(arc));
+    std::list<ArcWPtr>::iterator it = arcs_.insert(arcs_.end(), ArcWPtr(arc));
     if (arc->getNodeSrc() == shared_from_this()) {
         arc->setNodeSrcListIt(it);
     } else if (arc->hasNodeDst()) {
@@ -83,25 +87,25 @@ bool Node::removeArc(ArcSPtr arc) {
     bool result = false;
     if (arc->getNodeSrc() == shared_from_this()) {
         arcs_.erase(arc->getNodeSrcListIt());
-        arc->setNodeSrcListIt(list<ArcWPtr>::iterator());
+        arc->setNodeSrcListIt(std::list<ArcWPtr>::iterator());
         result = true;
     } else if (arc->hasNodeDst()) {
         if (arc->getNodeDst() == shared_from_this()) {
             arcs_.erase(arc->getNodeDstListIt());
-            arc->setNodeDstListIt(list<ArcWPtr>::iterator());
+            arc->setNodeDstListIt(std::list<ArcWPtr>::iterator());
             result = true;
         }
     }
     return result;
 }
 
-list<ArcWPtr>& Node::arcs() {
+std::list<ArcWPtr>& Node::arcs() {
     return this->arcs_;
 }
 
 unsigned int Node::degree() const {
     unsigned int result = 0;
-    list<ArcWPtr>::const_iterator it_a = arcs_.begin();
+    std::list<ArcWPtr>::const_iterator it_a = arcs_.begin();
     while (it_a != arcs_.end()) {
         ArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -127,15 +131,15 @@ double Node::getY() const {
 #endif
 }
 
-string Node::toString() const {
-    string result("Node(");
+std::string Node::toString() const {
+    std::string result("Node(");
     if (id_ != -1) {
-        result += "id=" + StringFactory::fromInteger(id_) + ", ";
+        result += "id=" + util::StringFactory::fromInteger(id_) + ", ";
     } else {
-        result += StringFactory::fromPointer(this) + ", ";
+        result += util::StringFactory::fromPointer(this) + ", ";
     }
-    result += "<" + StringFactory::fromDouble(getX()) + ", ";
-    result += StringFactory::fromDouble(getY()) + ">)";
+    result += "<" + util::StringFactory::fromDouble(getX()) + ", ";
+    result += util::StringFactory::fromDouble(getY()) + ">)";
     return result;
 }
 

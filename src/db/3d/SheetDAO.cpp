@@ -1,10 +1,18 @@
-/**
+/**.
  * @file   db/3d/SheetDAO.cpp
  * @author Gernot Walzl
  * @date   2013-06-05
  */
 
-#include "SheetDAO.h"
+#include "db/3d/SheetDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/NodeDAO.h"
+#include "db/3d/ArcDAO.h"
+#include "db/3d/StraightSkeletonDAO.h"
+#include <list>
+#include <map>
 
 namespace db { namespace _3d {
 
@@ -16,8 +24,8 @@ SheetDAO::~SheetDAO() {
     // intentionally does nothing
 }
 
-string SheetDAO::getTableSchema() const {
-    string schema("CREATE TABLE Sheets (\n"
+std::string SheetDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Sheets (\n"
             "  SkelID INTEGER NOT NULL,\n"
             "  SID INTEGER NOT NULL,\n"
             "  PRIMARY KEY (SkelID, SID)\n"
@@ -25,8 +33,8 @@ string SheetDAO::getTableSchema() const {
     return schema;
 }
 
-string SheetDAO::getTable2Schema() const {
-    string schema("CREATE TABLE Sheets_Arcs (\n"
+std::string SheetDAO::getTable2Schema() const {
+    std::string schema("CREATE TABLE Sheets_Arcs (\n"
             "  SkelID INTEGER NOT NULL,\n"
             "  SID INTEGER NOT NULL,\n"
             "  AID INTEGER NOT NULL,\n"
@@ -38,7 +46,7 @@ string SheetDAO::getTable2Schema() const {
 int SheetDAO::nextSID(int skelid) {
     int sid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(SID) FROM Sheets WHERE SkelID=?;");
+    std::string sql("SELECT MAX(SID) FROM Sheets WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -63,7 +71,7 @@ int SheetDAO::insert(SheetSPtr sheet) {
     }
     if (skelid > 0) {
         int sid = nextSID(skelid);
-        string sql("INSERT INTO Sheets (SkelID, SID) VALUES (?, ?);");
+        std::string sql("INSERT INTO Sheets (SkelID, SID) VALUES (?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
             stmt->bindInteger(1, skelid);
@@ -77,7 +85,7 @@ int SheetDAO::insert(SheetSPtr sheet) {
                         "VALUES (?, ?, ?);";
                 SQLiteStmtSPtr stmt_sa = db->prepare(sql);
                 if (stmt_sa) {
-                    list<ArcSPtr>::iterator it_a = sheet->arcs().begin();
+                    std::list<ArcSPtr>::iterator it_a = sheet->arcs().begin();
                     while (it_a != sheet->arcs().end()) {
                         ArcSPtr arc = *it_a++;
                         if (arc->getID() > 0) {
@@ -110,7 +118,7 @@ bool SheetDAO::del(SheetSPtr sheet) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Sheets WHERE SkelID=? AND SID=?;");
+    std::string sql("DELETE FROM Sheets WHERE SkelID=? AND SID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -134,7 +142,7 @@ SheetSPtr SheetDAO::find(int skelid, int sid) {
     SheetSPtr result = SheetSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     NodeDAOSPtr dao_node = DAOFactory::getNodeDAO();
-    string sql("SELECT SID FROM Sheets "
+    std::string sql("SELECT SID FROM Sheets "
             "WHERE SkelID=? AND SID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
@@ -143,7 +151,7 @@ SheetSPtr SheetDAO::find(int skelid, int sid) {
         if (stmt->execute() > 0) {
             result = Sheet::create();
             result->setID(sid);
-            map<int, NodeSPtr> nodes;
+            std::map<int, NodeSPtr> nodes;
             sql = "SELECT Arcs.AID, NID_SRC, NID_DST FROM Arcs "
                     "JOIN Sheets_Arcs ON (Arcs.SkelID=Sheets_Arcs.SkelID AND Arcs.AID=Sheets_Arcs.AID) "
                     "WHERE Arcs.SkelID=? AND SID=?";

@@ -4,7 +4,9 @@
  * @date   2013-01-29
  */
 
-#include "projection.h"
+#include "kernel/projection.h"
+
+#include <cmath>
 
 namespace kernel {
 

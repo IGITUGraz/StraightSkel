@@ -5,9 +5,9 @@
  */
 
 #ifndef DATA_2D_PTRS_H
-#define	DATA_2D_PTRS_H
+#define DATA_2D_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 #include "config.h"
 #ifdef USE_CGAL
@@ -67,4 +67,4 @@ typedef WEAK_PTR<EdgeData> EdgeDataWPtr;
 
 } }
 
-#endif	/* DATA_2D_PTRS_H */
+#endif /* DATA_2D_PTRS_H */

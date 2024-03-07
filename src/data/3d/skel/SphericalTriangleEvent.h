@@ -5,16 +5,11 @@
  */
 
 #ifndef DATA_3D_SKEL_SPHERICALTRIANGLEEVENT_H
-#define	DATA_3D_SKEL_SPHERICALTRIANGLEEVENT_H
+#define DATA_3D_SKEL_SPHERICALTRIANGLEEVENT_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/CircularVertex.h"
-#include "data/3d/CircularEdge.h"
 #include "data/3d/skel/ptrs.h"
 #include "data/3d/skel/SphericalAbstractEvent.h"
-#include "data/3d/skel/CircularNode.h"
-#include "data/3d/skel/SphericalSkelEdgeData.h"
 
 namespace data { namespace _3d { namespace skel {
 
@@ -38,5 +33,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SPHERICALTRIANGLEEVENT_H */
+#endif /* DATA_3D_SKEL_SPHERICALTRIANGLEEVENT_H */
 

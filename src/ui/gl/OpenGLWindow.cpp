@@ -4,11 +4,17 @@
  * @date   2011-12-19
  */
 
-#include "OpenGLWindow.h"
+#include "ui/gl/OpenGLWindow.h"
+
+#include "debug.h"
+#include "ui/gl/Camera.h"
+#include "ui/vecmath.h"
+#include <cmath>
+#include <stdexcept>
 
 namespace ui { namespace gl {
 
-map<int, OpenGLWindowWPtr> OpenGLWindow::windows_;
+std::map<int, OpenGLWindowWPtr> OpenGLWindow::windows_;
 bool OpenGLWindow::glut_started_ = false;
 RecursiveMutex OpenGLWindow::mutex_;
 
@@ -104,7 +110,7 @@ void OpenGLWindow::init() {
     glEnable(GL_CULL_FACE);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(fovy_, (double)width_/(double)height_, 0.01, 100.0);
+    gluPerspective(fovy_, (double)width_/(double)height_, 0.001, 1000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -273,7 +279,7 @@ void OpenGLWindow::drawArrow(const vec3f position, const vec3f direction) {
     glPopMatrix();
 }
 
-void OpenGLWindow::drawText(const string text) {
+void OpenGLWindow::drawText(const std::string& text) {
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -325,32 +331,32 @@ void OpenGLWindow::drawCrosshair(float size) {
 }
 
 void OpenGLWindow::drawContent() {
-    throw runtime_error("drawContent()"
+    throw std::runtime_error("drawContent()"
             " has to be implemented by inherited class.");
 }
 
 void OpenGLWindow::handleKeyPressed(int key, int x, int y) {
-    throw runtime_error("handleKeyPressed(...)"
+    throw std::runtime_error("handleKeyPressed(...)"
             " has to be implemented by inherited class.");
 }
 
 void OpenGLWindow::handleKeyReleased(int key, int x, int y) {
-    throw runtime_error("handleKeyReleased(...)"
+    throw std::runtime_error("handleKeyReleased(...)"
             " has to be implemented by inherited class.");
 }
 
 void OpenGLWindow::handleMousePressed(int button, int x, int y) {
-    throw runtime_error("handleMousePressed(...)"
+    throw std::runtime_error("handleMousePressed(...)"
             " has to be implemented by inherited class.");
 }
 
 void OpenGLWindow::handleMouseReleased(int button, int x, int y) {
-    throw runtime_error("handleMouseReleased(...)"
+    throw std::runtime_error("handleMouseReleased(...)"
             " has to be implemented by inherited class.");
 }
 
 void OpenGLWindow::handleMotion(int x, int y) {
-    throw runtime_error("handleMotion(...)"
+    throw std::runtime_error("handleMotion(...)"
             " has to be implemented by inherited class.");
 }
 
@@ -371,7 +377,7 @@ void OpenGLWindow::displayFunc() {
         glutSwapBuffers();
         // TODO: for each window: glutSetWindow(); glutPostRedisplay();
     }
-    boost_thread_sleep(10);
+    thread_sleep(10);
 }
 
 

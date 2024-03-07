@@ -4,7 +4,15 @@
  * @date   2012-03-27
  */
 
-#include "Sheet.h"
+#include "data/3d/skel/Sheet.h"
+
+#include "debug.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Facet.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/Arc.h"
+#include "util/StringFactory.h"
+#include <sstream>
 
 namespace data { namespace _3d { namespace skel {
 
@@ -52,11 +60,11 @@ void Sheet::setSkel(StraightSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<SheetSPtr>::iterator Sheet::getListIt() const {
+std::list<SheetSPtr>::iterator Sheet::getListIt() const {
     return this->list_it_;
 }
 
-void Sheet::setListIt(list<SheetSPtr>::iterator list_it) {
+void Sheet::setListIt(std::list<SheetSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -78,7 +86,7 @@ void Sheet::setPlane(Plane3SPtr plane) {
 }
 
 void Sheet::addNode(NodeSPtr node) {
-    list<NodeSPtr>::iterator it = nodes_.insert(nodes_.end(), node);
+    std::list<NodeSPtr>::iterator it = nodes_.insert(nodes_.end(), node);
     if (!node->containsSheet(shared_from_this())) {
         node->addSheet(shared_from_this());
     }
@@ -92,7 +100,7 @@ bool Sheet::removeNode(NodeSPtr node) {
 }
 
 void Sheet::addArc(ArcSPtr arc) {
-    list<ArcSPtr>::iterator it = arcs_.insert(arcs_.end(), arc);
+    std::list<ArcSPtr>::iterator it = arcs_.insert(arcs_.end(), arc);
     arc->addSheet(shared_from_this());
 }
 
@@ -103,21 +111,21 @@ bool Sheet::removeArc(ArcSPtr arc) {
     return result;
 }
 
-list<ArcSPtr>& Sheet::arcs() {
+std::list<ArcSPtr>& Sheet::arcs() {
     return this->arcs_;
 }
 
-list<NodeSPtr>& Sheet::nodes() {
+std::list<NodeSPtr>& Sheet::nodes() {
     return this->nodes_;
 }
 
-string Sheet::toString() const {
-    stringstream result;
+std::string Sheet::toString() const {
+    std::stringstream result;
     result << "Sheet(";
     if (id_ != -1) {
-        result << "id=" + StringFactory::fromInteger(id_) << ", ";
+        result << "id=" + util::StringFactory::fromInteger(id_) << ", ";
     } else {
-        result << StringFactory::fromPointer(this) << ", ";
+        result << util::StringFactory::fromPointer(this) << ", ";
     }
     result << "nodes:" << nodes_.size() << ", ";
     result << "arcs:" << arcs_.size() << ")";

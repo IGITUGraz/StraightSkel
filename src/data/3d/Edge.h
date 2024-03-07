@@ -5,23 +5,15 @@
  */
 
 #ifndef DATA_3D_EDGE_H
-#define	DATA_3D_EDGE_H
+#define DATA_3D_EDGE_H
 
+#include "data/3d/ptrs.h"
 #include <list>
 #include <string>
-#include "debug.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/KernelFactory.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Facet.h"
-#include "data/3d/Polyhedron.h"
 
 namespace data { namespace _3d {
 
-using std::list;
-using std::string;
-
-class Edge : public boost::enable_shared_from_this<Edge>  {
+class Edge : public std::enable_shared_from_this<Edge>  {
 public:
     virtual ~Edge();
 
@@ -31,28 +23,28 @@ public:
 
     VertexSPtr getVertexSrc() const;
     void setVertexSrc(VertexSPtr src);
-    list<EdgeWPtr>::iterator getVertexSrcListIt() const;
-    void setVertexSrcListIt(list<EdgeWPtr>::iterator list_it);
+    std::list<EdgeWPtr>::iterator getVertexSrcListIt() const;
+    void setVertexSrcListIt(std::list<EdgeWPtr>::iterator list_it);
 
     VertexSPtr getVertexDst() const;
     void setVertexDst(VertexSPtr dst);
-    list<EdgeWPtr>::iterator getVertexDstListIt() const;
-    void setVertexDstListIt(list<EdgeWPtr>::iterator list_it);
+    std::list<EdgeWPtr>::iterator getVertexDstListIt() const;
+    void setVertexDstListIt(std::list<EdgeWPtr>::iterator list_it);
 
     FacetSPtr getFacetL() const;
     void setFacetL(FacetSPtr facet);
-    list<EdgeSPtr>::iterator getFacetLListIt() const;
-    void setFacetLListIt(list<EdgeSPtr>::iterator list_it);
+    std::list<EdgeSPtr>::iterator getFacetLListIt() const;
+    void setFacetLListIt(std::list<EdgeSPtr>::iterator list_it);
 
     FacetSPtr getFacetR() const;
     void setFacetR(FacetSPtr facet);
-    list<EdgeSPtr>::iterator getFacetRListIt() const;
-    void setFacetRListIt(list<EdgeSPtr>::iterator list_it);
+    std::list<EdgeSPtr>::iterator getFacetRListIt() const;
+    void setFacetRListIt(std::list<EdgeSPtr>::iterator list_it);
 
     PolyhedronSPtr getPolyhedron() const;
     void setPolyhedron(PolyhedronSPtr polyhedron);
-    list<EdgeSPtr>::iterator getPolyhedronListIt() const;
-    void setPolyhedronListIt(list<EdgeSPtr>::iterator list_it);
+    std::list<EdgeSPtr>::iterator getPolyhedronListIt() const;
+    void setPolyhedronListIt(std::list<EdgeSPtr>::iterator list_it);
 
     EdgeDataSPtr getData() const;
     void setData(EdgeDataSPtr data);
@@ -105,21 +97,21 @@ public:
 
     double angleTo(EdgeSPtr edge) const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Edge(VertexSPtr src, VertexSPtr dst);
     Edge(const Edge& edge);
     VertexSPtr vertex_src_;
-    list<EdgeWPtr>::iterator vertex_src_list_it_;
+    std::list<EdgeWPtr>::iterator vertex_src_list_it_;
     VertexSPtr vertex_dst_;
-    list<EdgeWPtr>::iterator vertex_dst_list_it_;
+    std::list<EdgeWPtr>::iterator vertex_dst_list_it_;
     FacetWPtr facet_l_;
-    list<EdgeSPtr>::iterator facet_l_list_it_;
+    std::list<EdgeSPtr>::iterator facet_l_list_it_;
     FacetWPtr facet_r_;
-    list<EdgeSPtr>::iterator facet_r_list_it_;
+    std::list<EdgeSPtr>::iterator facet_r_list_it_;
     PolyhedronWPtr polyhedron_;
-    list<EdgeSPtr>::iterator polyhedron_list_it_;
+    std::list<EdgeSPtr>::iterator polyhedron_list_it_;
     EdgeDataSPtr data_;
 
     int id_;
@@ -127,5 +119,4 @@ protected:
 
 } }
 
-#endif	/* DATA_3D_EDGE_H */
-
+#endif /* DATA_3D_EDGE_H */

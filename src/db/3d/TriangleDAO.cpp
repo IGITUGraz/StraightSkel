@@ -1,4 +1,11 @@
-#include "TriangleDAO.h"
+#include "db/3d/TriangleDAO.h"
+
+#include "data/3d/Triangle.h"
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/VertexDAO.h"
+#include "db/3d/FacetDAO.h"
+#include "db/3d/PolyhedronDAO.h"
 
 namespace db { namespace _3d {
 
@@ -10,8 +17,8 @@ TriangleDAO::~TriangleDAO() {
     // intentionally does nothing
 }
 
-string TriangleDAO::getTableSchema() const {
-    string schema("CREATE TABLE Triangles (\n"
+std::string TriangleDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Triangles (\n"
             "  PolyhedronID INTEGER NOT NULL,\n"
             "  FID INTEGER NOT NULL,\n"
             "  TID INTEGER NOT NULL,\n"
@@ -26,7 +33,7 @@ string TriangleDAO::getTableSchema() const {
 int TriangleDAO::nextTID(int polyhedronid, int fid) {
     int tid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(TID) FROM Triangles "
+    std::string sql("SELECT MAX(TID) FROM Triangles "
             "WHERE PolyhedronID=? AND FID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
@@ -73,7 +80,7 @@ int TriangleDAO::insert(TriangleSPtr triangle) {
                 dao_vertex->insert(vertex);
             }
         }
-        string sql("INSERT INTO Triangles (PolyhedronID, FID, TID, VID_1, VID_2, VID_3) "
+        std::string sql("INSERT INTO Triangles (PolyhedronID, FID, TID, VID_1, VID_2, VID_3) "
             "VALUES (?, ?, ?, ?, ?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
@@ -107,7 +114,7 @@ bool TriangleDAO::del(TriangleSPtr triangle) {
         return false;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("DELETE FROM Triangles WHERE PolyhedronID=? AND FID=? AND TID=?;");
+    std::string sql("DELETE FROM Triangles WHERE PolyhedronID=? AND FID=? AND TID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
@@ -124,7 +131,7 @@ bool TriangleDAO::del(TriangleSPtr triangle) {
 TriangleSPtr TriangleDAO::find(int polyhedronid, int fid, int tid) {
     TriangleSPtr result = TriangleSPtr();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT VID_1, VID_2, VID_3 FROM Triangles "
+    std::string sql("SELECT VID_1, VID_2, VID_3 FROM Triangles "
             "WHERE PolyhedronID=? AND FID=? AND TID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {

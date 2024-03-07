@@ -5,15 +5,12 @@
  */
 
 #ifndef DB_SQLITESTMT_H
-#define	DB_SQLITESTMT_H
+#define DB_SQLITESTMT_H
 
-#include <string>
-#include <iostream>
 #include <sqlite3.h>
+#include <string>
 
 namespace db {
-
-using std::string;
 
 class SQLiteStmt {
 public:
@@ -27,7 +24,7 @@ public:
      */
     bool bindInteger(int col, int value);
     bool bindDouble(int col, double value);
-    bool bindString(int col, string value);
+    bool bindString(int col, std::string value);
     int execute();
 
     bool fetchRow();
@@ -36,7 +33,7 @@ public:
      */
     int getInteger(int col);
     double getDouble(int col);
-    string getString(int col);
+    std::string getString(int col);
 
     bool reset();
 
@@ -50,5 +47,4 @@ protected:
 
 }
 
-#endif	/* DB_SQLITESTMT_H */
-
+#endif /* DB_SQLITESTMT_H */

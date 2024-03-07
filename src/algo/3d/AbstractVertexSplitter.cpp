@@ -4,7 +4,20 @@
  * @date   2012-10-17
  */
 
-#include "AbstractVertexSplitter.h"
+#include "algo/3d/AbstractVertexSplitter.h"
+
+#include "algo/3d/KernelWrapper.h"
+#include "algo/3d/SelfIntersection.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/SkelVertexData.h"
+#include "data/3d/skel/SkelEdgeData.h"
+#include "data/3d/skel/SkelFacetData.h"
+#include <limits>
 
 namespace algo { namespace _3d {
 
@@ -29,7 +42,7 @@ PolyhedronSPtr AbstractVertexSplitter::splitConvexVertex(VertexSPtr vertex) {
         double speed_max = 0.0;
         FacetSPtr facet_1;
         FacetSPtr facet_2;
-        list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+        std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
         while (it_f != vertex->facets().end()) {
             FacetWPtr facet_wptr = *it_f++;
             if (facet_wptr.expired()) {
@@ -56,7 +69,7 @@ PolyhedronSPtr AbstractVertexSplitter::splitConvexVertex(VertexSPtr vertex) {
         }
         VertexSPtr vertex_splitted = vertex->split(facet_1, facet_2);
         if (vertex->hasData()) {
-            SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(
                     vertex->getData());
             SkelVertexDataSPtr data_splitted = SkelVertexData::create(
                     vertex_splitted);
@@ -73,7 +86,7 @@ PolyhedronSPtr AbstractVertexSplitter::splitReflexVertex(VertexSPtr vertex) {
         double speed_min = std::numeric_limits<double>::max();
         FacetSPtr facet_1;
         FacetSPtr facet_2;
-        list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+        std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
         while (it_f != vertex->facets().end()) {
             FacetWPtr facet_wptr = *it_f++;
             if (facet_wptr.expired()) {
@@ -100,7 +113,7 @@ PolyhedronSPtr AbstractVertexSplitter::splitReflexVertex(VertexSPtr vertex) {
         }
         VertexSPtr vertex_splitted = vertex->split(facet_1, facet_2);
         if (vertex->hasData()) {
-            SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(
                     vertex->getData());
             SkelVertexDataSPtr data_splitted = SkelVertexData::create(
                     vertex_splitted);
@@ -114,19 +127,19 @@ PolyhedronSPtr AbstractVertexSplitter::splitReflexVertex(VertexSPtr vertex) {
 PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, double offset) {
     PolyhedronSPtr result = Polyhedron::create();
 
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Plane3SPtr planes[3];
         unsigned int i = 0;
-        list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+        std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
         while (i < 3 && it_f != vertex->facets().end()) {
             FacetWPtr facet_wptr = *it_f++;
             if (!facet_wptr.expired()) {
                 FacetSPtr facet = FacetSPtr(facet_wptr);
                 double speed = 1.0;
                 if (facet->hasData()) {
-                    speed = dynamic_pointer_cast<SkelFacetData>(
+                    speed = std::dynamic_pointer_cast<SkelFacetData>(
                             facet->getData())->getSpeed();
                 }
                 planes[i] = KernelWrapper::offsetPlane(facet->plane(), offset*speed);
@@ -144,7 +157,7 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
             // SkelVertexData for each vertex should be created by init
             SkelVertexDataSPtr data;
             if (vertex->hasData()) {
-                data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+                data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
                 SkelVertexDataSPtr offset_data = SkelVertexData::create(offset_vertex);
                 offset_data->setArc(data->getArc());
             } else {
@@ -161,7 +174,7 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
         VertexSPtr vertex = *it_v++;
         EdgeSPtr edge;
         unsigned int i = 0;
-        list<EdgeWPtr>::iterator it_e = vertex->edges().begin();
+        std::list<EdgeWPtr>::iterator it_e = vertex->edges().begin();
         while (it_e != vertex->edges().end()) {
             EdgeWPtr edge_wptr = *it_e++;
             if (!edge_wptr.expired()) {
@@ -176,7 +189,7 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
             } else if (edge->getVertexDst() == vertex) {
                 vertex_other = edge->getVertexSrc();
             }
-            SkelVertexDataSPtr data_other = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr data_other = std::dynamic_pointer_cast<SkelVertexData>(
                     vertex_other->getData());
             VertexSPtr offset_vertex_other = data_other->getOffsetVertex();
             Vector3 direction =
@@ -186,7 +199,7 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
             VertexSPtr offset_vertex = Vertex::create(point);
             SkelVertexDataSPtr data;
             if (vertex->hasData()) {
-                data = dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+                data = std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
             } else {
                 data = SkelVertexData::create(vertex);
             }
@@ -195,12 +208,12 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
         }
     }
 
-    list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
     while (it_e != polyhedron->edges().end()) {
         EdgeSPtr edge = *it_e++;
-        SkelVertexDataSPtr vertex_src_data = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr vertex_src_data = std::dynamic_pointer_cast<SkelVertexData>(
                 edge->getVertexSrc()->getData());
-        SkelVertexDataSPtr vertex_dst_data = dynamic_pointer_cast<SkelVertexData>(
+        SkelVertexDataSPtr vertex_dst_data = std::dynamic_pointer_cast<SkelVertexData>(
                 edge->getVertexDst()->getData());
         if (vertex_src_data && vertex_dst_data) {
             VertexSPtr offset_vertex_src = vertex_src_data->getOffsetVertex();
@@ -208,7 +221,7 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
             EdgeSPtr offset_edge = Edge::create(offset_vertex_src, offset_vertex_dst);
             SkelEdgeDataSPtr data;
             if (edge->hasData()) {
-                data = dynamic_pointer_cast<SkelEdgeData>(edge->getData());
+                data = std::dynamic_pointer_cast<SkelEdgeData>(edge->getData());
                 SkelEdgeDataSPtr offset_data = SkelEdgeData::create(offset_edge);
                 offset_data->setSheet(data->getSheet());
             } else {
@@ -219,14 +232,14 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
         }
     }
 
-    list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+    std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
     while (it_f != polyhedron->facets().end()) {
         FacetSPtr facet = *it_f++;
         FacetSPtr offset_facet = Facet::create();
         SkelFacetDataSPtr data;
         double speed = 1.0;
         if (facet->hasData()) {
-            data = dynamic_pointer_cast<SkelFacetData>(facet->getData());
+            data = std::dynamic_pointer_cast<SkelFacetData>(facet->getData());
             speed = data->getSpeed();
             SkelFacetDataSPtr data_offset = SkelFacetData::create(offset_facet);
             data_offset->setFacetOrigin(data->getFacetOrigin());
@@ -236,11 +249,11 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
         }
         Plane3SPtr offset_plane = KernelWrapper::offsetPlane(facet->plane(), offset*speed);
         offset_facet->setPlane(offset_plane);
-        list<VertexSPtr>::iterator it_v = facet->vertices().begin();
+        std::list<VertexSPtr>::iterator it_v = facet->vertices().begin();
         while (it_v != facet->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             if (vertex->hasData()) {
-                SkelVertexDataSPtr vertex_data = dynamic_pointer_cast<SkelVertexData>(
+                SkelVertexDataSPtr vertex_data = std::dynamic_pointer_cast<SkelVertexData>(
                     vertex->getData());
                 VertexSPtr offset_vertex = vertex_data->getOffsetVertex();
                 if (offset_vertex) {
@@ -248,10 +261,10 @@ PolyhedronSPtr AbstractVertexSplitter::shiftFacets(PolyhedronSPtr polyhedron, do
                 }
             }
         }
-        list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
         while (it_e != facet->edges().end()) {
             EdgeSPtr edge = *it_e++;
-            SkelEdgeDataSPtr edge_data = dynamic_pointer_cast<SkelEdgeData>(
+            SkelEdgeDataSPtr edge_data = std::dynamic_pointer_cast<SkelEdgeData>(
                 edge->getData());
             EdgeSPtr offset_edge = edge_data->getOffsetEdge();
             if (facet == edge->getFacetL()) {
@@ -283,8 +296,8 @@ bool AbstractVertexSplitter::checkSplitted(PolyhedronSPtr polyhedron) {
 }
 
 
-string AbstractVertexSplitter::toString() const {
-    string result;
+std::string AbstractVertexSplitter::toString() const {
+    std::string result;
     switch (getType()) {
         case ANGLE_VERTEX_SPLITTER:
             result = "AngleVertexSplitter";

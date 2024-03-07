@@ -4,7 +4,19 @@
  * @date   2013-05-23
  */
 
-#include "StraightSkeletonDAO.h"
+#include "db/2d/StraightSkeletonDAO.h"
+
+#include "data/2d/skel/EdgeEvent.h"
+#include "data/2d/skel/SplitEvent.h"
+#include "data/2d/skel/TriangleEvent.h"
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/2d/NodeDAO.h"
+#include "db/2d/ArcDAO.h"
+#include "db/2d/EventDAO.h"
+#include "db/2d/PolygonDAO.h"
+#include <list>
+#include <map>
 
 namespace db { namespace _2d {
 
@@ -16,8 +28,8 @@ StraightSkeletonDAO::~StraightSkeletonDAO() {
     // intentionally does nothing
 }
 
-string StraightSkeletonDAO::getTableSchema() const {
-    string schema("CREATE TABLE StraightSkeletons (\n"
+std::string StraightSkeletonDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE StraightSkeletons (\n"
             "  SkelID INTEGER PRIMARY KEY,\n"
             "  PolyID INTEGER,\n"
             "  description TEXT,\n"
@@ -29,7 +41,7 @@ string StraightSkeletonDAO::getTableSchema() const {
 int StraightSkeletonDAO::nextSkelID() {
     int skelid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(SkelID) FROM StraightSkeletons;");
+    std::string sql("SELECT MAX(SkelID) FROM StraightSkeletons;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         skelid = 1;
@@ -48,7 +60,7 @@ int StraightSkeletonDAO::createSkelID(StraightSkeletonSPtr skel) {
         polyid = skel->getPolygon()->getID();
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql;
+    std::string sql;
     if (polyid > 0) {
         sql = "INSERT INTO StraightSkeletons (SkelID, PolyID, description, created) "
             "VALUES (?, ?, ?, strftime('%s','now'));";
@@ -83,7 +95,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
     int skelid = createSkelID(skel);
     if (skelid > 0) {
         NodeDAOSPtr dao_node = DAOFactory::getNodeDAO();
-        list<NodeSPtr>::iterator it_n = skel->nodes().begin();
+        std::list<NodeSPtr>::iterator it_n = skel->nodes().begin();
         while (it_n != skel->nodes().end()) {
             NodeSPtr node = *it_n++;
             if (node->getID() > 0) {
@@ -93,7 +105,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
             }
         }
         ArcDAOSPtr dao_arc = DAOFactory::getArcDAO();
-        list<ArcSPtr>::iterator it_a = skel->arcs().begin();
+        std::list<ArcSPtr>::iterator it_a = skel->arcs().begin();
         while (it_a != skel->arcs().end()) {
             ArcSPtr arc = *it_a++;
             if (arc->getID() > 0) {
@@ -103,7 +115,7 @@ int StraightSkeletonDAO::insert(StraightSkeletonSPtr skel) {
             }
         }
         EventDAOSPtr dao_event = DAOFactory::getEventDAO();
-        list<AbstractEventSPtr>::iterator it_e = skel->events().begin();
+        std::list<AbstractEventSPtr>::iterator it_e = skel->events().begin();
         while (it_e != skel->events().end()) {
             AbstractEventSPtr event = *it_e++;
             if (event->getID() > 0) {
@@ -128,7 +140,7 @@ bool StraightSkeletonDAO::del(StraightSkeletonSPtr skel) {
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     bool trans_started = db->beginTransaction();
-    string sql("DELETE FROM StraightSkeletons WHERE SkelID=?;");
+    std::string sql("DELETE FROM StraightSkeletons WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
@@ -166,14 +178,14 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     NodeDAOSPtr dao_node = DAOFactory::getNodeDAO();
     EventDAOSPtr dao_event = DAOFactory::getEventDAO();
-    string sql("SELECT SkelID FROM StraightSkeletons WHERE SkelID=?;");
+    std::string sql("SELECT SkelID FROM StraightSkeletons WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);
         if (stmt->execute() > 0) {
             result = StraightSkeleton::create();
             result->setID(skelid);
-            map<int, NodeSPtr> nodes;
+            std::map<int, NodeSPtr> nodes;
             sql = "SELECT NID FROM Nodes WHERE SkelID=? ORDER BY NID ASC;";
             SQLiteStmtSPtr stmt_n = db->prepare(sql);
             if (stmt_n) {
@@ -214,11 +226,11 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
                     int nid = stmt_e->getInteger(1);
                     AbstractEventSPtr event = dao_event->find(skelid, eventid);
                     if (event->getType() == AbstractEvent::EDGE_EVENT) {
-                        dynamic_pointer_cast<data::_2d::skel::EdgeEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_2d::skel::EdgeEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::SPLIT_EVENT) {
-                        dynamic_pointer_cast<data::_2d::skel::SplitEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_2d::skel::SplitEvent>(event)->setNode(nodes[nid]);
                     } else if (event->getType() == AbstractEvent::TRIANGLE_EVENT) {
-                        dynamic_pointer_cast<data::_2d::skel::TriangleEvent>(event)->setNode(nodes[nid]);
+                        std::dynamic_pointer_cast<data::_2d::skel::TriangleEvent>(event)->setNode(nodes[nid]);
                     }
                     result->addEvent(event);
                 }
@@ -232,7 +244,7 @@ StraightSkeletonSPtr StraightSkeletonDAO::find(int skelid) {
 int StraightSkeletonDAO::findPolyID(int skelid) {
     int result = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT PolyID FROM StraightSkeletons WHERE SkelID=?;");
+    std::string sql("SELECT PolyID FROM StraightSkeletons WHERE SkelID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, skelid);

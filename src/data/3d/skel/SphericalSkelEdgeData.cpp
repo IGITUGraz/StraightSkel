@@ -4,7 +4,10 @@
  * @date   2012-11-30
  */
 
-#include "SphericalSkelEdgeData.h"
+#include "data/3d/skel/SphericalSkelEdgeData.h"
+
+#include "debug.h"
+#include "data/3d/CircularEdge.h"
 
 namespace data { namespace _3d { namespace skel {
 

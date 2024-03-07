@@ -5,14 +5,13 @@
  */
 
 #ifndef DISTANCE_H
-#define	DISTANCE_H
+#define DISTANCE_H
 
-#include <cmath>
-#include "Point2.h"
-#include "Line2.h"
-#include "Point3.h"
-#include "Plane3.h"
-#include "Line3.h"
+#include "kernel/Point2.h"
+#include "kernel/Line2.h"
+#include "kernel/Point3.h"
+#include "kernel/Plane3.h"
+#include "kernel/Line3.h"
 
 namespace kernel {
 
@@ -25,5 +24,5 @@ double distance(const Line3* line, const Point3* point);
 
 }
 
-#endif	/* DISTANCE_H */
+#endif /* DISTANCE_H */
 

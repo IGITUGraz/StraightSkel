@@ -5,9 +5,8 @@
  */
 
 #ifndef DATA_3D_SKEL_SPHERICALSKELEDGEDATA_H
-#define	DATA_3D_SKEL_SPHERICALSKELEDGEDATA_H
+#define DATA_3D_SKEL_SPHERICALSKELEDGEDATA_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
 #include "data/3d/CircularEdgeData.h"
 #include "data/3d/skel/ptrs.h"
@@ -42,5 +41,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SPHERICALSKELEDGEDATA_H */
+#endif /* DATA_3D_SKEL_SPHERICALSKELEDGEDATA_H */
 

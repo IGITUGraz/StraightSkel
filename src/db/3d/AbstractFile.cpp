@@ -4,7 +4,16 @@
  * @date   2013-12-18
  */
 
-#include "AbstractFile.h"
+#include "db/3d/AbstractFile.h"
+
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "debug.h"
+#include <cmath>
+#include <list>
 
 namespace db { namespace _3d {
 
@@ -45,8 +54,8 @@ bool AbstractFile::hasCoplanarFacets(EdgeSPtr edge, double epsilon) {
 
 int AbstractFile::mergeCoplanarFacets(PolyhedronSPtr polyhedron, double epsilon) {
     int result = 0;
-    list<EdgeSPtr> edges_toremove;
-    list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+    std::list<EdgeSPtr> edges_toremove;
+    std::list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
     while (it_e != polyhedron->edges().end()) {
         EdgeSPtr edge = *it_e++;
         if (hasCoplanarFacets(edge, epsilon)) {
@@ -81,8 +90,8 @@ int AbstractFile::mergeCoplanarFacets(PolyhedronSPtr polyhedron, double epsilon)
 
 int AbstractFile::removeVerticesDegLt3(PolyhedronSPtr polyhedron) {
     int result = 0;
-    list<VertexSPtr> vertices_toremove;
-    list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+    std::list<VertexSPtr> vertices_toremove;
+    std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
     while (it_v != polyhedron->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         if (vertex->degree() < 3) {
@@ -93,7 +102,7 @@ int AbstractFile::removeVerticesDegLt3(PolyhedronSPtr polyhedron) {
     while (it_v != vertices_toremove.end()) {
         VertexSPtr vertex = *it_v++;
         DEBUG_VAR(vertex->toString());
-        list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+        std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
         while (it_f != vertex->facets().end()) {
             FacetWPtr facet_wptr = *it_f++;
             if (!facet_wptr.expired()) {

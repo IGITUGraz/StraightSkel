@@ -4,7 +4,19 @@
  * @date   2012-07-26
  */
 
-#include "CombiVertexSplitter.h"
+#include "algo/3d/CombiVertexSplitter.h"
+
+#include "debug.h"
+#include "typedefs_thread.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/skel/SkelVertexData.h"
+#include "data/3d/skel/SkelFacetData.h"
+#include "util/Configuration.h"
+#include <map>
+#include <sstream>
 
 namespace algo { namespace _3d {
 
@@ -47,22 +59,22 @@ int CombiVertexSplitter::compareSplits(vec2i split1, vec2i split2) {
     return result;
 }
 
-vector<int> CombiVertexSplitter::initLabels(unsigned int degree) {
-    vector<int> result;
+std::vector<int> CombiVertexSplitter::initLabels(unsigned int degree) {
+    std::vector<int> result;
     for (unsigned int i = 0; i < degree; i++) {
         result.push_back(i);
     }
     return result;
 }
 
-vector<int> CombiVertexSplitter::splitLabels(vector<int>& labels, vec2i split) {
-    vector<int> result;
+std::vector<int> CombiVertexSplitter::splitLabels(std::vector<int>& labels, vec2i split) {
+    std::vector<int> result;
     int begin = split[0];
     int end = split[1];
     bool inside = false;
-    vector<int>::iterator it = labels.begin();
+    std::vector<int>::iterator it = labels.begin();
     while (it != labels.end()) {
-        vector<int>::iterator it_current = it;
+        std::vector<int>::iterator it_current = it;
         int label = *it++;
         if (label == begin) {
             inside = true;
@@ -85,8 +97,8 @@ vector<int> CombiVertexSplitter::splitLabels(vector<int>& labels, vec2i split) {
     return result;
 }
 
-list<vec2i> CombiVertexSplitter::createSingleSplitCombinations(vector<int> labels) {
-    list<vec2i> result;
+std::list<vec2i> CombiVertexSplitter::createSingleSplitCombinations(std::vector<int> labels) {
+    std::list<vec2i> result;
     unsigned int degree = labels.size();
     for (unsigned int i = 0; i < degree-1; i++) {
         for (unsigned int j = i+2; j < degree; j++) {
@@ -100,11 +112,11 @@ list<vec2i> CombiVertexSplitter::createSingleSplitCombinations(vector<int> label
     return result;
 }
 
-list<combi> CombiVertexSplitter::appendSplitCombinations(
-        combi history, list<vec2i> splits) {
-    list<combi> result;
+std::list<combi> CombiVertexSplitter::appendSplitCombinations(
+        combi history, std::list<vec2i> splits) {
+    std::list<combi> result;
     if (history.size() == 0) {
-        list<vec2i>::iterator it_splits = splits.begin();
+        std::list<vec2i>::iterator it_splits = splits.begin();
         while (it_splits != splits.end()) {
             vec2i split = *it_splits++;
             combi combination;
@@ -113,7 +125,7 @@ list<combi> CombiVertexSplitter::appendSplitCombinations(
         }
     } else {
         vec2i last_split = history.back();
-        list<vec2i>::iterator it_splits = splits.begin();
+        std::list<vec2i>::iterator it_splits = splits.begin();
         while (it_splits != splits.end()) {
             vec2i split = *it_splits++;
             if (compareSplits(last_split, split) > 0) {
@@ -126,19 +138,19 @@ list<combi> CombiVertexSplitter::appendSplitCombinations(
     return result;
 }
 
-list<combi> CombiVertexSplitter::mergeCombinations(combi history,
-        list<combi> combis1, list<combi> combis2) {
-    list<combi> result;
+std::list<combi> CombiVertexSplitter::mergeCombinations(combi history,
+        std::list<combi> combis1, std::list<combi> combis2) {
+    std::list<combi> result;
     unsigned int history_size = history.size();
-    list<combi>::iterator it_combis1 = combis1.begin();
+    std::list<combi>::iterator it_combis1 = combis1.begin();
     while (it_combis1 != combis1.end()) {
         combi combi1 = *it_combis1++;
-        list<combi>::iterator it_combis2 = combis2.begin();
+        std::list<combi>::iterator it_combis2 = combis2.begin();
         while (it_combis2 != combis2.end()) {
             combi combi2 = *it_combis2++;
             combi combi_merged(history);
-            vector<vec2i>::iterator it_combi1 = combi1.begin();
-            vector<vec2i>::iterator it_combi2 = combi2.begin();
+            std::vector<vec2i>::iterator it_combi1 = combi1.begin();
+            std::vector<vec2i>::iterator it_combi2 = combi2.begin();
             for (unsigned int i = 0; i < history_size; i++) {
                 it_combi1++;
                 it_combi2++;
@@ -168,24 +180,24 @@ list<combi> CombiVertexSplitter::mergeCombinations(combi history,
     return result;
 }
 
-list<combi> CombiVertexSplitter::generateCombinationsRec(
-        combi history, vector<int> labels) {
-    list<combi> result;
-    list<vec2i> splits = createSingleSplitCombinations(labels);
-    list<combi> combis = appendSplitCombinations(history, splits);
+std::list<combi> CombiVertexSplitter::generateCombinationsRec(
+        combi history, std::vector<int> labels) {
+    std::list<combi> result;
+    std::list<vec2i> splits = createSingleSplitCombinations(labels);
+    std::list<combi> combis = appendSplitCombinations(history, splits);
     if (labels.size() <= 4) {
         result = combis;
     } else {
-        list<combi>::iterator it_combis = combis.begin();
+        std::list<combi>::iterator it_combis = combis.begin();
         while (it_combis != combis.end()) {
             combi split_combi = *it_combis++;
-            list<combi> combis_next;
+            std::list<combi> combis_next;
             vec2i split = split_combi.back();
-            vector<int> labels1(labels);
-            vector<int> labels2 = splitLabels(labels1, split);
+            std::vector<int> labels1(labels);
+            std::vector<int> labels2 = splitLabels(labels1, split);
             if (labels1.size() > 3 && labels2.size() > 3) {
-                list<combi> combis1 = generateCombinationsRec(split_combi, labels1);
-                list<combi> combis2 = generateCombinationsRec(split_combi, labels2);
+                std::list<combi> combis1 = generateCombinationsRec(split_combi, labels1);
+                std::list<combi> combis2 = generateCombinationsRec(split_combi, labels2);
                 combis_next = mergeCombinations(split_combi, combis1, combis2);
             } else if (labels1.size() > 3) {
                 combis_next = generateCombinationsRec(split_combi, labels1);
@@ -198,12 +210,12 @@ list<combi> CombiVertexSplitter::generateCombinationsRec(
     return result;
 }
 
-list<combi> CombiVertexSplitter::generateAllCombinations(unsigned int degree) {
+std::list<combi> CombiVertexSplitter::generateAllCombinations(unsigned int degree) {
     combi history;
-    vector<int> labels = initLabels(degree);
-    list<combi> result = generateCombinationsRec(history, labels);
+    std::vector<int> labels = initLabels(degree);
+    std::list<combi> result = generateCombinationsRec(history, labels);
     DEBUG_VAR(degree);
-    list<combi>::iterator it_combis = result.begin();
+    std::list<combi>::iterator it_combis = result.begin();
     while (it_combis != result.end()) {
         combi combination = *it_combis++;
         DEBUG_VAL(combiToString(combination));
@@ -251,7 +263,7 @@ PolyhedronSPtr CombiVertexSplitter::copyVertex(VertexSPtr vertex) {
             facet_c_data = SkelFacetData::create(facet_c);
             facet_c_data->setFacetOrigin(facet);
             if (facet->hasData()) {
-                facet_c_data->setSpeed(dynamic_pointer_cast<SkelFacetData>(
+                facet_c_data->setSpeed(std::dynamic_pointer_cast<SkelFacetData>(
                         facet->getData())->getSpeed());
             }
             result->addFacet(facet_c);
@@ -271,7 +283,7 @@ PolyhedronSPtr CombiVertexSplitter::copyVertex(VertexSPtr vertex) {
     facet_c_data = SkelFacetData::create(facet_c);
     facet_c_data->setFacetOrigin(facet);
     if (facet->hasData()) {
-        facet_c_data->setSpeed(dynamic_pointer_cast<SkelFacetData>(
+        facet_c_data->setSpeed(std::dynamic_pointer_cast<SkelFacetData>(
                 facet->getData())->getSpeed());
     }
     result->addFacet(facet_c);
@@ -281,10 +293,10 @@ PolyhedronSPtr CombiVertexSplitter::copyVertex(VertexSPtr vertex) {
 PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex, combi combination) {
     assert(vertex->degree() - 3 == combination.size());
     PolyhedronSPtr polyhedron = vertex->getPolyhedron();
-    list<VertexSPtr> vertices_tosplit;
+    std::list<VertexSPtr> vertices_tosplit;
     vertices_tosplit.push_back(vertex);
 
-    vector<FacetSPtr> facets;
+    std::vector<FacetSPtr> facets;
     FacetSPtr facet = vertex->firstFacet();
     EdgeSPtr edge_first = vertex->findEdge(facet);
     EdgeSPtr edge;
@@ -297,14 +309,14 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex, combi combina
         facet = edge->other(facet);
     }
 
-    list<EdgeSPtr> edges_toremove;
+    std::list<EdgeSPtr> edges_toremove;
     for (unsigned int i = 0; i < combination.size(); i++) {
         vec2i split = combination[i];
         FacetSPtr facet_right = facets[split[0]];
         FacetSPtr facet_left = facets[split[1]];
-        list<VertexSPtr>::iterator it_v = vertices_tosplit.begin();
+        std::list<VertexSPtr>::iterator it_v = vertices_tosplit.begin();
         while (it_v != vertices_tosplit.end()) {
-            list<VertexSPtr>::iterator it_current = it_v;
+            std::list<VertexSPtr>::iterator it_current = it_v;
             VertexSPtr vertex = *it_v++;
             if (vertex->containsFacet(facet_right) &&
                     vertex->containsFacet(facet_left)) {
@@ -315,7 +327,7 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex, combi combina
                     edges_toremove.push_back(edge);
                 }
                 if (vertex->hasData()) {
-                    SkelVertexDataSPtr data = dynamic_pointer_cast<SkelVertexData>(
+                    SkelVertexDataSPtr data = std::dynamic_pointer_cast<SkelVertexData>(
                             vertex->getData());
                     SkelVertexDataSPtr data2 = SkelVertexData::create(vertex2);
                     data2->setNode(data->getNode());
@@ -331,7 +343,7 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex, combi combina
         }
     }
 
-    list<EdgeSPtr>::iterator it_e = edges_toremove.begin();
+    std::list<EdgeSPtr>::iterator it_e = edges_toremove.begin();
     while (it_e != edges_toremove.end()) {
         EdgeSPtr edge = *it_e++;
         VertexSPtr vertex_src = edge->getVertexSrc();
@@ -357,7 +369,7 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex, combi combina
             VertexSPtr vertex_merged_src = vertex->prev(facet_l);
             VertexSPtr vertex_merged_dst = vertex->next(facet_l);
             FacetSPtr facet_r = facet_l->next(vertex);
-            list<EdgeWPtr>::iterator it_ew = vertex->edges().begin();
+            std::list<EdgeWPtr>::iterator it_ew = vertex->edges().begin();
             while (it_ew != vertex->edges().end()) {
                 EdgeWPtr edge_wptr = *it_ew++;
                 if (!edge_wptr.expired()) {
@@ -367,7 +379,7 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex, combi combina
                     polyhedron->removeEdge(edge_toremove);
                 }
             }
-            list<FacetWPtr>::iterator it_fw = vertex->facets().begin();
+            std::list<FacetWPtr>::iterator it_fw = vertex->facets().begin();
             while (it_fw != vertex->facets().end()) {
                 FacetWPtr facet_wptr = *it_fw++;
                 if (!facet_wptr.expired()) {
@@ -392,11 +404,11 @@ PolyhedronSPtr CombiVertexSplitter::apply(PolyhedronSPtr poly_split, VertexSPtr 
     NodeSPtr node;
     if (vertex->hasData()) {
         SkelVertexDataSPtr data =
-                dynamic_pointer_cast<SkelVertexData>(vertex->getData());
+                std::dynamic_pointer_cast<SkelVertexData>(vertex->getData());
         node = data->getNode();
     }
-    map<VertexSPtr, VertexSPtr> vertices;
-    list<VertexSPtr>::iterator it_v = poly_split->vertices().begin();
+    std::map<VertexSPtr, VertexSPtr> vertices;
+    std::list<VertexSPtr>::iterator it_v = poly_split->vertices().begin();
     while (it_v != poly_split->vertices().end()) {
         VertexSPtr vertex_ps = *it_v++;
         if (vertex_ps->degree() > 1) {
@@ -408,7 +420,7 @@ PolyhedronSPtr CombiVertexSplitter::apply(PolyhedronSPtr poly_split, VertexSPtr 
         }
     }
 
-    list<EdgeSPtr>::iterator it_e = poly_split->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = poly_split->edges().begin();
     while (it_e != poly_split->edges().end()) {
         EdgeSPtr edge_ps = *it_e++;
         VertexSPtr vertex_ps_src = edge_ps->getVertexSrc();
@@ -417,7 +429,7 @@ PolyhedronSPtr CombiVertexSplitter::apply(PolyhedronSPtr poly_split, VertexSPtr 
         FacetSPtr facet_ps_r = edge_ps->getFacetR();
         if (vertex_ps_dst->degree() == 1) {
             EdgeSPtr edge_vs;
-            list<EdgeWPtr>::iterator it_ve = vertex->edges().begin();
+            std::list<EdgeWPtr>::iterator it_ve = vertex->edges().begin();
             while (it_ve != vertex->edges().end()) {
                 EdgeWPtr edge_wptr = *it_ve++;
                 if (!edge_wptr.expired()) {
@@ -443,7 +455,7 @@ PolyhedronSPtr CombiVertexSplitter::apply(PolyhedronSPtr poly_split, VertexSPtr 
             }
         } else if (vertex_ps_src->degree() == 1) {
             EdgeSPtr edge_vs;
-            list<EdgeWPtr>::iterator it_ve = vertex->edges().begin();
+            std::list<EdgeWPtr>::iterator it_ve = vertex->edges().begin();
             while (it_ve != vertex->edges().end()) {
                 EdgeWPtr edge_wptr = *it_ve++;
                 if (!edge_wptr.expired()) {
@@ -470,10 +482,10 @@ PolyhedronSPtr CombiVertexSplitter::apply(PolyhedronSPtr poly_split, VertexSPtr 
         } else {
             EdgeSPtr edge_vs = Edge::create(vertices[vertex_ps_src], vertices[vertex_ps_dst]);
             SkelFacetDataSPtr data_l =
-                    dynamic_pointer_cast<SkelFacetData>(
+                    std::dynamic_pointer_cast<SkelFacetData>(
                     facet_ps_l->getData());
             SkelFacetDataSPtr data_r =
-                    dynamic_pointer_cast<SkelFacetData>(
+                    std::dynamic_pointer_cast<SkelFacetData>(
                     facet_ps_r->getData());
             FacetSPtr facet_vs_l = data_l->getFacetOrigin();
             FacetSPtr facet_vs_r = data_r->getFacetOrigin();
@@ -485,7 +497,7 @@ PolyhedronSPtr CombiVertexSplitter::apply(PolyhedronSPtr poly_split, VertexSPtr 
         }
     }
 
-    list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+    std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
     while (it_f != vertex->facets().end()) {
         FacetWPtr facet_wptr = *it_f++;
         if (!facet_wptr.expired()) {
@@ -504,10 +516,10 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex) {
     }
     WriteLock l(polyhedron->mutex());
     vertex->sort();
-    list<combi> combinations = generateAllCombinations(vertex->degree());
-    list<combi> combinations_valid;
-    list<PolyhedronSPtr> polys_split;
-    list<combi>::iterator it_combi = combinations.begin();
+    std::list<combi> combinations = generateAllCombinations(vertex->degree());
+    std::list<combi> combinations_valid;
+    std::list<PolyhedronSPtr> polys_split;
+    std::list<combi>::iterator it_combi = combinations.begin();
     while (it_combi != combinations.end()) {
         combi combination = *it_combi++;
         PolyhedronSPtr poly_c = copyVertex(vertex);
@@ -522,7 +534,7 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex) {
 
     unsigned int selected_combi = selected_combi_ % combinations_valid.size();
     it_combi = combinations_valid.begin();
-    list<PolyhedronSPtr>::iterator it_p = polys_split.begin();
+    std::list<PolyhedronSPtr>::iterator it_p = polys_split.begin();
     for (unsigned int i = 0; i < combinations_valid.size(); i++) {
         combi combination_valid = *it_combi++;
         PolyhedronSPtr poly_split = *it_p++;
@@ -535,8 +547,8 @@ PolyhedronSPtr CombiVertexSplitter::splitVertex(VertexSPtr vertex) {
     return polyhedron;
 }
 
-string CombiVertexSplitter::combiToString(combi combination) {
-    stringstream sstr;
+std::string CombiVertexSplitter::combiToString(combi combination) {
+    std::stringstream sstr;
     sstr << "{ ";
     for (unsigned int i = 0; i < combination.size(); i++) {
         vec2i split = combination[i];
@@ -549,8 +561,8 @@ string CombiVertexSplitter::combiToString(combi combination) {
     return sstr.str();
 }
 
-string CombiVertexSplitter::toString() const {
-    stringstream sstr;
+std::string CombiVertexSplitter::toString() const {
+    std::stringstream sstr;
     sstr << "CombiVertexSplitter(" << selected_combi_ << ")";
     return sstr.str();
 }

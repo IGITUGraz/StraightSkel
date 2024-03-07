@@ -5,20 +5,15 @@
  */
 
 #ifndef ALGO_3D_CONVEXVERTEXSPLITTER_H
-#define	ALGO_3D_CONVEXVERTEXSPLITTER_H
+#define ALGO_3D_CONVEXVERTEXSPLITTER_H
 
-#include "data/3d/ptrs.h"
-#include "data/3d/Vertex.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Polyhedron.h"
 #include "algo/ptrs.h"
 #include "algo/3d/ptrs.h"
-#include "algo/3d/AbstractVertexSplitter.h"
 #include "algo/3d/CombiVertexSplitter.h"
+#include "data/3d/ptrs.h"
+#include <string>
 
 namespace algo { namespace _3d {
-
-using std::string;
 
 class ConvexVertexSplitter : public CombiVertexSplitter {
 public:
@@ -30,7 +25,7 @@ public:
 
     virtual PolyhedronSPtr splitVertex(VertexSPtr vertex);
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     ConvexVertexSplitter();
@@ -39,5 +34,5 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_CONVEXVERTEXSPLITTER_H */
+#endif /* ALGO_3D_CONVEXVERTEXSPLITTER_H */
 

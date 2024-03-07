@@ -1,17 +1,16 @@
 #ifndef DB_3D_VERTEXDAO_H
-#define	DB_3D_VERTEXDAO_H
+#define DB_3D_VERTEXDAO_H
 
-#include <string>
 #include "data/3d/ptrs.h"
 #include "data/3d/Vertex.h"
 #include "data/3d/Polyhedron.h"
 #include "db/ptrs.h"
 #include "db/3d/ptrs.h"
 #include "db/3d/DAOFactory.h"
+#include <string>
 
 namespace db { namespace _3d {
 
-using std::string;
 using data::_3d::Vertex;
 using data::_3d::VertexSPtr;
 
@@ -19,7 +18,7 @@ class VertexDAO {
 friend class DAOFactory;
 public:
     virtual ~VertexDAO();
-    string getTableSchema() const;
+    std::string getTableSchema() const;
     int insert(VertexSPtr vertex);
     bool del(VertexSPtr vertex);
     VertexSPtr find(int polyhedronid, int vid);
@@ -31,5 +30,4 @@ protected:
 
 } }
 
-#endif	/* DB_3D_VERTEXDAO_H */
-
+#endif /* DB_3D_VERTEXDAO_H */

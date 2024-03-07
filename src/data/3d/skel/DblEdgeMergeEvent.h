@@ -5,15 +5,11 @@
  */
 
 #ifndef DATA_3D_SKEL_DBLEDGEMERGEEVENT_H
-#define	DATA_3D_SKEL_DBLEDGEMERGEEVENT_H
+#define DATA_3D_SKEL_DBLEDGEMERGEEVENT_H
 
-#include "debug.h"
 #include "data/3d/ptrs.h"
-#include "data/3d/Edge.h"
 #include "data/3d/skel/ptrs.h"
 #include "data/3d/skel/AbstractEvent.h"
-#include "data/3d/skel/Node.h"
-#include "data/3d/skel/SkelEdgeData.h"
 
 namespace data { namespace _3d { namespace skel {
 
@@ -52,5 +48,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_DBLEDGEMERGEEVENT_H */
+#endif /* DATA_3D_SKEL_DBLEDGEMERGEEVENT_H */
 

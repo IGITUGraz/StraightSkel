@@ -5,22 +5,14 @@
  */
 
 #ifndef DATA_3D_SKEL_ABSTRACTEVENT_H
-#define	DATA_3D_SKEL_ABSTRACTEVENT_H
+#define DATA_3D_SKEL_ABSTRACTEVENT_H
 
 #include <list>
 #include <string>
-#include <sstream>
-#include "debug.h"
 #include "data/3d/ptrs.h"
 #include "data/3d/skel/ptrs.h"
-#include "util/StringFactory.h"
 
 namespace data { namespace _3d { namespace skel {
-
-using std::list;
-using std::string;
-using std::stringstream;
-using util::StringFactory;
 
 class AbstractEvent {
 public:
@@ -30,8 +22,8 @@ public:
     void setPolyhedronResult(PolyhedronSPtr polyhedron);
     StraightSkeletonSPtr getSkel() const;
     void setSkel(StraightSkeletonSPtr skel);
-    list<AbstractEventSPtr>::iterator getListIt() const;
-    void setListIt(list<AbstractEventSPtr>::iterator list_it);
+    std::list<AbstractEventSPtr>::iterator getListIt() const;
+    void setListIt(std::list<AbstractEventSPtr>::iterator list_it);
 
     int getID() const;
     void setID(int id);
@@ -40,61 +32,61 @@ public:
     virtual double getOffset() const = 0;  // abstract
 
     static const int CONST_OFFSET_EVENT = 1;
+    static const int SAVE_OFFSET_EVENT = 2;
 
     /** 1 edge vanish event */
-    static const int EDGE_EVENT = 2;
+    static const int EDGE_EVENT = 3;
 
     /** 2 edge vanish event */
-    static const int EDGE_MERGE_EVENT = 3;
+    static const int EDGE_MERGE_EVENT = 4;
 
     /** 3 edge vanish event */
-    static const int TRIANGLE_EVENT = 4;
+    static const int TRIANGLE_EVENT = 5;
 
     /** 4 edge vanish event */
-    static const int DBL_EDGE_MERGE_EVENT = 5;
+    static const int DBL_EDGE_MERGE_EVENT = 6;
 
     /** 5 edge vanish event */
-    static const int DBL_TRIANGLE_EVENT = 6;
+    static const int DBL_TRIANGLE_EVENT = 7;
 
     /** 6 edge vanish event */
-    static const int TETRAHEDRON_EVENT = 7;
+    static const int TETRAHEDRON_EVENT = 8;
 
     /** vertex-vertex contact event I */
-    static const int VERTEX_EVENT = 8;
+    static const int VERTEX_EVENT = 9;
 
     /** vertex-vertex contact event II */
-    static const int FLIP_VERTEX_EVENT = 9;
+    static const int FLIP_VERTEX_EVENT = 10;
 
     /** vertex-edge contact event */
-    static const int SURFACE_EVENT = 10;
+    static const int SURFACE_EVENT = 11;
 
     /** vertex-vertex-edge contact event I */
-    static const int POLYHEDRON_SPLIT_EVENT = 11;
+    static const int POLYHEDRON_SPLIT_EVENT = 12;
 
     /** vertex-vertex-edge contact event II */
-    static const int SPLIT_MERGE_EVENT = 12;
+    static const int SPLIT_MERGE_EVENT = 13;
 
     /** edge-edge contact event */
-    static const int EDGE_SPLIT_EVENT = 13;
+    static const int EDGE_SPLIT_EVENT = 14;
 
     /** vertex-facet contact event */
-    static const int PIERCE_EVENT = 14;
+    static const int PIERCE_EVENT = 15;
 
     virtual int getType() const;
 
-    virtual string toString() const;
+    virtual std::string toString() const;
 
 protected:
     AbstractEvent();
 
     PolyhedronSPtr polyhedron_result_;
     StraightSkeletonWPtr skel_;
-    list<AbstractEventSPtr>::iterator list_it_;
+    std::list<AbstractEventSPtr>::iterator list_it_;
     int type_;
     int id_;
 };
 
 } } }
 
-#endif	/* DATA_3D_ABSTRACTEVENT_H */
-
+#endif /* DATA_3D_ABSTRACTEVENT_H */

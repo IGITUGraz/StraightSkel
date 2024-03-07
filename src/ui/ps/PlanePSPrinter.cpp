@@ -4,7 +4,22 @@
  * @date   2012-11-14
  */
 
-#include "PlanePSPrinter.h"
+#include "ui/ps/PlanePSPrinter.h"
+
+#include "debug.h"
+#include "typedefs_thread.h"
+#include "data/2d/Polygon.h"
+#include "data/2d/Edge.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/Arc.h"
+#include "data/2d/skel/StraightSkeleton.h"
+#include "data/2d/mesh/Mesh.h"
+#include "data/2d/mesh/MeshCell.h"
+#include "data/2d/mesh/MeshVertex.h"
+#include <cmath>
+#include <limits>
+#include <list>
 
 namespace ui { namespace ps {
 
@@ -27,7 +42,7 @@ void PlanePSPrinter::boundingBoxMin(PolygonSPtr polygon, vec2f& out) {
     for (unsigned int i = 0; i < 2; i++) {
         out[i] = std::numeric_limits<float>::max();
     }
-    list<data::_2d::VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<data::_2d::VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         data::_2d::VertexSPtr vertex = *it_v++;
         if ((float)vertex->getX() < out[0]) {
@@ -43,7 +58,7 @@ void PlanePSPrinter::boundingBoxMax(PolygonSPtr polygon, vec2f& out) {
     for (unsigned int i = 0; i < 2; i++) {
         out[i] = -std::numeric_limits<float>::max();
     }
-    list<data::_2d::VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<data::_2d::VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         data::_2d::VertexSPtr vertex = *it_v++;
         if ((float)vertex->getX() > out[0]) {
@@ -86,13 +101,13 @@ void PlanePSPrinter::toPaper(const vec2f in, vec2f& out) {
     }
 }
 
-void PlanePSPrinter::printPolygon(PolygonSPtr polygon, ostream& out) {
+void PlanePSPrinter::printPolygon(PolygonSPtr polygon, std::ostream& out) {
     if (!polygon) {
         DEBUG_PRINT("Warning: polygon is null.");
         return;
     }
     ReadLock l(polygon->mutex());
-    list<data::_2d::EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<data::_2d::EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         data::_2d::EdgeSPtr edge = *it_e++;
         data::_2d::VertexSPtr vertex_src = edge->getVertexSrc();
@@ -109,9 +124,9 @@ void PlanePSPrinter::printPolygon(PolygonSPtr polygon, ostream& out) {
     }
 }
 
-void PlanePSPrinter::printSkel(data::_2d::skel::StraightSkeletonSPtr skel, ostream& out) {
+void PlanePSPrinter::printSkel(data::_2d::skel::StraightSkeletonSPtr skel, std::ostream& out) {
     ReadLock l(skel->mutex());
-    list<data::_2d::skel::ArcSPtr>::iterator it_a = skel->arcs().begin();
+    std::list<data::_2d::skel::ArcSPtr>::iterator it_a = skel->arcs().begin();
     while (it_a != skel->arcs().end()) {
         data::_2d::skel::ArcSPtr arc = *it_a++;
         if (!arc->hasNodeDst()) {
@@ -131,15 +146,15 @@ void PlanePSPrinter::printSkel(data::_2d::skel::StraightSkeletonSPtr skel, ostre
     }
 }
 
-void PlanePSPrinter::printMesh(data::_2d::mesh::MeshSPtr mesh, ostream& out) {
+void PlanePSPrinter::printMesh(data::_2d::mesh::MeshSPtr mesh, std::ostream& out) {
     ReadLock l(mesh->mutex());
-    list<data::_2d::mesh::MeshCellSPtr>::iterator it_c = mesh->cells().begin();
+    std::list<data::_2d::mesh::MeshCellSPtr>::iterator it_c = mesh->cells().begin();
     while (it_c != mesh->cells().end()) {
         data::_2d::mesh::MeshCellSPtr cell = *it_c++;
         unsigned int num_points = cell->vertices().size();
         vec2f points[num_points];
         unsigned int i = 0;
-        list<data::_2d::mesh::MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+        std::list<data::_2d::mesh::MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
         while (it_v != cell->vertices().end()) {
             data::_2d::mesh::MeshVertexSPtr vertex = *it_v++;
             vec2f point = {(float)vertex->getX(),

@@ -4,7 +4,26 @@
  * @date   2014-01-28
  */
 
-#include "SkelMeshGenerator.h"
+#include "algo/2d/SkelMeshGenerator.h"
+
+#include "debug.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/Polygon.h"
+#include "data/2d/skel/Node.h"
+#include "data/2d/skel/Arc.h"
+#include "data/2d/skel/StraightSkeleton.h"
+#include "data/2d/skel/SkelVertexData.h"
+#include "data/2d/skel/AbstractEvent.h"
+#include "data/2d/mesh/Mesh.h"
+#include "data/2d/mesh/MeshEdgeData.h"
+#include "data/2d/mesh/MeshVertex.h"
+#include "data/2d/mesh/MeshCell.h"
+#include "data/2d/mesh/MeshRay.h"
+#include "algo/Controller.h"
+#include "algo/2d/KernelWrapper.h"
+#include "algo/2d/MeshModifier.h"
+#include <list>
 
 namespace algo { namespace _2d {
 
@@ -37,17 +56,17 @@ SkelMeshGeneratorSPtr SkelMeshGenerator::create(StraightSkeletonSPtr skel, Contr
 void SkelMeshGenerator::initEdgeDatas() {
     PolygonSPtr polygon = skel_->getPolygon();
     WriteLock l(polygon->mutex());
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
         MeshEdgeData::create(edge);
     }
-    list<ArcSPtr>::iterator it_a = skel_->arcs().begin();
+    std::list<ArcSPtr>::iterator it_a = skel_->arcs().begin();
     while (it_a != skel_->arcs().end()) {
         ArcSPtr arc = *it_a++;
-        MeshEdgeDataSPtr data_l = dynamic_pointer_cast<MeshEdgeData>(
+        MeshEdgeDataSPtr data_l = std::dynamic_pointer_cast<MeshEdgeData>(
                 arc->getEdgeLeft()->getData());
-        MeshEdgeDataSPtr data_r = dynamic_pointer_cast<MeshEdgeData>(
+        MeshEdgeDataSPtr data_r = std::dynamic_pointer_cast<MeshEdgeData>(
                 arc->getEdgeRight()->getData());
         data_l->addArc(arc);
         data_r->addArc(arc);
@@ -60,9 +79,9 @@ void SkelMeshGenerator::initEdgeDatas() {
 }
 
 void SkelMeshGenerator::sortArcs(EdgeSPtr edge) {
-    MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(edge->getData());
-    list<ArcSPtr> arcs;
-    list<ArcWPtr>::iterator it_a_w = data->arcs().begin();
+    MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(edge->getData());
+    std::list<ArcSPtr> arcs;
+    std::list<ArcWPtr>::iterator it_a_w = data->arcs().begin();
     while (it_a_w != data->arcs().end()) {
         ArcWPtr arc_wptr = *it_a_w++;
         if (!arc_wptr.expired()) {
@@ -71,15 +90,15 @@ void SkelMeshGenerator::sortArcs(EdgeSPtr edge) {
         }
     }
 
-    list<ArcSPtr> arcs_sorted;
-    SkelVertexDataSPtr data_vertex = dynamic_pointer_cast<SkelVertexData>(
+    std::list<ArcSPtr> arcs_sorted;
+    SkelVertexDataSPtr data_vertex = std::dynamic_pointer_cast<SkelVertexData>(
             edge->getVertexDst()->getData());
     NodeSPtr node_first = data_vertex->getNode();
     NodeSPtr node_current = node_first;
     while (!arcs.empty()) {
-        list<ArcSPtr>::iterator it_a = arcs.begin();
+        std::list<ArcSPtr>::iterator it_a = arcs.begin();
         while (it_a != arcs.end()) {
-            list<ArcSPtr>::iterator it_current = it_a;
+            std::list<ArcSPtr>::iterator it_current = it_a;
             ArcSPtr arc = *it_a++;
             if (arc->getNodeSrc() == node_current) {
                 node_current = arc->getNodeDst();
@@ -96,7 +115,7 @@ void SkelMeshGenerator::sortArcs(EdgeSPtr edge) {
     }
 
     data->arcs().clear();
-    list<ArcSPtr>::iterator it_a = arcs_sorted.begin();
+    std::list<ArcSPtr>::iterator it_a = arcs_sorted.begin();
     while (it_a != arcs_sorted.end()) {
         ArcSPtr arc = *it_a++;
         data->addArc(arc);
@@ -106,14 +125,14 @@ void SkelMeshGenerator::sortArcs(EdgeSPtr edge) {
 void SkelMeshGenerator::initCells() {
     WriteLock l(mesh_result_->mutex());
     PolygonSPtr polygon = skel_->getPolygon();
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
-        MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(
+        MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(
                 edge->getData());
-        list<Point2SPtr> points;
+        std::list<Point2SPtr> points;
         Point2SPtr p_last;
-        list<ArcWPtr>::iterator it_a = data->arcs().begin();
+        std::list<ArcWPtr>::iterator it_a = data->arcs().begin();
         while (it_a != data->arcs().end()) {
             ArcWPtr arc_wptr = *it_a++;
             if (!arc_wptr.expired()) {
@@ -137,7 +156,7 @@ void SkelMeshGenerator::initCells() {
                 }
             }
         }
-        list<Point2SPtr>::iterator it_p = points.begin();
+        std::list<Point2SPtr>::iterator it_p = points.begin();
         unsigned int num_vertices = points.size();
         MeshVertexSPtr vertices[num_vertices];
         for (unsigned int i = 0; i < num_vertices; i++) {
@@ -158,11 +177,11 @@ void SkelMeshGenerator::initCells() {
 
 void SkelMeshGenerator::createRays(EdgeSPtr edge) {
     WriteLock l(mesh_result_->mutex());
-    MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(edge->getData());
+    MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(edge->getData());
 
-    list<NodeSPtr> nodes;
+    std::list<NodeSPtr> nodes;
     NodeSPtr node_prev;
-    list<ArcWPtr>::iterator it_a = data->arcs().begin();
+    std::list<ArcWPtr>::iterator it_a = data->arcs().begin();
     while (it_a != data->arcs().end()) {
         ArcWPtr arc_wptr = *it_a++;
         if (!arc_wptr.expired()) {
@@ -186,13 +205,13 @@ void SkelMeshGenerator::createRays(EdgeSPtr edge) {
     Point2SPtr p_src = edge->getVertexSrc()->getPoint();
     Point2SPtr p_dst = edge->getVertexDst()->getPoint();
     Vector2SPtr v_dir = KernelFactory::createVector2(*p_dst - *p_src);
-    list<NodeSPtr> nodes_sorted;
+    std::list<NodeSPtr> nodes_sorted;
     while (!nodes.empty()) {
         NodeSPtr node_min = nodes.front();
-        list<NodeSPtr>::iterator it_min = nodes.begin();
-        list<NodeSPtr>::iterator it_n = nodes.begin();
+        std::list<NodeSPtr>::iterator it_min = nodes.begin();
+        std::list<NodeSPtr>::iterator it_n = nodes.begin();
         while (it_n != nodes.end()) {
-            list<NodeSPtr>::iterator it_current = it_n;
+            std::list<NodeSPtr>::iterator it_current = it_n;
             NodeSPtr node = *it_n++;
             if (KernelWrapper::compatePoints(v_dir,
                     node_min->getPoint(), node->getPoint()) > 0) {
@@ -207,7 +226,7 @@ void SkelMeshGenerator::createRays(EdgeSPtr edge) {
     nodes_sorted.pop_front();
     nodes_sorted.pop_back();
 
-    list<NodeSPtr>::iterator it_n = nodes_sorted.begin();
+    std::list<NodeSPtr>::iterator it_n = nodes_sorted.begin();
     while (it_n != nodes_sorted.end()) {
         NodeSPtr node = *it_n++;
         MeshVertexSPtr vertex = mesh_result_->getVertex(node->getPoint());
@@ -219,8 +238,8 @@ void SkelMeshGenerator::createRays(EdgeSPtr edge) {
 
 void SkelMeshGenerator::findRayDsts() {
     WriteLock l(mesh_result_->mutex());
-    list<MeshRaySPtr> rays;
-    list<MeshRaySPtr>::iterator it_r = mesh_result_->rays().begin();
+    std::list<MeshRaySPtr> rays;
+    std::list<MeshRaySPtr>::iterator it_r = mesh_result_->rays().begin();
     while (it_r != mesh_result_->rays().end()) {
         MeshRaySPtr ray = *it_r++;
         if (!ray->getDst()) {
@@ -247,11 +266,11 @@ void SkelMeshGenerator::findRayDsts() {
             mesh_result_->addVertex(vertex_dst);
             ray->setDst(vertex_dst);
         } else {
-            MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(
+            MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(
                     edge->getData());
             double dist_max = 0.0;
             ArcSPtr arc_max;
-            list<ArcWPtr>::iterator it_a = data->arcs().begin();
+            std::list<ArcWPtr>::iterator it_a = data->arcs().begin();
             while (it_a != data->arcs().end()) {
                 ArcWPtr arc_wptr = *it_a++;
                 if (!arc_wptr.expired()) {
@@ -280,7 +299,7 @@ void SkelMeshGenerator::findRayDsts() {
                     edge_next = arc_max->getEdgeRight();
                 }
                 MeshRaySPtr ray_next = MeshRay::create(edge_next, vertex);
-                MeshEdgeDataSPtr data_next = dynamic_pointer_cast<MeshEdgeData>(
+                MeshEdgeDataSPtr data_next = std::dynamic_pointer_cast<MeshEdgeData>(
                         edge_next->getData());
                 data_next->addRay(ray_next);
                 mesh_result_->addRay(ray_next);
@@ -293,12 +312,12 @@ void SkelMeshGenerator::findRayDsts() {
 }
 
 void SkelMeshGenerator::sortRays(EdgeSPtr edge) {
-    MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(edge->getData());
+    MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(edge->getData());
     Point2SPtr p_src = edge->getVertexSrc()->getPoint();
     Point2SPtr p_dst = edge->getVertexDst()->getPoint();
     Vector2SPtr v_dir = KernelFactory::createVector2(*p_dst - *p_src);
-    list<MeshRaySPtr> rays;
-    list<MeshRayWPtr>::iterator it_r_wptr = data->rays().begin();
+    std::list<MeshRaySPtr> rays;
+    std::list<MeshRayWPtr>::iterator it_r_wptr = data->rays().begin();
     while (it_r_wptr != data->rays().end()) {
         MeshRayWPtr ray_wptr = *it_r_wptr++;
         if (!ray_wptr.expired()) {
@@ -309,10 +328,10 @@ void SkelMeshGenerator::sortRays(EdgeSPtr edge) {
     data->rays().clear();
     while (!rays.empty()) {
         MeshRaySPtr ray_min = rays.front();
-        list<MeshRaySPtr>::iterator it_min = rays.begin();
-        list<MeshRaySPtr>::iterator it_r = rays.begin();
+        std::list<MeshRaySPtr>::iterator it_min = rays.begin();
+        std::list<MeshRaySPtr>::iterator it_r = rays.begin();
         while (it_r != rays.end()) {
-            list<MeshRaySPtr>::iterator it_current = it_r;
+            std::list<MeshRaySPtr>::iterator it_current = it_r;
             MeshRaySPtr ray = *it_r++;
             if (KernelWrapper::compatePoints(v_dir,
                     ray_min->getSrc()->getPoint(), ray->getSrc()->getPoint()) > 0) {
@@ -328,11 +347,11 @@ void SkelMeshGenerator::sortRays(EdgeSPtr edge) {
 
 void SkelMeshGenerator::splitCellR(EdgeSPtr edge) {
     WriteLock l(mesh_result_->mutex());
-    MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(edge->getData());
+    MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(edge->getData());
     MeshCellSPtr cell = MeshCellSPtr(data->cells().front());
     Vector2SPtr dir_line = KernelFactory::createVector2(edge->line());
     Vector2SPtr dir_inside = KernelWrapper::perpendicular(dir_line);
-    list<MeshRayWPtr>::iterator it_r = data->rays().begin();
+    std::list<MeshRayWPtr>::iterator it_r = data->rays().begin();
     while (it_r != data->rays().end()) {
         MeshRayWPtr ray_wptr = *it_r++;
         if (!ray_wptr.expired()) {
@@ -359,7 +378,7 @@ MeshVertexSPtr SkelMeshGenerator::findNearestIntersection(MeshCellSPtr cell,
     double dist_min = std::numeric_limits<double>::max();
     MeshVertexSPtr vertex_current;
     MeshVertexSPtr vertex_prev = cell->vertices().back();
-    list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+    std::list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
     while (it_v != cell->vertices().end()) {
         vertex_current = *it_v++;
         if (vertex_current == vertex) {
@@ -403,20 +422,20 @@ MeshCellSPtr SkelMeshGenerator::splitCell(MeshCellSPtr cell,
 
 
 void SkelMeshGenerator::offsetEdges() {
-    list<AbstractEventSPtr>::iterator it_ev = skel_->events().begin();
+    std::list<AbstractEventSPtr>::iterator it_ev = skel_->events().begin();
     while (it_ev != skel_->events().end()) {
         AbstractEventSPtr event = *it_ev++;
         if (event->getType() == AbstractEvent::CONST_OFFSET_EVENT) {
             PolygonSPtr polygon_offset = event->getPolygonResult();
-            list<EdgeSPtr>::iterator it_e = polygon_offset->edges().begin();
+            std::list<EdgeSPtr>::iterator it_e = polygon_offset->edges().begin();
             while (it_e != polygon_offset->edges().end()) {
                 EdgeSPtr edge_offset = *it_e++;
                 SkelVertexDataSPtr data_src =
-                        dynamic_pointer_cast<SkelVertexData>(
+                        std::dynamic_pointer_cast<SkelVertexData>(
                         edge_offset->getVertexSrc()->getData());
                 EdgeSPtr edge_origin = data_src->getArc()->getEdgeRight();
                 MeshEdgeDataSPtr data_origin =
-                        dynamic_pointer_cast<MeshEdgeData>(
+                        std::dynamic_pointer_cast<MeshEdgeData>(
                         edge_origin->getData());
                 data_origin->addEdge(edge_offset);
             }
@@ -426,9 +445,9 @@ void SkelMeshGenerator::offsetEdges() {
 
 void SkelMeshGenerator::splitCellsE(EdgeSPtr edge, double radius_snap) {
     WriteLock l(mesh_result_->mutex());
-    MeshEdgeDataSPtr data = dynamic_pointer_cast<MeshEdgeData>(edge->getData());
-    list<MeshCellSPtr> cells;
-    list<MeshCellWPtr>::iterator it_c = data->cells().begin();
+    MeshEdgeDataSPtr data = std::dynamic_pointer_cast<MeshEdgeData>(edge->getData());
+    std::list<MeshCellSPtr> cells;
+    std::list<MeshCellWPtr>::iterator it_c = data->cells().begin();
     while (it_c != data->cells().end()) {
         MeshCellWPtr cell_wptr = *it_c++;
         if (!cell_wptr.expired()) {
@@ -440,7 +459,7 @@ void SkelMeshGenerator::splitCellsE(EdgeSPtr edge, double radius_snap) {
     while (!cells.empty()) {
         MeshCellSPtr cell = cells.front();
         cells.pop_front();
-        list<EdgeWPtr>::iterator it_e = data->edges().begin();
+        std::list<EdgeWPtr>::iterator it_e = data->edges().begin();
         while (it_e != data->edges().end()) {
             EdgeWPtr edge_wptr = *it_e++;
             if (edge_wptr.expired()) continue;
@@ -462,7 +481,7 @@ MeshCellSPtr SkelMeshGenerator::splitCell(MeshCellSPtr cell, Line2SPtr line,
     MeshVertexSPtr pos_insert_dst;
     MeshVertexSPtr vertex_current;
     MeshVertexSPtr vertex_prev = cell->vertices().back();
-    list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+    std::list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
     while (it_v != cell->vertices().end()) {
         vertex_current = *it_v++;
         Point2SPtr p_src = vertex_prev->getPoint();
@@ -540,7 +559,7 @@ MeshCellSPtr SkelMeshGenerator::splitCell(MeshCellSPtr cell, Line2SPtr line,
 
 void SkelMeshGenerator::mergeAdjTriangles() {
     WriteLock l(mesh_result_->mutex());
-    list<NodeSPtr>::iterator it_n = skel_->nodes().begin();
+    std::list<NodeSPtr>::iterator it_n = skel_->nodes().begin();
     while (it_n != skel_->nodes().end()) {
         NodeSPtr node = *it_n++;
         if (node->degree() > 1) {
@@ -566,11 +585,11 @@ void SkelMeshGenerator::mergeAdjTriangles() {
             }
         }
     }
-    list<MeshCellSPtr>::iterator it_c = mesh_result_->cells().begin();
+    std::list<MeshCellSPtr>::iterator it_c = mesh_result_->cells().begin();
     while (it_c != mesh_result_->cells().end()) {
         MeshCellSPtr cell = *it_c;
         if (cell->vertices().size() == 3) {
-            list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
+            std::list<MeshVertexSPtr>::iterator it_v = cell->vertices().begin();
             while (it_v != cell->vertices().end()) {
                 MeshVertexSPtr vertex = *it_v++;
                 MeshCellSPtr cell_next = cell->next(vertex);
@@ -586,8 +605,8 @@ void SkelMeshGenerator::mergeAdjTriangles() {
 
 void SkelMeshGenerator::mergeVertices() {
     WriteLock l(mesh_result_->mutex());
-    list<MeshVertexSPtr> vertices;
-    map<Point2SPtr, MeshVertexSPtr>::iterator it_mv = mesh_result_->vertices().begin();
+    std::list<MeshVertexSPtr> vertices;
+    std::map<Point2SPtr, MeshVertexSPtr>::iterator it_mv = mesh_result_->vertices().begin();
     while (it_mv != mesh_result_->vertices().end()) {
         MeshVertexSPtr vertex = it_mv->second;
         if (vertex->countCells() == 3) {
@@ -595,10 +614,10 @@ void SkelMeshGenerator::mergeVertices() {
         }
         it_mv++;
     }
-    list<MeshVertexSPtr>::iterator it_v = vertices.begin();
+    std::list<MeshVertexSPtr>::iterator it_v = vertices.begin();
     while (it_v != vertices.end()) {
         MeshVertexSPtr vertex = *it_v;
-        list<MeshCellWPtr>::iterator it_c = vertex->cells().begin();
+        std::list<MeshCellWPtr>::iterator it_c = vertex->cells().begin();
         while (it_c != vertex->cells().end()) {
             MeshCellWPtr cell_wptr = *it_c++;
             if (cell_wptr.expired()) continue;
@@ -621,7 +640,7 @@ void SkelMeshGenerator::run() {
     initCells();
     if (controller_) controller_->wait();
     PolygonSPtr polygon = skel_->getPolygon();
-    list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polygon->edges().begin();
     while (it_e != polygon->edges().end()) {
         EdgeSPtr edge = *it_e++;
         createRays(edge);
@@ -653,8 +672,8 @@ void SkelMeshGenerator::run() {
 }
 
 ThreadSPtr SkelMeshGenerator::startThread() {
-    return ThreadSPtr(new boost::thread(
-            boost::bind(&SkelMeshGenerator::run, this)));
+    return ThreadSPtr(new std::thread(
+            std::bind(&SkelMeshGenerator::run, this)));
 }
 
 MeshSPtr SkelMeshGenerator::getResult() const {

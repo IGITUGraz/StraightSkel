@@ -4,7 +4,9 @@
  * @date   2012-02-08
  */
 
-#include "KernelWrapper.h"
+#include "algo/2d/KernelWrapper.h"
+
+#include <cmath>
 
 namespace algo { namespace _2d {
 

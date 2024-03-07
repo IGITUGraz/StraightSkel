@@ -4,7 +4,21 @@
  * @date   2012-09-26
  */
 
-#include "PolyhedronIntersection.h"
+#include "algo/3d/PolyhedronIntersection.h"
+
+#include "algo/3d/KernelWrapper.h"
+#include "data/2d/Edge.h"
+#include "data/2d/Polygon.h"
+#include "data/2d/skel/SkelEdgeData.h"
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/skel/SkelEdgeData.h"
+#include <cmath>
+#include <limits>
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -42,8 +56,8 @@ EdgeSPtr PolyhedronIntersection::findDst(FacetSPtr facet, EdgeSPtr edge_src,
     Vector3SPtr normal_poly = KernelFactory::createVector3(facet->plane());
     Vector3SPtr dir_req = KernelWrapper::cross(normal_plane, normal_poly);
 
-    double dist_min = numeric_limits<double>::max();
-    list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+    double dist_min = std::numeric_limits<double>::max();
+    std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
     while (it_e != facet->edges().end()) {
         EdgeSPtr edge = *it_e++;
         if (edge == edge_src) {
@@ -71,7 +85,7 @@ FacetSPtr PolyhedronIntersection::intersect(PolyhedronSPtr polyhedron,
     result->setPlane(plane);
 
     EdgeSPtr edge_begin;
-    list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
     while (it_e != polyhedron->edges().end()) {
         EdgeSPtr edge = *it_e++;
         Point3SPtr p = intersect(edge, plane);
@@ -125,12 +139,12 @@ FacetSPtr PolyhedronIntersection::intersect(PolyhedronSPtr polyhedron,
 
 data::_2d::PolygonSPtr PolyhedronIntersection::toWeighted2d(FacetSPtr facet) {
     data::_2d::PolygonSPtr result = facet->toPolygon();
-    list<EdgeSPtr>::iterator it_e = facet->edges().begin();
-    list<data::_2d::EdgeSPtr>::iterator it_e2 = result->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+    std::list<data::_2d::EdgeSPtr>::iterator it_e2 = result->edges().begin();
     while (it_e != facet->edges().end() && it_e2 != result->edges().end()) {
         EdgeSPtr edge = *it_e++;
         data::_2d::EdgeSPtr edge2 = *it_e2++;
-        skel::SkelEdgeDataSPtr data = dynamic_pointer_cast<skel::SkelEdgeData>(
+        skel::SkelEdgeDataSPtr data = std::dynamic_pointer_cast<skel::SkelEdgeData>(
                 edge->getData());
         double angle = KernelWrapper::angle(
                 facet->plane(), data->getFacetOrigin()->plane());

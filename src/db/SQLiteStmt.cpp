@@ -4,7 +4,9 @@
  * @date   2012-01-31
  */
 
-#include "SQLiteStmt.h"
+#include "db/SQLiteStmt.h"
+
+#include <iostream>
 
 namespace db {
 
@@ -24,7 +26,7 @@ bool SQLiteStmt::close() {
     if (stmt_) {
         if (SQLITE_OK == sqlite3_finalize(stmt_)) {
             result = true;
-            stmt_ = NULL;
+            stmt_ = nullptr;
             result_set_ = false;
             result_set_row_ = 0;
         }
@@ -62,7 +64,7 @@ bool SQLiteStmt::bindDouble(int col, double value) {
     return result;
 }
 
-bool SQLiteStmt::bindString(int col, string value) {
+bool SQLiteStmt::bindString(int col, std::string value) {
     bool result = false;
     if (db_ && stmt_) {
         if (SQLITE_OK == sqlite3_bind_text(stmt_, col, value.c_str(), -1, SQLITE_STATIC)) {
@@ -118,8 +120,8 @@ double SQLiteStmt::getDouble(int col) {
     return sqlite3_column_double(stmt_, col);
 }
 
-string SQLiteStmt::getString(int col) {
-    return string((const char*)sqlite3_column_text(stmt_, col));
+std::string SQLiteStmt::getString(int col) {
+    return std::string((const char*)sqlite3_column_text(stmt_, col));
 }
 
 bool SQLiteStmt::reset() {

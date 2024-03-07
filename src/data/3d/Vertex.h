@@ -5,22 +5,15 @@
  */
 
 #ifndef DATA_3D_VERTEX_H
-#define	DATA_3D_VERTEX_H
+#define DATA_3D_VERTEX_H
 
+#include "data/3d/ptrs.h"
 #include <list>
 #include <string>
-#include "debug.h"
-#include "data/3d/ptrs.h"
-#include "data/3d/Edge.h"
-#include "util/StringFactory.h"
 
 namespace data { namespace _3d {
 
-using std::list;
-using std::string;
-using util::StringFactory;
-
-class Vertex : public boost::enable_shared_from_this<Vertex> {
+class Vertex : public std::enable_shared_from_this<Vertex> {
 public:
     virtual ~Vertex();
 
@@ -62,15 +55,15 @@ public:
 
     PolyhedronSPtr getPolyhedron() const;
     void setPolyhedron(PolyhedronSPtr polyhedron);
-    list<VertexSPtr>::iterator getPolyhedronListIt() const;
-    void setPolyhedronListIt(list<VertexSPtr>::iterator list_it);
+    std::list<VertexSPtr>::iterator getPolyhedronListIt() const;
+    void setPolyhedronListIt(std::list<VertexSPtr>::iterator list_it);
 
     VertexDataSPtr getData() const;
     void setData(VertexDataSPtr data);
     bool hasData() const;
 
-    list<EdgeWPtr>& edges();
-    list<FacetWPtr>& facets();
+    std::list<EdgeWPtr>& edges();
+    std::list<FacetWPtr>& facets();
 
     VertexSPtr next(FacetSPtr facet) const;
     VertexSPtr prev(FacetSPtr facet) const;
@@ -100,21 +93,20 @@ public:
      */
     bool isConvex() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Vertex(Point3SPtr point);
     Vertex(const Vertex& vertex);
     Point3SPtr point_;
-    list<EdgeWPtr> edges_;
-    list<FacetWPtr> facets_;
+    std::list<EdgeWPtr> edges_;
+    std::list<FacetWPtr> facets_;
     PolyhedronWPtr polyhedron_;
-    list<VertexSPtr>::iterator polyhedron_list_it_;
+    std::list<VertexSPtr>::iterator polyhedron_list_it_;
     VertexDataSPtr data_;
     int id_;
 };
 
 } }
 
-#endif	/* DATA_3D_VERTEX_H */
-
+#endif /* DATA_3D_VERTEX_H */

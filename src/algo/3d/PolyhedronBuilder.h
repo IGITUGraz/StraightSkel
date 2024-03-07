@@ -5,14 +5,9 @@
  */
 
 #ifndef ALGO_3D_POLYHEDRONBUILDER_H
-#define	ALGO_3D_POLYHEDRONBUILDER_H
+#define ALGO_3D_POLYHEDRONBUILDER_H
 
 #include "data/3d/ptrs.h"
-#include "data/3d/Polyhedron.h"
-#include "data/3d/Facet.h"
-#include "data/3d/Edge.h"
-#include "data/3d/Vertex.h"
-#include "algo/3d/KernelWrapper.h"
 
 namespace algo { namespace _3d {
 
@@ -29,5 +24,5 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_POLYHEDRONBUILDER_H */
+#endif /* ALGO_3D_POLYHEDRONBUILDER_H */
 

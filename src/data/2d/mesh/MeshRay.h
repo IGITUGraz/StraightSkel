@@ -5,16 +5,13 @@
  */
 
 #ifndef DATA_2D_MESH_MESHRAY_H
-#define	DATA_2D_MESH_MESHRAY_H
+#define DATA_2D_MESH_MESHRAY_H
 
-#include <list>
-#include "debug.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/mesh/ptrs.h"
+#include <list>
 
 namespace data { namespace _2d { namespace mesh {
-
-using std::list;
 
 class MeshRay {
 public:
@@ -23,8 +20,8 @@ public:
 
     MeshSPtr getMesh() const;
     void setMesh(MeshSPtr mesh);
-    list<MeshRaySPtr>::iterator getListIt() const;
-    void setListIt(list<MeshRaySPtr>::iterator list_it);
+    std::list<MeshRaySPtr>::iterator getListIt() const;
+    void setListIt(std::list<MeshRaySPtr>::iterator list_it);
 
     EdgeSPtr getEdge() const;
     void setEdge(EdgeSPtr edge);
@@ -36,7 +33,7 @@ public:
 protected:
     MeshRay(EdgeSPtr edge, MeshVertexSPtr src);
     MeshWPtr mesh_;
-    list<MeshRaySPtr>::iterator list_it_;
+    std::list<MeshRaySPtr>::iterator list_it_;
     EdgeSPtr edge_;
     MeshVertexSPtr src_;
     MeshVertexSPtr dst_;
@@ -44,5 +41,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_2D_MESH_MESHRAY_H */
+#endif /* DATA_2D_MESH_MESHRAY_H */
 

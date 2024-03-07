@@ -5,7 +5,7 @@
  */
 
 #ifndef UI_TYPEDEFS_H
-#define	UI_TYPEDEFS_H
+#define UI_TYPEDEFS_H
 
 namespace ui {
 
@@ -21,5 +21,5 @@ typedef double vec4d[4];
 
 }
 
-#endif	/* UI_TYPEDEFS_H */
+#endif /* UI_TYPEDEFS_H */
 

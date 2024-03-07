@@ -4,7 +4,7 @@
  * @date   2013-03-13
  */
 
-#include "SphericalInversionEvent.h"
+#include "data/3d/skel/SphericalInversionEvent.h"
 
 namespace data { namespace _3d { namespace skel {
 

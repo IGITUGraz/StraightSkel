@@ -4,7 +4,12 @@
  * @date   2013-05-06
  */
 
-#include "TriangleEvent.h"
+#include "data/2d/skel/TriangleEvent.h"
+
+#include "data/2d/Vertex.h"
+#include "data/2d/Edge.h"
+#include "data/2d/skel/SkelVertexData.h"
+#include "data/2d/skel/SkelEdgeData.h"
 
 namespace data { namespace _2d { namespace skel {
 

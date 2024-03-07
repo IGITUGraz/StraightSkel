@@ -5,10 +5,9 @@
  */
 
 #ifndef DATA_3D_EDGEDATA_H
-#define	DATA_3D_EDGEDATA_H
+#define DATA_3D_EDGEDATA_H
 
 #include "data/3d/ptrs.h"
-#include "data/3d/Edge.h"
 
 namespace data { namespace _3d {
 
@@ -35,5 +34,5 @@ protected:
 
 } }
 
-#endif	/* DATA_3D_EDGEDATA_H */
+#endif /* DATA_3D_EDGEDATA_H */
 

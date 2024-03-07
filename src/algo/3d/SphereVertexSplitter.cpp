@@ -4,7 +4,30 @@
  * @date   2012-12-20
  */
 
-#include "SphereVertexSplitter.h"
+#include "algo/3d/SphereVertexSplitter.h"
+
+#include "algo/Controller.h"
+#include "algo/3d/KernelWrapper.h"
+#include "algo/3d/AbstractSimpleSphericalSkel.h"
+#include "algo/3d/ProjSimpleSphericalSkel.h"
+#include "algo/3d/RotSimpleSphericalSkel.h"
+#include "algo/3d/TransSimpleSphericalSkel.h"
+#include "algo/3d/SpeedSimpleSphericalSkel.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/CircularVertex.h"
+#include "data/3d/CircularEdge.h"
+#include "data/3d/SphericalPolygon.h"
+#include "data/3d/skel/CircularNode.h"
+#include "data/3d/skel/CircularArc.h"
+#include "data/3d/skel/SkelVertexData.h"
+#include "data/3d/skel/SphericalSkelVertexData.h"
+#include "data/3d/skel/SphericalSkelEdgeData.h"
+#include "util/Configuration.h"
+#include <list>
+#include <map>
 
 namespace algo { namespace _3d {
 
@@ -69,8 +92,8 @@ SphericalPolygonSPtr SphereVertexSplitter::intersectPolyhedron(VertexSPtr vertex
     Sphere3SPtr sphere = KernelFactory::createSphere3(p_center, radius);
     SphericalPolygonSPtr result = SphericalPolygon::create(sphere);
 
-    list<EdgeSPtr> edges;
-    list<EdgeWPtr>::iterator it_ew = vertex->edges().begin();
+    std::list<EdgeSPtr> edges;
+    std::list<EdgeWPtr>::iterator it_ew = vertex->edges().begin();
     while (it_ew != vertex->edges().end()) {
         EdgeWPtr edge_wptr = *it_ew++;
         if (!edge_wptr.expired()) {
@@ -151,7 +174,7 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
     AbstractSimpleSphericalSkelSPtr algo_sphericalskel;
     util::ConfigurationSPtr config = util::Configuration::getInstance();
     if (config->isLoaded()) {
-        string s_algo_sphericalskel = config->getString(
+        std::string s_algo_sphericalskel = config->getString(
                 "algo_3d_SphereVertexSplitter", "algo_sphericalskel");
         if (s_algo_sphericalskel.compare("ProjSimpleSphericalSkel") == 0) {
             algo_sphericalskel = ProjSimpleSphericalSkel::create(polygon, controller_);
@@ -185,11 +208,11 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
     NodeSPtr node_vertex;
     if (vertex->hasData()) {
         skel::SkelVertexDataSPtr data =
-                dynamic_pointer_cast<skel::SkelVertexData>(vertex->getData());
+                std::dynamic_pointer_cast<skel::SkelVertexData>(vertex->getData());
         node_vertex = data->getNode();
     }
-    map<CircularNodeSPtr, VertexSPtr> vertices;
-    list<CircularNodeSPtr>::iterator it_n = sphericalskel->nodes().begin();
+    std::map<CircularNodeSPtr, VertexSPtr> vertices;
+    std::list<CircularNodeSPtr>::iterator it_n = sphericalskel->nodes().begin();
     while (it_n != sphericalskel->nodes().end()) {
         CircularNodeSPtr node = *it_n++;
         if (node->degree() > 1) {
@@ -202,7 +225,7 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
         }
     }
 
-    list<CircularArcSPtr>::iterator it_a = sphericalskel->arcs().begin();
+    std::list<CircularArcSPtr>::iterator it_a = sphericalskel->arcs().begin();
     while (it_a != sphericalskel->arcs().end()) {
         CircularArcSPtr arc = *it_a++;
         CircularNodeSPtr node_src = arc->getNodeSrc();
@@ -210,9 +233,9 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
         CircularEdgeSPtr edge_l = arc->getEdgeLeft();
         CircularEdgeSPtr edge_r = arc->getEdgeRight();
         SphericalSkelEdgeDataSPtr data_l =
-                dynamic_pointer_cast<SphericalSkelEdgeData>(edge_l->getData());
+                std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge_l->getData());
         SphericalSkelEdgeDataSPtr data_r =
-                dynamic_pointer_cast<SphericalSkelEdgeData>(edge_r->getData());
+                std::dynamic_pointer_cast<SphericalSkelEdgeData>(edge_r->getData());
         FacetSPtr facet_l = data_l->getFacetOrigin();
         FacetSPtr facet_r = data_r->getFacetOrigin();
         if (node_src->degree() == 1) {
@@ -220,7 +243,7 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
                 // 2 edges with the same adjacent facets have to be merged
                 EdgeSPtr edge_1;
                 EdgeSPtr edge_2;
-                list<EdgeSPtr>::iterator it_e = facet_l->edges().begin();
+                std::list<EdgeSPtr>::iterator it_e = facet_l->edges().begin();
                 while (it_e != facet_l->edges().end()) {
                     EdgeSPtr edge = *it_e++;
                     if (edge->getFacetL() == facet_r ||
@@ -252,11 +275,11 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
                 polyhedron->removeEdge(edge_2);
             } else {
                 EdgeSPtr edge;
-                list<CircularVertexSPtr>::iterator it_cv = polygon->vertices().begin();
+                std::list<CircularVertexSPtr>::iterator it_cv = polygon->vertices().begin();
                 while (it_cv != polygon->vertices().end()) {
                     CircularVertexSPtr cvertex = *it_cv++;
                     SphericalSkelVertexDataSPtr cvertex_data =
-                            dynamic_pointer_cast<SphericalSkelVertexData>(
+                            std::dynamic_pointer_cast<SphericalSkelVertexData>(
                             cvertex->getData());
                     if (cvertex_data->getNode() == node_src) {
                         edge = cvertex_data->getEdgeOrigin();
@@ -287,7 +310,7 @@ PolyhedronSPtr SphereVertexSplitter::splitVertex(VertexSPtr vertex) {
         }
     }
 
-    list<FacetWPtr>::iterator it_f = vertex->facets().begin();
+    std::list<FacetWPtr>::iterator it_f = vertex->facets().begin();
     while (it_f != vertex->facets().end()) {
         FacetWPtr facet_wptr = *it_f++;
         if (!facet_wptr.expired()) {

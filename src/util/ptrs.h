@@ -5,9 +5,9 @@
  */
 
 #ifndef UTIL_PTRS_H
-#define	UTIL_PTRS_H
+#define UTIL_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 namespace util {
 
@@ -18,5 +18,4 @@ typedef WEAK_PTR<Configuration> ConfigurationWPtr;
 
 }
 
-#endif	/* UTIL_PTRS_H */
-
+#endif /* UTIL_PTRS_H */

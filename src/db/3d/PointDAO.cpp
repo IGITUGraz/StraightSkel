@@ -4,12 +4,15 @@
  * @date   2013-05-24
  */
 
-#include "PointDAO.h"
+#include "db/3d/PointDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
 
 namespace db { namespace _3d {
 
-map<Point3SPtr, int> PointDAO::point_ids_;
-map<int, Point3SPtr> PointDAO::points_;
+std::map<Point3SPtr, int> PointDAO::point_ids_;
+std::map<int, Point3SPtr> PointDAO::points_;
 
 PointDAO::PointDAO() {
     // intentionally does nothing
@@ -20,8 +23,8 @@ PointDAO::~PointDAO() {
     points_.clear();
 }
 
-string PointDAO::getTableSchema() const {
-    string schema("CREATE TABLE Points (\n"
+std::string PointDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Points (\n"
             "  PointID INTEGER PRIMARY KEY,\n"
             "  x REAL,\n"
             "  y REAL,\n"
@@ -33,7 +36,7 @@ string PointDAO::getTableSchema() const {
 int PointDAO::nextPointID() {
     int point_id = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(PointID) FROM Points;");
+    std::string sql("SELECT MAX(PointID) FROM Points;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         point_id = 1;
@@ -49,7 +52,7 @@ int PointDAO::insert(Point3SPtr point) {
     if (!point) {
         return -1;
     }
-    map<Point3SPtr, int>::const_iterator it_p = point_ids_.find(point);
+    std::map<Point3SPtr, int>::const_iterator it_p = point_ids_.find(point);
     if (it_p != point_ids_.end()) {
         result = it_p->second;
         return result;
@@ -57,7 +60,7 @@ int PointDAO::insert(Point3SPtr point) {
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     int point_id = nextPointID();
     if (point_id > 0) {
-        string sql("INSERT INTO Points (PointID, x, y, z) VALUES (?, ?, ?, ?);");
+        std::string sql("INSERT INTO Points (PointID, x, y, z) VALUES (?, ?, ?, ?);");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
             Vector3SPtr vec = KernelFactory::createVector3(point);
@@ -77,13 +80,13 @@ int PointDAO::insert(Point3SPtr point) {
 bool PointDAO::del(Point3SPtr point) {
     bool result = false;
     int point_id = 0;
-    map<Point3SPtr, int>::iterator it_p = point_ids_.find(point);
+    std::map<Point3SPtr, int>::iterator it_p = point_ids_.find(point);
     if (it_p != point_ids_.end()) {
         point_id = it_p->second;
     }
     if (point_id > 0) {
         SQLiteDatabaseSPtr db = DAOFactory::getDB();
-        string sql("DELETE FROM Points WHERE PointID=?;");
+        std::string sql("DELETE FROM Points WHERE PointID=?;");
         SQLiteStmtSPtr stmt = db->prepare(sql);
         if (stmt) {
             stmt->bindInteger(1, point_id);
@@ -99,13 +102,13 @@ bool PointDAO::del(Point3SPtr point) {
 
 Point3SPtr PointDAO::find(int point_id) {
     Point3SPtr result = Point3SPtr();
-    map<int, Point3SPtr>::const_iterator it_p = points_.find(point_id);
+    std::map<int, Point3SPtr>::const_iterator it_p = points_.find(point_id);
     if (it_p != points_.end()) {
         result = it_p->second;
         return result;
     }
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT x, y, z FROM Points WHERE PointID=?;");
+    std::string sql("SELECT x, y, z FROM Points WHERE PointID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, point_id);

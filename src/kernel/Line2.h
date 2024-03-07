@@ -5,10 +5,10 @@
  */
 
 #ifndef LINE2_H
-#define	LINE2_H
+#define LINE2_H
 
-#include "Point2.h"
-#include "Vector2.h"
+#include "kernel/Point2.h"
+#include "kernel/Vector2.h"
 
 namespace kernel {
 
@@ -40,5 +40,5 @@ protected:
 
 }
 
-#endif	/* LINE2_H */
+#endif /* LINE2_H */
 

@@ -1,4 +1,13 @@
-#include "PolyhedronDAO.h"
+#include "db/3d/PolyhedronDAO.h"
+
+#include "db/SQLiteDatabase.h"
+#include "db/SQLiteStmt.h"
+#include "db/3d/VertexDAO.h"
+#include "db/3d/EdgeDAO.h"
+#include "db/3d/FacetDAO.h"
+#include "db/3d/TriangleDAO.h"
+#include "db/3d/PlaneDAO.h"
+#include <map>
 
 namespace db { namespace _3d {
 
@@ -10,8 +19,8 @@ PolyhedronDAO::~PolyhedronDAO() {
     // intentionally does nothing
 }
 
-string PolyhedronDAO::getTableSchema() const {
-    string schema("CREATE TABLE Polyhedrons (\n"
+std::string PolyhedronDAO::getTableSchema() const {
+    std::string schema("CREATE TABLE Polyhedrons (\n"
             "  PolyhedronID INTEGER PRIMARY KEY,\n"
             "  description TEXT,\n"
             "  created INTEGER\n"
@@ -22,7 +31,7 @@ string PolyhedronDAO::getTableSchema() const {
 int PolyhedronDAO::nextPolyhedronID() {
     int polyhedronid = -1;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("SELECT MAX(PolyhedronID) FROM Polyhedrons;");
+    std::string sql("SELECT MAX(PolyhedronID) FROM Polyhedrons;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         polyhedronid = 1;
@@ -37,7 +46,7 @@ int PolyhedronDAO::createPolyhedronID(PolyhedronSPtr polyhedron) {
     int result = -1;
     int polyhedronid = nextPolyhedronID();
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
-    string sql("INSERT INTO Polyhedrons (PolyhedronID, description, created) "
+    std::string sql("INSERT INTO Polyhedrons (PolyhedronID, description, created) "
             "VALUES (?, ?, strftime('%s','now'));");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
@@ -62,7 +71,7 @@ int PolyhedronDAO::insert(PolyhedronSPtr polyhedron) {
     int polyhedronid = createPolyhedronID(polyhedron);
     if (polyhedronid > 0) {
         VertexDAOSPtr dao_vertex = DAOFactory::getVertexDAO();
-        list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
+        std::list<VertexSPtr>::iterator it_v = polyhedron->vertices().begin();
         while (it_v != polyhedron->vertices().end()) {
             VertexSPtr vertex = *it_v++;
             if (vertex->getID() > 0) {
@@ -72,7 +81,7 @@ int PolyhedronDAO::insert(PolyhedronSPtr polyhedron) {
             }
         }
         EdgeDAOSPtr dao_edge = DAOFactory::getEdgeDAO();
-        list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+        std::list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
         while (it_e != polyhedron->edges().end()) {
             EdgeSPtr edge = *it_e++;
             if (edge->getID() > 0) {
@@ -82,7 +91,7 @@ int PolyhedronDAO::insert(PolyhedronSPtr polyhedron) {
             }
         }
         FacetDAOSPtr dao_facet = DAOFactory::getFacetDAO();
-        list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+        std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
         while (it_f != polyhedron->facets().end()) {
             FacetSPtr facet = *it_f++;
             if (facet->getID() > 0) {
@@ -103,7 +112,7 @@ bool PolyhedronDAO::del(PolyhedronSPtr polyhedron) {
     bool result = false;
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     bool trans_started = db->beginTransaction();
-    string sql("DELETE FROM Polyhedrons WHERE PolyhedronID=?;");
+    std::string sql("DELETE FROM Polyhedrons WHERE PolyhedronID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedron->getID());
@@ -147,16 +156,16 @@ PolyhedronSPtr PolyhedronDAO::find(int polyhedronid) {
     SQLiteDatabaseSPtr db = DAOFactory::getDB();
     PlaneDAOSPtr plane_dao = DAOFactory::getPlaneDAO();
     VertexDAOSPtr vertex_dao = DAOFactory::getVertexDAO();
-    string sql("SELECT PolyhedronID, description FROM Polyhedrons WHERE PolyhedronID=?;");
+    std::string sql("SELECT PolyhedronID, description FROM Polyhedrons WHERE PolyhedronID=?;");
     SQLiteStmtSPtr stmt = db->prepare(sql);
     if (stmt) {
         stmt->bindInteger(1, polyhedronid);
         if (stmt->execute() > 0) {
             result = Polyhedron::create();
             result->setID(polyhedronid);
-            string description = stmt->getString(1);
+            std::string description = stmt->getString(1);
             result->setDescription(description);
-            map<int, VertexSPtr> vertices;
+            std::map<int, VertexSPtr> vertices;
             vertices.clear();
             sql = "SELECT VID FROM Vertices WHERE PolyhedronID=? ORDER BY VID ASC;";
             SQLiteStmtSPtr stmt_v = db->prepare(sql);
@@ -171,7 +180,7 @@ PolyhedronSPtr PolyhedronDAO::find(int polyhedronid) {
                 }
                 stmt_v->close();
             }
-            map<int, FacetSPtr> facets;
+            std::map<int, FacetSPtr> facets;
             sql = "SELECT FID, PlaneID FROM Facets WHERE PolyhedronID=?;";
             SQLiteStmtSPtr stmt_p = db->prepare(sql);
             if (stmt_p) {
@@ -239,7 +248,7 @@ PolyhedronSPtr PolyhedronDAO::find(int polyhedronid) {
                 }
                 stmt_e->close();
             }
-            list<FacetSPtr>::iterator it_f = result->facets().begin();
+            std::list<FacetSPtr>::iterator it_f = result->facets().begin();
             while (it_f != result->facets().end()) {
                 FacetSPtr facet = *it_f++;
                 facet->makeFirstConvex();

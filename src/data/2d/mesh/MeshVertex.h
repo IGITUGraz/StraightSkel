@@ -5,21 +5,14 @@
  */
 
 #ifndef DATA_2D_MESH_MESHVERTEX_H
-#define	DATA_2D_MESH_MESHVERTEX_H
+#define DATA_2D_MESH_MESHVERTEX_H
 
-#include <list>
-#include <string>
-#include "debug.h"
-#include "util/StringFactory.h"
 #include "data/2d/ptrs.h"
 #include "data/2d/mesh/ptrs.h"
-#include "data/2d/mesh/MeshCell.h"
+#include <list>
+#include <string>
 
 namespace data { namespace _2d { namespace mesh {
-
-using std::list;
-using std::string;
-using util::StringFactory;
 
 class MeshVertex {
 public:
@@ -40,23 +33,22 @@ public:
     MeshVertexSPtr next(MeshCellSPtr cell) const;
     MeshVertexSPtr prev(MeshCellSPtr cell) const;
 
-    list<MeshCellWPtr>& cells();
+    std::list<MeshCellWPtr>& cells();
 
     unsigned int countCells() const;
 
     double getX() const;
     double getY() const;
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     MeshVertex(Point2SPtr point);
     Point2SPtr point_;
     MeshWPtr mesh_;
-    list<MeshCellWPtr> cells_;
+    std::list<MeshCellWPtr> cells_;
 };
 
 } } }
 
-#endif	/* DATA_2D_MESH_MESHVERTEX_H */
-
+#endif /* DATA_2D_MESH_MESHVERTEX_H */

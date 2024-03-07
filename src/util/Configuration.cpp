@@ -4,7 +4,13 @@
  * @date   2012-10-30
  */
 
-#include "Configuration.h"
+#include "util/Configuration.h"
+
+#include "debug.h"
+#include "util/StringFuncs.h"
+#include <cstdlib>
+#include <fstream>
+#include <set>
 
 namespace util {
 
@@ -25,12 +31,12 @@ ConfigurationSPtr Configuration::getInstance() {
     return instance_;
 }
 
-string Configuration::findDefaultFilename() {
-    string name("StraightSkel");
-    string result = name + ".ini";
-    string home(getenv("HOME"));
-    string sysconfdir("/etc");
-    string filenames[2];
+std::string Configuration::findDefaultFilename() {
+    std::string name("StraightSkel");
+    std::string result = name + ".ini";
+    std::string home(getenv("HOME"));
+    std::string sysconfdir("/etc");
+    std::string filenames[2];
     filenames[0] = home+"/."+name+"/"+name+".ini";
     filenames[1] = sysconfdir+"/"+name+"/"+name+".ini";
     for (unsigned int i = 0; i < 2; i++) {
@@ -46,8 +52,8 @@ string Configuration::findDefaultFilename() {
 
 void Configuration::parse(std::istream& input) {
     properties_.clear();
-    string section;
-    string line;
+    std::string section;
+    std::string line;
     while (std::getline(input, line)) {
         line = StringFuncs::trim(line);
         if (line.empty()) {
@@ -60,11 +66,11 @@ void Configuration::parse(std::istream& input) {
         }
         if (!section.empty()) {
             std::size_t pos = line.find("=");
-            if (pos != string::npos) {
-                string key = StringFuncs::trim(line.substr(0, pos));
-                string value = StringFuncs::trim(
+            if (pos != std::string::npos) {
+                std::string key = StringFuncs::trim(line.substr(0, pos));
+                std::string value = StringFuncs::trim(
                         line.substr(pos+1, line.length()-pos-1));
-                string mapkey = section + "." + key;
+                std::string mapkey = section + "." + key;
                 properties_[mapkey] = value;
             }
         }
@@ -77,7 +83,7 @@ void Configuration::parse(std::istream& input) {
 //    }
 }
 
-bool Configuration::load(const string& filename) {
+bool Configuration::load(const std::string& filename) {
     DEBUG_VAR(filename);
     bool result = false;
     std::ifstream input(filename.c_str());
@@ -96,15 +102,15 @@ bool Configuration::isLoaded() const {
     return result;
 }
 
-bool Configuration::contains(const string& section, const string& key) {
-    string mapkey = section + "." + key;
+bool Configuration::contains(const std::string& section, const std::string& key) {
+    std::string mapkey = section + "." + key;
     bool result = (properties_.find(mapkey) != properties_.end());
     return result;
 }
 
-string Configuration::getString(const string& section, const string& key) {
-    string result;
-    string mapkey = section + "." + key;
+std::string Configuration::getString(const std::string& section, const std::string& key) {
+    std::string result;
+    std::string mapkey = section + "." + key;
     if (properties_.find(mapkey) == properties_.end()) {
         // map does not contain this key
         DEBUG_VAL("key=" << mapkey << " not found.");
@@ -114,27 +120,27 @@ string Configuration::getString(const string& section, const string& key) {
     return result;
 }
 
-int Configuration::getInt(const string& section, const string& key) {
+int Configuration::getInt(const std::string& section, const std::string& key) {
     int result = 0;
-    string value = getString(section, key);
+    std::string value = getString(section, key);
     if (value.length() != 0) {
         result = atoi(value.c_str());
     }
     return result;
 }
 
-double Configuration::getDouble(const string& section, const string& key) {
+double Configuration::getDouble(const std::string& section, const std::string& key) {
     double result = 0.0;
-    string value = getString(section, key);
+    std::string value = getString(section, key);
     if (value.length() != 0) {
         result = atof(value.c_str());
     }
     return result;
 }
 
-bool Configuration::getBool(const string& section, const string& key) {
+bool Configuration::getBool(const std::string& section, const std::string& key) {
     bool result = false;
-    string value = getString(section, key);
+    std::string value = getString(section, key);
     if (value.length() != 0) {
         if (value.compare("1") == 0 ||
                 value.compare("t") == 0 ||

@@ -5,7 +5,7 @@
  */
 
 #ifndef ALGO_3D_KERNELWRAPPER_H
-#define	ALGO_3D_KERNELWRAPPER_H
+#define ALGO_3D_KERNELWRAPPER_H
 
 #include <cmath>
 
@@ -100,5 +100,4 @@ protected:
 
 } }
 
-#endif	/* ALGO_3D_KERNELWRAPPER_H */
-
+#endif /* ALGO_3D_KERNELWRAPPER_H */

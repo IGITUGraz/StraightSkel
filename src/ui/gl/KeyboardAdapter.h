@@ -5,17 +5,13 @@
  */
 
 #ifndef UI_GL_KEYBOARDADAPTER_H
-#define	UI_GL_KEYBOARDADAPTER_H
+#define UI_GL_KEYBOARDADAPTER_H
 
-#include "boost_thread.h"
-#include "debug.h"
-#include "ui/gl/ptrs.h"
-#include "ui/gl/Camera.h"
-#include "ui/gl/MainOpenGLWindow.h"
-#include "util/ptrs.h"
-#include "util/Configuration.h"
+#include "typedefs_thread.h"
 #include "algo/ptrs.h"
-#include "algo/Controller.h"
+#include "util/ptrs.h"
+#include "ui/gl/ptrs.h"
+#include <string>
 
 namespace ui { namespace gl {
 
@@ -31,7 +27,7 @@ public:
     /**
      * special keys (glutSpecialFunc(...)) have negative values
      */
-    int toKey(const string& key);
+    int toKey(const std::string& key);
     void loadConfig(util::ConfigurationSPtr config);
 
     void pressed(int key, int x, int y);
@@ -92,5 +88,4 @@ protected:
 
 } }
 
-#endif	/* UI_GL_KEYBOARDADAPTER_H */
-
+#endif /* UI_GL_KEYBOARDADAPTER_H */

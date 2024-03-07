@@ -4,7 +4,13 @@
  * @date   2012-10-01
  */
 
-#include "AngleVertexSplitter.h"
+#include "algo/3d/AngleVertexSplitter.h"
+
+#include "debug.h"
+#include "algo/3d/KernelWrapper.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Polyhedron.h"
+#include "data/3d/skel/SkelVertexData.h"
 
 namespace algo { namespace _3d {
 
@@ -28,7 +34,7 @@ PolyhedronSPtr AngleVertexSplitter::splitVertex(VertexSPtr vertex) {
     if (vertex->degree() <= 3) {
         return polyhedron;
     }
-    list<VertexSPtr> queue;
+    std::list<VertexSPtr> queue;
     queue.push_back(vertex);
     while (queue.size() > 0) {
         VertexSPtr vertex1 = queue.front();
@@ -38,10 +44,10 @@ PolyhedronSPtr AngleVertexSplitter::splitVertex(VertexSPtr vertex) {
         double angle_min = 2*M_PI;
         FacetSPtr facet_min1;
         FacetSPtr facet_min2;
-        list<FacetWPtr>::iterator it_f1 = vertex1->facets().begin();
+        std::list<FacetWPtr>::iterator it_f1 = vertex1->facets().begin();
         while (it_f1 != vertex1->facets().end()) {
             FacetSPtr facet1 = FacetSPtr(*it_f1++);
-            list<FacetWPtr>::iterator it_f2 = vertex1->facets().begin();
+            std::list<FacetWPtr>::iterator it_f2 = vertex1->facets().begin();
             while (it_f2 != vertex1->facets().end()) {
                 FacetSPtr facet2 = FacetSPtr(*it_f2++);
                 if (facet1 == facet2 ||
@@ -63,7 +69,7 @@ PolyhedronSPtr AngleVertexSplitter::splitVertex(VertexSPtr vertex) {
         // 2. split vertex
         VertexSPtr vertex2 = vertex1->split(facet_min1, facet_min2);
         if (vertex1->hasData()) {
-            SkelVertexDataSPtr data1 = dynamic_pointer_cast<SkelVertexData>(
+            SkelVertexDataSPtr data1 = std::dynamic_pointer_cast<SkelVertexData>(
                     vertex1->getData());
             SkelVertexDataSPtr data2 = SkelVertexData::create(vertex2);
             data2->setNode(data1->getNode());
@@ -82,4 +88,3 @@ PolyhedronSPtr AngleVertexSplitter::splitVertex(VertexSPtr vertex) {
 }
 
 } }
-

@@ -4,7 +4,10 @@
  * @date   2011-11-22
  */
 
-#include "EdgeData.h"
+#include "data/2d/EdgeData.h"
+
+#include "data/2d/Edge.h"
+#include "debug.h"
 
 namespace data { namespace _2d {
 

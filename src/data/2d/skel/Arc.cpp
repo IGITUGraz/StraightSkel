@@ -4,7 +4,12 @@
  * @date   2012-02-02
  */
 
-#include "Arc.h"
+#include "data/2d/skel/Arc.h"
+
+#include "debug.h"
+#include "data/2d/KernelFactory.h"
+#include "data/2d/skel/Node.h"
+#include "util/StringFactory.h"
 
 namespace data { namespace _2d { namespace skel {
 
@@ -50,11 +55,11 @@ void Arc::setNodeSrc(NodeSPtr node_src) {
     this->node_src_ = node_src;
 }
 
-list<ArcWPtr>::iterator Arc::getNodeSrcListIt() const {
+std::list<ArcWPtr>::iterator Arc::getNodeSrcListIt() const {
     return this->node_src_list_it_;
 }
 
-void Arc::setNodeSrcListIt(list<ArcWPtr>::iterator node_src_list_it) {
+void Arc::setNodeSrcListIt(std::list<ArcWPtr>::iterator node_src_list_it) {
     this->node_src_list_it_ = node_src_list_it;
 }
 
@@ -67,11 +72,11 @@ void Arc::setNodeDst(NodeSPtr node_dst) {
     this->node_dst_ = node_dst;
 }
 
-list<ArcWPtr>::iterator Arc::getNodeDstListIt() const {
+std::list<ArcWPtr>::iterator Arc::getNodeDstListIt() const {
     return this->node_dst_list_it_;
 }
 
-void Arc::setNodeDstListIt(list<ArcWPtr>::iterator node_dst_list_it) {
+void Arc::setNodeDstListIt(std::list<ArcWPtr>::iterator node_dst_list_it) {
     this->node_dst_list_it_ = node_dst_list_it;
 }
 
@@ -114,11 +119,11 @@ void Arc::setSkel(StraightSkeletonSPtr skel) {
     this->skel_ = skel;
 }
 
-list<ArcSPtr>::iterator Arc::getListIt() const {
+std::list<ArcSPtr>::iterator Arc::getListIt() const {
     return this->list_it_;
 }
 
-void Arc::setListIt(list<ArcSPtr>::iterator list_it) {
+void Arc::setListIt(std::list<ArcSPtr>::iterator list_it) {
     this->list_it_ = list_it;
 }
 
@@ -150,19 +155,19 @@ bool Arc::hasNodeDst() const {
     return result;
 }
 
-string Arc::toString() const {
-    string result("Arc(");
+std::string Arc::toString() const {
+    std::string result("Arc(");
     if (id_ != -1) {
-        result += "id=" + StringFactory::fromInteger(id_) + ", ";
+        result += "id=" + util::StringFactory::fromInteger(id_) + ", ";
     } else {
-        result += StringFactory::fromPointer(this) + ", ";
+        result += util::StringFactory::fromPointer(this) + ", ";
     }
     result += "src=" + node_src_->toString() + ", ";
     if (node_dst_) {
         result += "dst=" + node_dst_->toString();
     } else {
-        result += "dir=<" + StringFactory::fromDouble((*direction_)[0]) + ", " +
-                StringFactory::fromDouble((*direction_)[1]) + ">";
+        result += "dir=<" + util::StringFactory::fromDouble((*direction_)[0]) + ", " +
+                util::StringFactory::fromDouble((*direction_)[1]) + ">";
     }
     result += ")";
     return result;

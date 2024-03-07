@@ -5,7 +5,7 @@
  */
 
 #ifndef DATA_3D_SKEL_SPHERICALOFFSET_H
-#define	DATA_3D_SKEL_SPHERICALOFFSET_H
+#define DATA_3D_SKEL_SPHERICALOFFSET_H
 
 #include "data/3d/skel/ptrs.h"
 
@@ -32,5 +32,5 @@ protected:
 
 } } }
 
-#endif	/* DATA_3D_SKEL_SPHERICALOFFSET_H */
+#endif /* DATA_3D_SKEL_SPHERICALOFFSET_H */
 

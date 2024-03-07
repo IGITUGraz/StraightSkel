@@ -4,7 +4,10 @@
  * @date   2012-11-30
  */
 
-#include "CircularVertexData.h"
+#include "data/3d/CircularVertexData.h"
+
+#include "debug.h"
+#include "data/3d/CircularVertex.h"
 
 namespace data { namespace _3d {
 

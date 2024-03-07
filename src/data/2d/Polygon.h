@@ -5,22 +5,16 @@
  */
 
 #ifndef DATA_2D_POLYGON_H
-#define	DATA_2D_POLYGON_H
+#define DATA_2D_POLYGON_H
 
+#include "data/2d/ptrs.h"
+#include "typedefs_thread.h"
 #include <list>
 #include <string>
-#include "boost_thread.h"
-#include "data/2d/ptrs.h"
-#include "data/2d/Vertex.h"
-#include "data/2d/Edge.h"
 
 namespace data { namespace _2d {
 
-using std::list;
-using std::string;
-using std::stringstream;
-
-class Polygon : public boost::enable_shared_from_this<Polygon> {
+class Polygon : public std::enable_shared_from_this<Polygon> {
 public:
     virtual ~Polygon();
 
@@ -41,8 +35,8 @@ public:
     void clear();
 
     SharedMutex& mutex();
-    list<VertexSPtr>& vertices();
-    list<EdgeSPtr>& edges();
+    std::list<VertexSPtr>& vertices();
+    std::list<EdgeSPtr>& edges();
 
     int getID() const;
     void setID(int id);
@@ -57,22 +51,21 @@ public:
      */
     int countHoles() const;
 
-    string getDescription() const;
-    void setDescription(string desc);
-    void appendDescription(string desc);
+    std::string getDescription() const;
+    void setDescription(const std::string& desc);
+    void appendDescription(const std::string& desc);
 
-    string toString() const;
+    std::string toString() const;
 
 protected:
     Polygon();
     mutable SharedMutex mutex_;
-    list<VertexSPtr> vertices_;
-    list<EdgeSPtr> edges_;
+    std::list<VertexSPtr> vertices_;
+    std::list<EdgeSPtr> edges_;
     int id_;
-    string description_;
+    std::string description_;
 };
 
 } }
 
-#endif	/* DATA_2D_POLYGON_H */
-
+#endif /* DATA_2D_POLYGON_H */

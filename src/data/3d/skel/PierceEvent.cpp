@@ -4,7 +4,17 @@
  * @date   2012-04-23
  */
 
-#include "PierceEvent.h"
+#include "data/3d/skel/PierceEvent.h"
+
+#include "debug.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/skel/Node.h"
+#include "data/3d/skel/SkelVertexData.h"
+#include "data/3d/skel/SkelEdgeData.h"
+#include "data/3d/skel/SkelFacetData.h"
+#include <list>
 
 namespace data { namespace _3d { namespace skel {
 
@@ -66,7 +76,7 @@ void PierceEvent::setHighlight(bool highlight) {
         SkelFacetData::create(facet_);
     }
     facet_->getData()->setHighlight(highlight);
-    list<EdgeSPtr>::iterator it_e = facet_->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = facet_->edges().begin();
     while (it_e != facet_->edges().end()) {
         EdgeSPtr edge = *it_e++;
         if (!edge->hasData()) {

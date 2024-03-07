@@ -4,7 +4,16 @@
  * @date   2012-07-18
  */
 
-#include "SelfIntersection.h"
+#include "algo/3d/SelfIntersection.h"
+
+#include "data/3d/KernelFactory.h"
+#include "data/3d/Vertex.h"
+#include "data/3d/Edge.h"
+#include "data/3d/Facet.h"
+#include "data/3d/Polyhedron.h"
+#include "algo/3d/KernelWrapper.h"
+#include <limits>
+#include <list>
 
 namespace algo { namespace _3d {
 
@@ -73,10 +82,10 @@ Point3SPtr SelfIntersection::intersectEdges(FacetSPtr facet,
 
 bool SelfIntersection::isSelfIntersectingFacet(FacetSPtr facet) {
     bool result = false;
-    list<EdgeSPtr>::iterator it_e1 = facet->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e1 = facet->edges().begin();
     while (it_e1 != facet->edges().end()) {
         EdgeSPtr edge1 = *it_e1++;
-        list<EdgeSPtr>::iterator it_e2 = it_e1;
+        std::list<EdgeSPtr>::iterator it_e2 = it_e1;
         while (it_e2 != facet->edges().end()) {
             EdgeSPtr edge2 = *it_e2++;
             if (edge1->getVertexSrc() == edge2->getVertexSrc() ||
@@ -99,7 +108,7 @@ bool SelfIntersection::isSelfIntersectingFacet(FacetSPtr facet) {
 
 unsigned int SelfIntersection::hasSelfIntersectingFacets(PolyhedronSPtr polyhedron) {
     unsigned int result = 0;
-    list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+    std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
     while (it_f != polyhedron->facets().end()) {
         FacetSPtr facet = *it_f++;
         if (isSelfIntersectingFacet(facet)) {
@@ -114,7 +123,7 @@ Plane3SPtr SelfIntersection::bisector(FacetSPtr facet, VertexSPtr vertex) {
     Plane3SPtr result;
     EdgeSPtr edge_in;
     EdgeSPtr edge_out;
-    list<EdgeWPtr>::iterator it_e = vertex->edges().begin();
+    std::list<EdgeWPtr>::iterator it_e = vertex->edges().begin();
     while (it_e != vertex->edges().end()) {
         EdgeWPtr edge_wptr = *it_e++;
         if (!edge_wptr.expired()) {
@@ -152,7 +161,7 @@ Plane3SPtr SelfIntersection::bisector(FacetSPtr facet, VertexSPtr vertex) {
 EdgeSPtr SelfIntersection::findNearestEdge(FacetSPtr facet, Point3SPtr point) {
     EdgeSPtr result;
     double dist_min = std::numeric_limits<double>::max();
-    list<EdgeSPtr>::iterator it_e = facet->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e = facet->edges().begin();
     while (it_e != facet->edges().end()) {
         EdgeSPtr edge = *it_e++;
         VertexSPtr vertex_src = edge->src(facet);
@@ -238,10 +247,10 @@ bool SelfIntersection::hasSelfIntersectingSurface(PolyhedronSPtr polyhedron) {
     if (SelfIntersection::hasSelfIntersectingFacets(polyhedron)) {
         result = true;
     } else {
-        list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
+        std::list<FacetSPtr>::iterator it_f = polyhedron->facets().begin();
         while (it_f != polyhedron->facets().end()) {
             FacetSPtr facet = *it_f++;
-            list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
+            std::list<EdgeSPtr>::iterator it_e = polyhedron->edges().begin();
             while (it_e != polyhedron->edges().end()) {
                 EdgeSPtr edge = *it_e++;
                 if (isEdgeInsideFacet(facet, edge, true)) {

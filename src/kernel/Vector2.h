@@ -5,14 +5,9 @@
  */
 
 #ifndef VECTOR2_H
-#define	VECTOR2_H
-
-#include <cmath>
-#include <stdexcept>
+#define VECTOR2_H
 
 namespace kernel {
-
-using std::out_of_range;
 
 class Vector2 {
 public:
@@ -39,5 +34,4 @@ protected:
 
 }
 
-#endif	/* VECTOR2_H */
-
+#endif /* VECTOR2_H */

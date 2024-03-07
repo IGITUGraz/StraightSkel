@@ -4,7 +4,7 @@
  * @date   2011-11-25
  */
 
-#include "KernelFactory.h"
+#include "data/2d/KernelFactory.h"
 
 namespace data { namespace _2d {
 

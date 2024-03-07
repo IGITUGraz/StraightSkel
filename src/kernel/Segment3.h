@@ -5,10 +5,10 @@
  */
 
 #ifndef SEGMENT3_H
-#define	SEGMENT3_H
+#define SEGMENT3_H
 
-#include "Point3.h"
-#include "Line3.h"
+#include "kernel/Point3.h"
+#include "kernel/Line3.h"
 
 namespace kernel {
 
@@ -29,5 +29,5 @@ protected:
 
 }
 
-#endif	/* SEGMENT3_H */
+#endif /* SEGMENT3_H */
 

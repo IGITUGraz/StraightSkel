@@ -5,9 +5,9 @@
  */
 
 #ifndef DATA_3D_SKEL_PTRS_H
-#define	DATA_3D_SKEL_PTRS_H
+#define DATA_3D_SKEL_PTRS_H
 
-#include "boost_ptr.h"
+#include "smarter_ptr.h"
 
 /*
  * forward declare classes
@@ -24,6 +24,7 @@ class Sheet;
 
 class AbstractEvent;
 class ConstOffsetEvent;
+class SaveOffsetEvent;
 class EdgeEvent;
 class EdgeMergeEvent;
 class TriangleEvent;
@@ -78,6 +79,8 @@ typedef SHARED_PTR<AbstractEvent> AbstractEventSPtr;
 typedef WEAK_PTR<AbstractEvent> AbstractEventWPtr;
 typedef SHARED_PTR<ConstOffsetEvent> ConstOffsetEventSPtr;
 typedef WEAK_PTR<ConstOffsetEvent> ConstOffsetEventWPtr;
+typedef SHARED_PTR<SaveOffsetEvent> SaveOffsetEventSPtr;
+typedef WEAK_PTR<SaveOffsetEvent> SaveOffsetEventWPtr;
 typedef SHARED_PTR<EdgeEvent> EdgeEventSPtr;
 typedef WEAK_PTR<EdgeEvent> EdgeEventWPtr;
 typedef SHARED_PTR<EdgeMergeEvent> EdgeMergeEventSPtr;
@@ -156,4 +159,4 @@ typedef WEAK_PTR<SphericalOffset> SphericalOffsetWPtr;
 
 } } }
 
-#endif	/* DATA_3D_SKEL_PTRS_H */
+#endif /* DATA_3D_SKEL_PTRS_H */

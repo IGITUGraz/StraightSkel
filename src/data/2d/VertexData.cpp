@@ -4,7 +4,9 @@
  * @date   2011-11-22
  */
 
-#include "VertexData.h"
+#include "data/2d/VertexData.h"
+
+#include "debug.h"
 
 namespace data { namespace _2d {
 

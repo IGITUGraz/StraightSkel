@@ -4,7 +4,10 @@
  * @date   2011-11-14
  */
 
-#include "Vector2.h"
+#include "kernel/Vector2.h"
+
+#include <cmath>
+#include <stdexcept>
 
 namespace kernel {
 
@@ -31,7 +34,7 @@ Vector2::~Vector2() {
 
 double Vector2::operator[](unsigned int i) const {
     if (i >= 2) {
-        throw out_of_range("Index out of bounds.");
+        throw std::out_of_range("Index out of bounds.");
     }
     return v_[i];
 }

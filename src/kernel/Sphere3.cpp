@@ -4,7 +4,7 @@
  * @date   2012-11-28
  */
 
-#include "Sphere3.h"
+#include "kernel/Sphere3.h"
 
 namespace kernel {
 

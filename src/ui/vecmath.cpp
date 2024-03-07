@@ -4,7 +4,7 @@
  * @date   2013-06-15
  */
 
-#include "vecmath.h"
+#include "ui/vecmath.h"
 
 namespace ui {
 

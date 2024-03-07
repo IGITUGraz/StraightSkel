@@ -4,7 +4,10 @@
  * @date   2013-01-28
  */
 
-#include "SphericalLeaveEvent.h"
+#include "data/3d/skel/SphericalLeaveEvent.h"
+
+#include "data/3d/CircularVertex.h"
+#include "data/3d/skel/SphericalSkelVertexData.h"
 
 namespace data { namespace _3d { namespace skel {
 

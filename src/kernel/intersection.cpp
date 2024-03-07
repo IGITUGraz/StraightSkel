@@ -4,7 +4,9 @@
  * @date   2012-02-25
  */
 
-#include "intersection.h"
+#include "kernel/intersection.h"
+
+#include <cmath>
 
 namespace kernel {
 

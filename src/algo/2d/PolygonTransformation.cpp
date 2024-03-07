@@ -4,7 +4,15 @@
  * @date   2012-09-18
  */
 
-#include "PolygonTransformation.h"
+#include "algo/2d/PolygonTransformation.h"
+
+#include "algo/2d/KernelWrapper.h"
+#include "data/2d/Edge.h"
+#include "data/2d/Vertex.h"
+#include "data/2d/Polygon.h"
+#include "util/StringFactory.h"
+#include <cstdlib>
+#include <list>
 
 namespace algo { namespace _2d {
 
@@ -18,10 +26,10 @@ PolygonTransformation::~PolygonTransformation() {
 
 bool PolygonTransformation::hasParallelLines(PolygonSPtr polygon) {
     bool result = false;
-    list<EdgeSPtr>::iterator it_e1 = polygon->edges().begin();
+    std::list<EdgeSPtr>::iterator it_e1 = polygon->edges().begin();
     while (it_e1 != polygon->edges().end()) {
         EdgeSPtr edge1 = *it_e1++;
-        list<EdgeSPtr>::iterator it_e2 = it_e1;
+        std::list<EdgeSPtr>::iterator it_e2 = it_e1;
         while (it_e2 != polygon->edges().end()) {
             EdgeSPtr edge2 = *it_e2++;
             if (!KernelWrapper::intersection(
@@ -49,7 +57,7 @@ Vector2SPtr PolygonTransformation::randVec(double min, double max) {
 void PolygonTransformation::randMovePoints(PolygonSPtr polygon, double range) {
     // srand(time(NULL));
     srand(0);   // set seed to a const value to reproduce errors
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point2SPtr p = vertex->getPoint();
@@ -59,7 +67,7 @@ void PolygonTransformation::randMovePoints(PolygonSPtr polygon, double range) {
     }
 
     polygon->appendDescription("rand_move_points_range=" +
-            StringFactory::fromDouble(range) + "; ");
+            util::StringFactory::fromDouble(range) + "; ");
 }
 
 
@@ -68,7 +76,7 @@ Point2SPtr PolygonTransformation::boundingBoxMin(PolygonSPtr polygon) {
     for (unsigned int i = 0; i < 2; i++) {
         p_min[i] = std::numeric_limits<double>::max();
     }
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point2SPtr p = vertex->getPoint();
@@ -87,7 +95,7 @@ Point2SPtr PolygonTransformation::boundingBoxMax(PolygonSPtr polygon) {
     for (unsigned int i = 0; i < 2; i++) {
         p_max[i] = -std::numeric_limits<double>::max();
     }
-    list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
+    std::list<VertexSPtr>::iterator it_v = polygon->vertices().begin();
     while (it_v != polygon->vertices().end()) {
         VertexSPtr vertex = *it_v++;
         Point2SPtr p = vertex->getPoint();
