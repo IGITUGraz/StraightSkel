@@ -12,8 +12,6 @@ StraightSkel was written by Gernot Walzl in the years 2011, 2012, 2013.
 
 * C++ Compiler  (of course)
   http://gcc.gnu.org/
-* Boost C++ Libraries
-  http://www.boost.org/
 * CMake build system
   http://www.cmake.org/
 * SQLite
